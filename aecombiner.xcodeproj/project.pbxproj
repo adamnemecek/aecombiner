@@ -407,6 +407,7 @@
 				C5CBBC541B3C0BFA008FB844 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C5CBBC551B3C0BFA008FB844 /* Build configuration list for PBXNativeTarget "aecombinerTests" */ = {
 			isa = XCConfigurationList;
@@ -415,6 +416,7 @@
 				C5CBBC571B3C0BFA008FB844 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
