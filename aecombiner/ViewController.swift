@@ -10,9 +10,11 @@ import Cocoa
 
 class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
 
-    
+    var parametersSet = Set<String>()
     
     @IBOutlet weak var tableViewCSVdata: NSTableView!
+    @IBOutlet weak var tableViewHeaders: NSTableView!
+    @IBOutlet weak var tableViewSetOfParameters: NSTableView!
     
     
     
@@ -28,6 +30,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         // Update the view, if already loaded.
             self.columnsClearAndRebuild()
             self.tableViewCSVdata.reloadData()
+            self.tableViewHeaders.reloadData()
             
             
         }
@@ -51,22 +54,67 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
 
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        return (self.representedObject as! CSVdata).csvData.count
+        if tableView.identifier != nil
+        {
+            switch tableView.identifier!
+            {
+            case "tableViewCSVdata":
+                return (self.representedObject as! CSVdata).csvData.count
+            case "tableViewHeaders":
+                return (self.representedObject as! CSVdata).headers.count
+                
+                
+            default:
+                return 0
+            }
+        }
+        return 0
     }
     
     func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
-        var cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
-        
-        // Set the stringValue of the cell's text field to the nameArray value at row
-        let colIndex = tableView.columnWithIdentifier(tableColumn?.identifier)
-        cellView.textField!.stringValue = (self.representedObject as! CSVdata).csvData[row][colIndex]
+        var cellView = NSTableCellView()
+        if tableView.identifier != nil
+        {
+            switch tableView.identifier!
+            {
+            case "tableViewCSVdata":
+                cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
+                // Set the stringValue of the cell's text field to the nameArray value at row
+                let colIndex = tableView.columnWithIdentifier(tableColumn?.identifier)
+                cellView.textField!.stringValue = (self.representedObject as! CSVdata).csvData[row][colIndex]
+            case "tableViewHeaders":
+                cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
+                cellView.textField!.stringValue = (self.representedObject as! CSVdata).headers[row]
+                
+            default:
+                break;
+            }
+        }
         
         // Return the cellView
         return cellView;
-
     }
     
+    func tableViewSelectionDidChange(notification: NSNotification) {
+        let tableView = notification.object as! NSTableView
+        switch tableView.identifier!
+        {
+        case "tableViewHeaders":
+            var params = self.extractParametersIntoSetFromColumnWithHeading("")
+        default:
+            break;
+        }
+        
+    }
+    
+    func extractParametersIntoSetFromColumnWithHeading(heading: String) -> Set<String>
+    {
+        var set = Set<String>()
+        
+        return set
+        
+    }
 }
 
