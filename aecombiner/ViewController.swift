@@ -10,15 +10,38 @@ import Cocoa
 
 class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
 
-    var parametersSet = Set<String>()
+    // MARK: - class vars
+
+    var parametersArray = [[String]]()
+
+    // MARK: - class constants
+    let kParametersTableParametersColumnIndex = 0
+    let kParametersTableParametersValuesColumnIndex = 1
+    let kParametersArrayParametersIndex = 0
+    let kParametersArrayParametersValueIndex = 1
     
+    // MARK: - @IBOutlet
+
     @IBOutlet weak var tableViewCSVdata: NSTableView!
     @IBOutlet weak var tableViewHeaders: NSTableView!
     @IBOutlet weak var tableViewSetOfParameters: NSTableView!
     
     
+    // MARK: - @IBAction - First Responder
+    @IBAction func extractParameters(sender: AnyObject) {
+        //called from Process menu
+        let row = self.tableViewHeaders.selectedRow
+        if row >= 0 && row < (self.representedObject as! CSVdata).headers.count
+        {
+            self.extractParametersIntoSetFromColumn(row)
+            self.tableViewSetOfParameters.reloadData()
+        }
+    }
     
+
     
+    // MARK: - overrides
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -35,6 +58,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             
         }
     }
+
+    // MARK: - CSV data table
 
     func columnsClearAndRebuild(){
         
@@ -53,6 +78,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
 
     }
 
+    // MARK: - TableView overrides
+
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         if tableView.identifier != nil
         {
@@ -62,7 +89,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 return (self.representedObject as! CSVdata).csvData.count
             case "tableViewHeaders":
                 return (self.representedObject as! CSVdata).headers.count
-                
+            case "tableViewSetOfParameters":
+                return self.parametersArray.count
                 
             default:
                 return 0
@@ -87,6 +115,18 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             case "tableViewHeaders":
                 cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
                 cellView.textField!.stringValue = (self.representedObject as! CSVdata).headers[row]
+            case "tableViewSetOfParameters":
+                switch tableView.columnWithIdentifier(tableColumn!.identifier)
+                {
+                case kParametersTableParametersColumnIndex://parameters
+                    cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
+                    cellView.textField!.stringValue = self.parametersArray[row][kParametersArrayParametersIndex]
+                case kParametersTableParametersValuesColumnIndex://parameters
+                    cellView = tableView.makeViewWithIdentifier("parametersValueCell", owner: self) as! NSTableCellView
+                    cellView.textField!.stringValue = self.parametersArray[row][kParametersArrayParametersValueIndex]
+                default:
+                    break
+                }
                 
             default:
                 break;
@@ -96,25 +136,45 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         // Return the cellView
         return cellView;
     }
+ 
     
     func tableViewSelectionDidChange(notification: NSNotification) {
         let tableView = notification.object as! NSTableView
         switch tableView.identifier!
         {
         case "tableViewHeaders":
-            var params = self.extractParametersIntoSetFromColumnWithHeading("")
+            self.parametersArray = [[String]]()
+            self.tableViewSetOfParameters.reloadData()
+
         default:
             break;
         }
         
     }
     
-    func extractParametersIntoSetFromColumnWithHeading(heading: String) -> Set<String>
+    
+    
+    // MARK: - Column parameters
+
+    func extractParametersIntoSetFromColumn(columnIndex: Int)
     {
         var set = Set<String>()
-        
-        return set
-        
+        for parameter in (self.representedObject as! CSVdata).csvData
+        {
+            // parameter is a [string] array of row columns
+            set.insert(parameter[columnIndex])
+        }
+        if set.count > 0
+        {
+            let subArray = Array(set)
+            //clear the parameters array
+            self.parametersArray = [[String]]()
+           for var row = 0; row<subArray.count; row++
+            {
+                self.parametersArray.append([subArray[row],"\(row)"])
+            }
+
+        }
     }
 }
 
