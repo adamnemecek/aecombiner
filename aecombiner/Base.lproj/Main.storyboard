@@ -758,7 +758,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView identifier="tableViewHeaders" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="EPe-sx-YiS" viewBased="YES" id="iox-zj-bfs" userLabel="Table View Headers">
-                                            <rect key="frame" x="0.0" y="0.0" width="148" height="0.0"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="230" height="0.0"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -830,7 +830,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView identifier="tableViewSetOfParameters" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="evc-Mc-ggu" viewBased="YES" id="UMZ-uz-X3z" userLabel="Table View Set Parameters">
-                                            <rect key="frame" x="0.0" y="0.0" width="188" height="0.0"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="436" height="0.0"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -892,7 +892,7 @@
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="ePC-kO-Xy4">
                                                                     <rect key="frame" x="0.0" y="0.0" width="39" height="17"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Table View Cell" id="wBR-Dd-lib">
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="center" title="Table View Cell" id="wBR-Dd-lib">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -945,6 +945,16 @@
                                     <action selector="extractParameters:" target="5gI-5U-AMq" id="ehs-Qm-nC3"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sJa-48-Gnf">
+                                <rect key="frame" x="528" y="48" width="176" height="32"/>
+                                <buttonCell key="cell" type="push" title="Add Column Recoded" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7gB-6v-Rns">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="recodeParametersAndAddNewColumn:" target="5gI-5U-AMq" id="3DT-Q6-BNG"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="top" secondItem="ERx-hH-rdd" secondAttribute="top" constant="178" id="7hP-2e-XQE"/>
@@ -956,6 +966,8 @@
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="top" secondItem="hNa-4k-z6y" secondAttribute="bottom" constant="8" symbolic="YES" id="Rak-IW-rsu"/>
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="top" secondItem="6CL-vK-1qL" secondAttribute="top" id="VwV-hq-TpV"/>
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="leading" secondItem="jT4-bN-qpR" secondAttribute="leading" id="W9L-on-nii"/>
+                            <constraint firstItem="sJa-48-Gnf" firstAttribute="trailing" secondItem="6CL-vK-1qL" secondAttribute="trailing" id="XQO-WH-gzK"/>
+                            <constraint firstItem="sJa-48-Gnf" firstAttribute="centerY" secondItem="jT4-bN-qpR" secondAttribute="centerY" id="ZLX-c9-DXz"/>
                             <constraint firstItem="jT4-bN-qpR" firstAttribute="top" secondItem="tDb-cQ-99h" secondAttribute="bottom" constant="5" id="d3S-fW-mfo"/>
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="leading" secondItem="hNa-4k-z6y" secondAttribute="leading" id="eS6-tW-4zb"/>
                             <constraint firstAttribute="bottom" secondItem="6CL-vK-1qL" secondAttribute="bottom" constant="85" id="fb9-m6-Udk"/>

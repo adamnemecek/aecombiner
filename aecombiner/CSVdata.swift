@@ -19,26 +19,19 @@ class CSVdata {
     var headers = [String]()
     var csvData = [[String]]()
     var columnsCount:Int = 0
+    var processedDataOK = false
     
-    
-    func processCSVtoData() -> NSData?
+    init()
     {
-        var tempArray = [String]()
-        for var row = 0; row<self.csvData.count; row++
-        {
-            let rowString = commaDelimiter.join(self.csvData[row])
-            tempArray.append(rowString)
-        }
-        tempArray.insert(commaDelimiter.join(self.headers), atIndex: 0)
-        let fileString = carriageReturn.join(tempArray)
-        return fileString.dataUsingEncoding(NSUTF8StringEncoding)
+        self.headers = [String]()
+        self.csvData = [[String]]()
+        self.columnsCount = 0
+        self.processedDataOK = false
     }
     
-    
-    class func processCSVfileToData(data: NSData) -> (noErrors:Bool, dataModel:CSVdata)
+    convenience init (data: NSData)
     {
-        var dataModel = CSVdata()
-        var processedOK = false
+        self.init()
         var dataAsString = NSString(data: data, encoding: NSUTF8StringEncoding)
         var arrayOfRowArrays = [[String]]()
         if dataAsString != nil
@@ -66,14 +59,26 @@ class CSVdata {
             })
             if arrayOfRowArrays.count > 0
             {
-                dataModel.headers = arrayOfRowArrays[0]
-                dataModel.columnsCount = arrayOfRowArrays[0].count
+                self.headers = arrayOfRowArrays[0]
+                self.columnsCount = arrayOfRowArrays[0].count
                 arrayOfRowArrays.removeAtIndex(0)
-                dataModel.csvData = arrayOfRowArrays
-                processedOK = true
+                self.csvData = arrayOfRowArrays
+                self.processedDataOK = true
             }
         }
-        return (processedOK, dataModel)
+    }
+    
+    func processCSVtoData() -> NSData?
+    {
+        var tempArray = [String]()
+        for var row = 0; row<self.csvData.count; row++
+        {
+            let rowString = commaDelimiter.join(self.csvData[row])
+            tempArray.append(rowString)
+        }
+        tempArray.insert(commaDelimiter.join(self.headers), atIndex: 0)
+        let fileString = carriageReturn.join(tempArray)
+        return fileString.dataUsingEncoding(NSUTF8StringEncoding)
     }
 
 }

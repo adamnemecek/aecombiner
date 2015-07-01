@@ -27,7 +27,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     @IBOutlet weak var tableViewSetOfParameters: NSTableView!
     
     
-    // MARK: - @IBAction - First Responder
+    // MARK: - @IBAction
     @IBAction func extractParameters(sender: AnyObject) {
         //called from Process menu
         let row = self.tableViewHeaders.selectedRow
@@ -39,6 +39,16 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
 
+    @IBAction func recodeParametersAndAddNewColumn(sender: AnyObject) {
+        let row = self.tableViewHeaders.selectedRow
+        if row >= 0 && row < (self.representedObject as! CSVdata).headers.count
+        {
+
+            self.tableViewHeaders.reloadData()
+            self.tableViewCSVdata.reloadData()
+        }
+
+    }
     
     // MARK: - overrides
 

@@ -59,12 +59,8 @@ class Document: NSDocument {
         switch typeName
         {
         case "csvFile":
-            let processedOK = CSVdata.processCSVfileToData(data)
-            if processedOK.noErrors
-            {
-                self.csvDataModel = processedOK.dataModel
-            }
-            return processedOK.noErrors
+            self.csvDataModel = CSVdata(data: data)
+            return self.csvDataModel.processedDataOK
         default:
             return false
         }
