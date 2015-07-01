@@ -12,12 +12,28 @@ let quotationMarks = "\""
 let quotationMarksReplacement = ""
 let commaReplacement = "‚"//,
 let commaDelimiter = ","
+let carriageReturn = "\n"
 
 class CSVdata {
 
     var headers = [String]()
     var csvData = [[String]]()
     var columnsCount:Int = 0
+    
+    
+    func processCSVtoData() -> NSData?
+    {
+        var tempArray = [String]()
+        for var row = 0; row<self.csvData.count; row++
+        {
+            let rowString = commaDelimiter.join(self.csvData[row])
+            tempArray.append(rowString)
+        }
+        tempArray.insert(commaDelimiter.join(self.headers), atIndex: 0)
+        let fileString = carriageReturn.join(tempArray)
+        return fileString.dataUsingEncoding(NSUTF8StringEncoding)
+    }
+    
     
     class func processCSVfileToData(data: NSData) -> (noErrors:Bool, dataModel:CSVdata)
     {

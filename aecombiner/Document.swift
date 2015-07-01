@@ -12,7 +12,7 @@ import Cocoa
 
 class Document: NSDocument {
 
-    var cvsDataModel = CSVdata()
+    var csvDataModel = CSVdata()
     
     
     override init() {
@@ -35,14 +35,20 @@ class Document: NSDocument {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)!
         let windowController = storyboard.instantiateControllerWithIdentifier("Document Window Controller") as! NSWindowController
         self.addWindowController(windowController)
-        windowController.window?.contentViewController?.representedObject = self.cvsDataModel
+        windowController.window?.contentViewController?.representedObject = self.csvDataModel
     }
 
     override func dataOfType(typeName: String, error outError: NSErrorPointer) -> NSData? {
         // Insert code here to write your document to data of the specified type. If outError != nil, ensure that you create and set an appropriate error when returning nil.
         // You can also choose to override fileWrapperOfType:error:, writeToURL:ofType:error:, or writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
         outError.memory = NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
-        return nil
+        switch typeName
+        {
+        case "csvFile":
+            return self.csvDataModel.processCSVtoData()
+        default:
+            return nil
+        }
     }
 
     override func readFromData(data: NSData, ofType typeName: String, error outError: NSErrorPointer) -> Bool {
@@ -56,7 +62,7 @@ class Document: NSDocument {
             let processedOK = CSVdata.processCSVfileToData(data)
             if processedOK.noErrors
             {
-                self.cvsDataModel = processedOK.dataModel
+                self.csvDataModel = processedOK.dataModel
             }
             return processedOK.noErrors
         default:
