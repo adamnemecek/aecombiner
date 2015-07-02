@@ -13,6 +13,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     // MARK: - class vars
 
     var parametersArray = [[String]]()
+    var parametersDictionary = [String : String]()
 
     // MARK: - class constants
     let kParametersTableParametersColumnIndex = 0
@@ -198,6 +199,13 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                     self.parametersArray.append([subArray[row],"0"])
                 }
             }
+            //clear then build the parametersDICTIONARY
+            self.parametersDictionary = [String : String]()
+            for param in parametersArray // [s,s]
+            {
+                self.parametersDictionary[param[0]] = param[1]
+                println(self.parametersDictionary)
+            }
             self.tableViewSetOfParameters.reloadData()
         }
     }
@@ -217,6 +225,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             for var r = 0; r<(self.representedObject as! CSVdata).csvData.count; r++
             {
                 var rowArray = (self.representedObject as! CSVdata).csvData[r]
+                ADD CORRECT PARAMETER AFTER LOOKUP
+                
                 rowArray.append("*")
                 (self.representedObject as! CSVdata).csvData[r] = rowArray
             }
@@ -227,7 +237,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             self.tableViewCSVdata.reloadData()
             self.documentMakeDirty()
         }
-        
     }
 
 }
