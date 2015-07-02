@@ -669,7 +669,7 @@
                 </windowController>
                 <customObject id="6f7-a7-6o1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="250"/>
+            <point key="canvasLocation" x="194" y="256"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -955,6 +955,14 @@
                                     <action selector="recodeParametersAndAddNewColumn:" target="5gI-5U-AMq" id="3DT-Q6-BNG"/>
                                 </connections>
                             </button>
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2Mv-n5-pTT">
+                                <rect key="frame" x="260" y="54" width="266" height="22"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="AdP-yq-shh">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="top" secondItem="ERx-hH-rdd" secondAttribute="top" constant="178" id="7hP-2e-XQE"/>
@@ -962,6 +970,7 @@
                             <constraint firstAttribute="bottom" secondItem="jT4-bN-qpR" secondAttribute="bottom" constant="51" id="IIY-7O-igu"/>
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="bottom" secondItem="6CL-vK-1qL" secondAttribute="bottom" id="P2C-ox-tYs"/>
                             <constraint firstItem="hNa-4k-z6y" firstAttribute="leading" secondItem="ERx-hH-rdd" secondAttribute="leading" constant="20" symbolic="YES" id="QZ2-2k-WRe"/>
+                            <constraint firstItem="sJa-48-Gnf" firstAttribute="leading" secondItem="2Mv-n5-pTT" secondAttribute="trailing" constant="8" symbolic="YES" id="Qgn-vL-mA7"/>
                             <constraint firstItem="6CL-vK-1qL" firstAttribute="trailing" secondItem="hNa-4k-z6y" secondAttribute="trailing" id="R4O-n8-h4o"/>
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="top" secondItem="hNa-4k-z6y" secondAttribute="bottom" constant="8" symbolic="YES" id="Rak-IW-rsu"/>
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="top" secondItem="6CL-vK-1qL" secondAttribute="top" id="VwV-hq-TpV"/>
@@ -972,19 +981,22 @@
                             <constraint firstItem="tDb-cQ-99h" firstAttribute="leading" secondItem="hNa-4k-z6y" secondAttribute="leading" id="eS6-tW-4zb"/>
                             <constraint firstAttribute="bottom" secondItem="6CL-vK-1qL" secondAttribute="bottom" constant="85" id="fb9-m6-Udk"/>
                             <constraint firstItem="6CL-vK-1qL" firstAttribute="leading" secondItem="tDb-cQ-99h" secondAttribute="trailing" constant="8" symbolic="YES" id="nJw-d4-3EG"/>
+                            <constraint firstItem="2Mv-n5-pTT" firstAttribute="leading" secondItem="6CL-vK-1qL" secondAttribute="leading" id="nhW-1D-Guc"/>
                             <constraint firstAttribute="trailing" secondItem="hNa-4k-z6y" secondAttribute="trailing" constant="20" symbolic="YES" id="oBJ-UJ-j0N"/>
                             <constraint firstItem="hNa-4k-z6y" firstAttribute="top" secondItem="ERx-hH-rdd" secondAttribute="top" id="pC0-3l-Die"/>
+                            <constraint firstItem="2Mv-n5-pTT" firstAttribute="top" secondItem="sJa-48-Gnf" secondAttribute="top" id="pGw-qX-ARw"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="tableViewCSVdata" destination="3Rq-rt-l8C" id="2O2-Jh-bn0"/>
                         <outlet property="tableViewHeaders" destination="iox-zj-bfs" id="RgM-5E-a52"/>
                         <outlet property="tableViewSetOfParameters" destination="UMZ-uz-X3z" id="OTo-GV-iah"/>
+                        <outlet property="textFieldColumnRecodedName" destination="2Mv-n5-pTT" id="rin-ZX-kd8"/>
                     </connections>
                 </viewController>
                 <customObject id="2Tp-Fl-jBw" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="194" y="655"/>
+            <point key="canvasLocation" x="194" y="747"/>
         </scene>
     </scenes>
 </document>

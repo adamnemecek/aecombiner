@@ -19,36 +19,36 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     let kParametersTableParametersValuesColumnIndex = 1
     let kParametersArrayParametersIndex = 0
     let kParametersArrayParametersValueIndex = 1
+    let kStringEmpty = "- Empty -"
+    let kStringRecodedColumnNameSuffix = "_#_"
+    
     
     // MARK: - @IBOutlet
 
     @IBOutlet weak var tableViewCSVdata: NSTableView!
     @IBOutlet weak var tableViewHeaders: NSTableView!
     @IBOutlet weak var tableViewSetOfParameters: NSTableView!
+    @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
     
     // MARK: - @IBAction
     @IBAction func extractParameters(sender: AnyObject) {
         //called from Process menu
-        let row = self.tableViewHeaders.selectedRow
-        if row >= 0 && row < (self.representedObject as! CSVdata).headers.count
-        {
-            self.extractParametersIntoSetFromColumn(row)
-            self.tableViewSetOfParameters.reloadData()
-        }
+        self.extractParametersIntoSetFromColumn()
     }
     
 
     @IBAction func recodeParametersAndAddNewColumn(sender: AnyObject) {
-        let row = self.tableViewHeaders.selectedRow
-        if row >= 0 && row < (self.representedObject as! CSVdata).headers.count
-        {
-
-            self.tableViewHeaders.reloadData()
-            self.tableViewCSVdata.reloadData()
-        }
-
+        self.doTheRecodeParametersAndAddNewColumn()
     }
+    
+    
+    // MARK: - Document
+    func documentMakeDirty()
+    {
+        ((self.view.window?.windowController() as? NSWindowController)?.document as? Document)?.updateChangeCount(.ChangeDone)
+    }
+    
     
     // MARK: - overrides
 
@@ -155,7 +155,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         case "tableViewHeaders":
             self.parametersArray = [[String]]()
             self.tableViewSetOfParameters.reloadData()
-
+            self.textFieldColumnRecodedName.stringValue = ""
         default:
             break;
         }
@@ -166,25 +166,69 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     // MARK: - Column parameters
 
-    func extractParametersIntoSetFromColumn(columnIndex: Int)
+    func extractParametersIntoSetFromColumn()
     {
-        var set = Set<String>()
-        for parameter in (self.representedObject as! CSVdata).csvData
+        //called from Process menu
+        let columnIndex = self.tableViewHeaders.selectedRow
+        if columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
         {
-            // parameter is a [string] array of row columns
-            set.insert(parameter[columnIndex])
-        }
-        if set.count > 0
-        {
-            let subArray = Array(set)
-            //clear the parameters array
-            self.parametersArray = [[String]]()
-           for var row = 0; row<subArray.count; row++
+            var set = Set<String>()
+            self.textFieldColumnRecodedName.stringValue = (self.representedObject as! CSVdata).headers[columnIndex]+kStringRecodedColumnNameSuffix
+            
+            for parameter in (self.representedObject as! CSVdata).csvData
             {
-                self.parametersArray.append([subArray[row],"\(row)"])
+                // parameter is a [string] array of row columns
+                set.insert(parameter[columnIndex])
             }
-
+            if set.count > 0
+            {
+                var subArray = Array(set)
+                // replace blanks with string
+                for var c=0;c < subArray.count; c++
+                {
+                    if count(subArray[c]) == 0
+                    {
+                        subArray[c] = kStringEmpty
+                    }
+                }
+                //clear the parameters array
+                self.parametersArray = [[String]]()
+                for var row = 0; row<subArray.count; row++
+                {
+                    self.parametersArray.append([subArray[row],"0"])
+                }
+            }
+            self.tableViewSetOfParameters.reloadData()
         }
     }
+    
+    func doTheRecodeParametersAndAddNewColumn()
+    {
+        if self.parametersArray.count > 0
+        {
+            let s = self.textFieldColumnRecodedName.stringValue
+            if self.textFieldColumnRecodedName.stringValue == ""
+            {
+                self.textFieldColumnRecodedName.stringValue = "Recoded"
+            }
+            (self.representedObject as! CSVdata).headers.append(self.textFieldColumnRecodedName.stringValue)
+            (self.representedObject as! CSVdata).columnsCount++
+            // must add the column to Array BEFORE adding column to table
+            for var r = 0; r<(self.representedObject as! CSVdata).csvData.count; r++
+            {
+                var rowArray = (self.representedObject as! CSVdata).csvData[r]
+                rowArray.append("*")
+                (self.representedObject as! CSVdata).csvData[r] = rowArray
+            }
+            //Safe to add column to table now
+            var col = NSTableColumn(identifier: self.textFieldColumnRecodedName.stringValue)
+            col.title = self.textFieldColumnRecodedName.stringValue
+            self.tableViewCSVdata.addTableColumn(col)
+            self.tableViewCSVdata.reloadData()
+            self.documentMakeDirty()
+        }
+        
+    }
+
 }
 
