@@ -32,7 +32,7 @@ class CSVdata {
     convenience init (data: NSData)
     {
         self.init()
-        let dataAsString = NSString(data: data, encoding: NSUTF8StringEncoding)
+        var dataAsString = NSString(data: data, encoding: NSUTF8StringEncoding)
         var arrayOfRowArrays = [[String]]()
         if dataAsString != nil
         {
