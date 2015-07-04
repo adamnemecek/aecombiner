@@ -9,11 +9,11 @@
 import Cocoa
 
 class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+    
 
     // MARK: - class vars
 
     var parametersArray = [[String]]()
-    var parametersDictionary = [String : String]()
 
     // MARK: - class constants
     let kParametersTableParametersColumnIndex = 0
@@ -23,6 +23,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     let kStringEmpty = "- Empty -"
     let kStringRecodedColumnNameSuffix = "_#_"
     
+    override func controlTextDidEndEditing(obj: NSNotification) {
+        print(obj, appendNewline: true)
+    }
     
     // MARK: - @IBOutlet
 
@@ -61,6 +64,10 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.representedObject = CSVdata()
+        //let nc = NSNotificationCenter.defaultCenter()
+        //nc.addObserver(self, selector: Selector("editingDidEnd:"), name: NSControlTextDidEndEditingNotification, object: nil)
+        //NSNotificationCenter.defaultCenter().addObserver(self selector:@selector(editingDidEnd:) name:NSControlTextDidEndEditingNotification object:nil)
+
     }
 
     override var representedObject: AnyObject? {
@@ -75,7 +82,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
 
     // MARK: - CSV data table
-
+    
     func columnsClearAndRebuild(){
         
         while self.tableViewCSVdata.tableColumns.count > 0
@@ -94,6 +101,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
 
     // MARK: - TableView overrides
+
 
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         if tableView.identifier != nil
@@ -168,7 +176,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     
-    
     // MARK: - Column parameters
 
     func extractParametersIntoSetFromColumn()
@@ -203,13 +210,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                     self.parametersArray.append([subArray[row],"0"])
                 }
             }
-            //clear then build the parametersDICTIONARY
-            self.parametersDictionary = [String : String]()
-            for param in parametersArray // [s,s]
-            {
-                self.parametersDictionary[param[0]] = param[1]
-                print(self.parametersDictionary)
-            }
             self.tableViewSetOfParameters.reloadData()
         }
     }
@@ -218,12 +218,23 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     {
         if self.parametersArray.count > 0
         {
+            //give a name
             if self.textFieldColumnRecodedName.stringValue == ""
             {
                 self.textFieldColumnRecodedName.stringValue = "Recoded"
             }
+            //add name to headers array
             (self.representedObject as! CSVdata).headers.append(self.textFieldColumnRecodedName.stringValue)
+            //add a column to the count
             (self.representedObject as! CSVdata).columnsCount++
+            
+            //make a temporary dictionary
+            var paramsDict = [String : String]()
+            for paramNameAndValueArray in self.parametersArray
+            {
+                paramsDict[paramNameAndValueArray[0]] = paramNameAndValueArray[1]
+            }
+            
             // must add the column to Array BEFORE adding column to table
             for var r = 0; r<(self.representedObject as! CSVdata).csvData.count; r++
             {
@@ -237,6 +248,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             let col = NSTableColumn(identifier: self.textFieldColumnRecodedName.stringValue)
             col.title = self.textFieldColumnRecodedName.stringValue
             self.tableViewCSVdata.addTableColumn(col)
+            
+            //reload etc
             self.tableViewCSVdata.reloadData()
             self.documentMakeDirty()
         }
