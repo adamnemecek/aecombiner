@@ -23,9 +23,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     let kStringEmpty = "- Empty -"
     let kStringRecodedColumnNameSuffix = "_#_"
     
-    override func controlTextDidEndEditing(obj: NSNotification) {
-        print(obj, appendNewline: true)
-    }
     
     // MARK: - @IBOutlet
 
@@ -102,6 +99,28 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
 
     // MARK: - TableView overrides
 
+    func control(control: NSControl, textShouldEndEditing fieldEditor: NSText) -> Bool {
+        guard let ident = control.identifier else {
+            return true
+        }
+        switch ident
+        {
+        case "parametersValueCell":
+            guard control.tag < self.parametersArray.count,
+            let str = fieldEditor.string else
+            {
+                break
+            }
+            self.parametersArray[control.tag][1] = str
+        default:
+            break
+        }
+        return true
+    }
+    
+    override func controlTextDidEndEditing(obj: NSNotification) {
+       // print(obj, appendNewline: true)
+    }
 
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         if tableView.identifier != nil
@@ -126,9 +145,10 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
-        if tableView.identifier != nil
-        {
-            switch tableView.identifier!
+        guard let tvidentifier = tableView.identifier else {
+            return cellView
+        }
+            switch tvidentifier
             {
             case "tableViewCSVdata":
                 cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
@@ -147,6 +167,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 case kParametersTableParametersValuesColumnIndex://parameters
                     cellView = tableView.makeViewWithIdentifier("parametersValueCell", owner: self) as! NSTableCellView
                     cellView.textField!.stringValue = self.parametersArray[row][kParametersArrayParametersValueIndex]
+                    cellView.textField!.tag = row
                 default:
                     break
                 }
@@ -154,12 +175,12 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             default:
                 break;
             }
-        }
+
         
         // Return the cellView
         return cellView;
     }
- 
+    
     
     func tableViewSelectionDidChange(notification: NSNotification) {
         let tableView = notification.object as! NSTableView
@@ -239,7 +260,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             for var r = 0; r<(self.representedObject as! CSVdata).csvData.count; r++
             {
                 var rowArray = (self.representedObject as! CSVdata).csvData[r]
-                //ADD CORRECT PARAMETER AFTER LOOKUP
+                ADD CORRECT PARAMETER AFTER LOOKUP
                 
                 rowArray.append("*")
                 (self.representedObject as! CSVdata).csvData[r] = rowArray
