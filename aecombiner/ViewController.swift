@@ -225,7 +225,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             for var r = 0; r<(self.representedObject as! CSVdata).csvData.count; r++
             {
                 var rowArray = (self.representedObject as! CSVdata).csvData[r]
-                ADD CORRECT PARAMETER AFTER LOOKUP
+                //ADD CORRECT PARAMETER AFTER LOOKUP
                 
                 rowArray.append("*")
                 (self.representedObject as! CSVdata).csvData[r] = rowArray
