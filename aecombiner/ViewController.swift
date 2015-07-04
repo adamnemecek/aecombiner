@@ -47,7 +47,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     // MARK: - Document
     func documentMakeDirty()
     {
-        ((self.view.window?.windowController() as? NSWindowController)?.document as? Document)?.updateChangeCount(.ChangeDone)
+        guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
+        {
+            return
+        }
+        (doc as! Document).updateChangeCount(.ChangeDone)
     }
     
     
@@ -76,12 +80,12 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         while self.tableViewCSVdata.tableColumns.count > 0
         {
-            self.tableViewCSVdata.removeTableColumn(tableViewCSVdata.tableColumns.last as! NSTableColumn)
+            self.tableViewCSVdata.removeTableColumn(tableViewCSVdata.tableColumns.last!)
         }
         for var c = 0; c < (self.representedObject as! CSVdata).columnsCount; c++
         {
-            var col_title = (self.representedObject as! CSVdata).headers[c]
-            var col = NSTableColumn(identifier: col_title)
+            let col_title = (self.representedObject as! CSVdata).headers[c]
+            let col = NSTableColumn(identifier: col_title)
             col.title = col_title
             self.tableViewCSVdata.addTableColumn(col)
             
@@ -121,7 +125,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             case "tableViewCSVdata":
                 cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
                 // Set the stringValue of the cell's text field to the nameArray value at row
-                let colIndex = tableView.columnWithIdentifier(tableColumn?.identifier)
+                let colIndex = tableView.columnWithIdentifier((tableColumn?.identifier)!)
                 cellView.textField!.stringValue = (self.representedObject as! CSVdata).csvData[row][colIndex]
             case "tableViewHeaders":
                 cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
@@ -187,7 +191,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 // replace blanks with string
                 for var c=0;c < subArray.count; c++
                 {
-                    if count(subArray[c]) == 0
+                    if subArray[c].characters.count == 0
                     {
                         subArray[c] = kStringEmpty
                     }
@@ -204,7 +208,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             for param in parametersArray // [s,s]
             {
                 self.parametersDictionary[param[0]] = param[1]
-                println(self.parametersDictionary)
+                print(self.parametersDictionary)
             }
             self.tableViewSetOfParameters.reloadData()
         }
@@ -214,7 +218,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     {
         if self.parametersArray.count > 0
         {
-            let s = self.textFieldColumnRecodedName.stringValue
             if self.textFieldColumnRecodedName.stringValue == ""
             {
                 self.textFieldColumnRecodedName.stringValue = "Recoded"
@@ -231,7 +234,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 (self.representedObject as! CSVdata).csvData[r] = rowArray
             }
             //Safe to add column to table now
-            var col = NSTableColumn(identifier: self.textFieldColumnRecodedName.stringValue)
+            let col = NSTableColumn(identifier: self.textFieldColumnRecodedName.stringValue)
             col.title = self.textFieldColumnRecodedName.stringValue
             self.tableViewCSVdata.addTableColumn(col)
             self.tableViewCSVdata.reloadData()
