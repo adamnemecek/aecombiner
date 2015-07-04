@@ -159,6 +159,7 @@
 		C5CBBC2C1B3C0BF9008FB844 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = djml.eu;
 				TargetAttributes = {
