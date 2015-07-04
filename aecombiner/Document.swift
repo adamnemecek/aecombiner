@@ -7,15 +7,12 @@
 //
 
 import Cocoa
-let quotationMarks = "\""
-let commaReplacement = "‚"//,
-let commaDelimiter = ","
 
 
 
 class Document: NSDocument {
 
-    var cvsDataModel = CSVdata()
+    var csvDataModel = CSVdata()
     
     
     override init() {
@@ -38,14 +35,20 @@ class Document: NSDocument {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)!
         let windowController = storyboard.instantiateControllerWithIdentifier("Document Window Controller") as! NSWindowController
         self.addWindowController(windowController)
-        windowController.window?.contentViewController?.representedObject = self.cvsDataModel
+        windowController.window?.contentViewController?.representedObject = self.csvDataModel
     }
 
     override func dataOfType(typeName: String, error outError: NSErrorPointer) -> NSData? {
         // Insert code here to write your document to data of the specified type. If outError != nil, ensure that you create and set an appropriate error when returning nil.
         // You can also choose to override fileWrapperOfType:error:, writeToURL:ofType:error:, or writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
         outError.memory = NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
-        return nil
+        switch typeName
+        {
+        case "csvFile":
+            return self.csvDataModel.processCSVtoData()
+        default:
+            return nil
+        }
     }
 
     override func readFromData(data: NSData, ofType typeName: String, error outError: NSErrorPointer) -> Bool {
@@ -56,51 +59,12 @@ class Document: NSDocument {
         switch typeName
         {
         case "csvFile":
-            var readOK = self.processCSVfileToData(data)
-            return readOK
+            self.csvDataModel = CSVdata(data: data)
+            return self.csvDataModel.processedDataOK
         default:
             return false
         }
         
-    }
-
-    func processCSVfileToData(data: NSData) -> Bool
-    {
-        var dataAsString = NSString(data: data, encoding: NSUTF8StringEncoding)
-        var arrayOfRowArrays = [[String]]()
-        if dataAsString != nil
-        {
-            dataAsString!.enumerateLinesUsingBlock({ (line, okay) -> Void in
-                //check for "" and replace , inside them
-                if line.rangeOfString(quotationMarks) != nil
-                {
-                    // ‚
-                    var subStrings = line.componentsSeparatedByString(quotationMarks)
-                    // we assume the file is properly formed with "" in pairs
-                    //odd indexed substrings are the substrings between "", even substrings are OUTSIDE the ""
-                    // empty strings used to pad start and end
-                    //replace , with special , inside the ''
-                    for var substringIndex=1; substringIndex < subStrings.count; substringIndex += 2
-                    {
-                        subStrings[substringIndex] = subStrings[substringIndex].stringByReplacingOccurrencesOfString(commaDelimiter, withString: commaReplacement)
-                    }
-                    arrayOfRowArrays.append("".join(subStrings).componentsSeparatedByString(commaDelimiter))
-                }
-                else
-                {
-                    arrayOfRowArrays.append(line.componentsSeparatedByString(commaDelimiter))
-                }
-            })
-            if arrayOfRowArrays.count > 0
-            {
-                self.cvsDataModel.headers = arrayOfRowArrays[0]
-                self.cvsDataModel.columnsCount = arrayOfRowArrays[0].count
-                arrayOfRowArrays.removeAtIndex(0)
-                self.cvsDataModel.csvData = arrayOfRowArrays
-                return true
-            }
-        }
-        return false
     }
 
 }
