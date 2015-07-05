@@ -87,7 +87,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         {
             self.tableViewCSVdata.removeTableColumn(tableViewCSVdata.tableColumns.last!)
         }
-        for var c = 0; c < (self.representedObject as! CSVdata).columnsCount; c++
+        for var c = 0; c < (self.representedObject as! CSVdata).headers.count; c++
         {
             let col_title = (self.representedObject as! CSVdata).headers[c]
             let col = NSTableColumn(identifier: col_title)
@@ -251,7 +251,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         {
             var subArray = Array(set)
             // replace blanks with string
-            for var c=0;c < subArray.count; c++
+            for var c=0;c < subArray.count; ++c
             {
                 if subArray[c].isEmpty
                 {
@@ -260,9 +260,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             }
             //clear the parameters array
             self.parametersArray = [[String]]()
-            for var row = 0; row<subArray.count; row++
+            for var row = 0; row<subArray.count; ++row
             {
-                self.parametersArray.append([subArray[row],"0"])
+                self.parametersArray.append([subArray[row],""])
             }
         }
         self.tableViewSetOfParameters.reloadData()
@@ -304,8 +304,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
         //add name to headers array
         (self.representedObject as! CSVdata).headers.append(self.textFieldColumnRecodedName.stringValue)
-        //add a column to the count
-        (self.representedObject as! CSVdata).columnsCount++
         //Safe to add column to table now
         let col = NSTableColumn(identifier: self.textFieldColumnRecodedName.stringValue)
         col.title = self.textFieldColumnRecodedName.stringValue

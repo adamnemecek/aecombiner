@@ -18,14 +18,12 @@ class CSVdata {
 
     var headers = [String]()
     var csvData = [[String]]()
-    var columnsCount:Int = 0
     var processedDataOK = false
     
     init()
     {
         self.headers = [String]()
         self.csvData = [[String]]()
-        self.columnsCount = 0
         self.processedDataOK = false
     }
     
@@ -60,7 +58,6 @@ class CSVdata {
             if arrayOfRowArrays.count > 0
             {
                 self.headers = arrayOfRowArrays[0]
-                self.columnsCount = arrayOfRowArrays[0].count
                 arrayOfRowArrays.removeAtIndex(0)
                 self.csvData = arrayOfRowArrays
                 self.processedDataOK = true
