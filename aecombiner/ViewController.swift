@@ -49,6 +49,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     {
         guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
         {
+            print("No document")
             return
         }
         (doc as! Document).updateChangeCount(.ChangeDone)
@@ -105,7 +106,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
         switch ident
         {
-        case "parametersValueCell":
+        case "parametersValueCellTextField":
             guard control.tag < self.parametersArray.count,
             let str = fieldEditor.string else
             {
@@ -187,9 +188,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         switch tableView.identifier!
         {
         case "tableViewHeaders":
-            self.parametersArray = [[String]]()
-            self.tableViewSetOfParameters.reloadData()
-            self.textFieldColumnRecodedName.stringValue = ""
+            self.resetExtractedParameters()
         default:
             break;
         }
@@ -198,82 +197,127 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     
     // MARK: - Column parameters
-
+    func resetExtractedParameters()
+    {
+        self.parametersArray = [[String]]()
+        self.tableViewSetOfParameters.reloadData()
+        self.textFieldColumnRecodedName.stringValue = ""
+    }
+    
+    func selectedColumnInExtractedParametersTableView() -> Int?
+    {
+        let columnIndex = self.tableViewHeaders.selectedRow
+        guard columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
+            else
+        {
+            print("out of range in selectedColumnInExtractedParametersTableView")
+            return nil
+        }
+        return columnIndex
+    }
+    
+    func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
+    {
+        return columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
+    }
+    
+    func stringForRecodedColumn(columnIndex:Int) -> String
+    {
+        guard self.requestedColumnIndexIsOK(columnIndex) else
+        {
+            print("columnIndex out of range in stringForRecodedColumn")
+            return kStringRecodedColumnNameSuffix
+        }
+        return (self.representedObject as! CSVdata).headers[columnIndex]+kStringRecodedColumnNameSuffix
+    }
+    
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        let columnIndex = self.tableViewHeaders.selectedRow
-        if columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
+        guard let columnIndex = self.selectedColumnInExtractedParametersTableView() else
         {
-            var set = Set<String>()
-            self.textFieldColumnRecodedName.stringValue = (self.representedObject as! CSVdata).headers[columnIndex]+kStringRecodedColumnNameSuffix
-            
-            for parameter in (self.representedObject as! CSVdata).csvData
-            {
-                // parameter is a [string] array of row columns
-                set.insert(parameter[columnIndex])
-            }
-            if set.count > 0
-            {
-                var subArray = Array(set)
-                // replace blanks with string
-                for var c=0;c < subArray.count; c++
-                {
-                    if subArray[c].characters.count == 0
-                    {
-                        subArray[c] = kStringEmpty
-                    }
-                }
-                //clear the parameters array
-                self.parametersArray = [[String]]()
-                for var row = 0; row<subArray.count; row++
-                {
-                    self.parametersArray.append([subArray[row],"0"])
-                }
-            }
-            self.tableViewSetOfParameters.reloadData()
+            print("columnIndex out of range in extractParametersIntoSetFromColumn")
+            return
         }
+        var set = Set<String>()
+        self.textFieldColumnRecodedName.stringValue = self.stringForRecodedColumn(columnIndex)
+        
+        for parameter in (self.representedObject as! CSVdata).csvData
+        {
+            // parameter is a [string] array of row columns
+            set.insert(parameter[columnIndex])
+        }
+        if set.count > 0
+        {
+            var subArray = Array(set)
+            // replace blanks with string
+            for var c=0;c < subArray.count; c++
+            {
+                if subArray[c].isEmpty
+                {
+                    subArray[c] = kStringEmpty
+                }
+            }
+            //clear the parameters array
+            self.parametersArray = [[String]]()
+            for var row = 0; row<subArray.count; row++
+            {
+                self.parametersArray.append([subArray[row],"0"])
+            }
+        }
+        self.tableViewSetOfParameters.reloadData()
+        
     }
     
     func doTheRecodeParametersAndAddNewColumn()
     {
-        if self.parametersArray.count > 0
+        guard let columnIndex = self.selectedColumnInExtractedParametersTableView() where self.parametersArray.count > 0
+            else
         {
-            //give a name
-            if self.textFieldColumnRecodedName.stringValue == ""
-            {
-                self.textFieldColumnRecodedName.stringValue = "Recoded"
-            }
-            //add name to headers array
-            (self.representedObject as! CSVdata).headers.append(self.textFieldColumnRecodedName.stringValue)
-            //add a column to the count
-            (self.representedObject as! CSVdata).columnsCount++
-            
-            //make a temporary dictionary
-            var paramsDict = [String : String]()
-            for paramNameAndValueArray in self.parametersArray
-            {
-                paramsDict[paramNameAndValueArray[0]] = paramNameAndValueArray[1]
-            }
-            
-            // must add the column to Array BEFORE adding column to table
-            for var r = 0; r<(self.representedObject as! CSVdata).csvData.count; r++
-            {
-                var rowArray = (self.representedObject as! CSVdata).csvData[r]
-                ADD CORRECT PARAMETER AFTER LOOKUP
-                
-                rowArray.append("*")
-                (self.representedObject as! CSVdata).csvData[r] = rowArray
-            }
-            //Safe to add column to table now
-            let col = NSTableColumn(identifier: self.textFieldColumnRecodedName.stringValue)
-            col.title = self.textFieldColumnRecodedName.stringValue
-            self.tableViewCSVdata.addTableColumn(col)
-            
-            //reload etc
-            self.tableViewCSVdata.reloadData()
-            self.documentMakeDirty()
+            print("out of range in doTheRecodeParametersAndAddNewColumn")
+            return
         }
+        
+        
+        //give a name if none
+        if self.textFieldColumnRecodedName.stringValue.isEmpty
+        {
+            self.textFieldColumnRecodedName.stringValue = self.stringForRecodedColumn(columnIndex)
+        }
+        
+        //make a temporary dictionary
+        var paramsDict = [String : String]()
+        for paramNameAndValueArray in self.parametersArray
+        {
+            paramsDict[paramNameAndValueArray[0]] = paramNameAndValueArray[1]
+        }
+        
+        // must add the column to Array BEFORE adding column to table
+        for var r = 0; r<(self.representedObject as! CSVdata).csvData.count; r++
+        {
+            var rowArray = (self.representedObject as! CSVdata).csvData[r]
+            //ADD CORRECT PARAMETER AFTER LOOKUP
+            let valueToRecode = rowArray[columnIndex]
+            let recodedValue = (paramsDict[valueToRecode] ?? "")
+            rowArray.append(recodedValue)
+            (self.representedObject as! CSVdata).csvData[r] = rowArray
+        }
+        //add name to headers array
+        (self.representedObject as! CSVdata).headers.append(self.textFieldColumnRecodedName.stringValue)
+        //add a column to the count
+        (self.representedObject as! CSVdata).columnsCount++
+        //Safe to add column to table now
+        let col = NSTableColumn(identifier: self.textFieldColumnRecodedName.stringValue)
+        col.title = self.textFieldColumnRecodedName.stringValue
+        self.tableViewCSVdata.addTableColumn(col)
+        
+        //reload etc
+        self.tableViewCSVdata.reloadData()
+        self.tableViewHeaders.reloadData()
+        self.resetExtractedParameters()
+        
+        self.documentMakeDirty()
+        
     }
 
 }
