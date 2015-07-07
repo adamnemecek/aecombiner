@@ -189,6 +189,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         {
         case "tableViewHeaders":
             self.resetExtractedParameters()
+            self.extractParametersIntoSetFromColumn()
+            
         default:
             break;
         }
