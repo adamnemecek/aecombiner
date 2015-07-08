@@ -12,8 +12,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
 
     // MARK: - class vars
-
     var parametersArray = [[String]]()
+    var selectedParametersArray = [[String]]()
+    
 
     // MARK: - class constants
     let kParametersTableParametersColumnIndex = 0
@@ -28,6 +29,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
 
     @IBOutlet weak var tableViewCSVdata: NSTableView!
     @IBOutlet weak var tableViewHeaders: NSTableView!
+    @IBOutlet weak var tableViewSelectedParameters: NSTableView!
     @IBOutlet weak var tableViewSetOfParameters: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
