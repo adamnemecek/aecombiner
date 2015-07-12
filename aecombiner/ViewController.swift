@@ -27,7 +27,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     // MARK: - @IBOutlet
 
-    @IBOutlet weak var tableViewCSVdata: NSTableView!
+    //@IBOutlet weak var tableViewCSVdata: NSTableView!
     @IBOutlet weak var tableViewHeaders: NSTableView!
     @IBOutlet weak var tableViewSelectedColumnAndParameters: NSTableView!
     @IBOutlet weak var tableViewExtractedParameters: NSTableView!
@@ -35,6 +35,16 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     
     // MARK: - @IBAction
+    @IBAction func showDataWindow(sender: AnyObject) {
+        guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
+        {
+            print("No document showDataWindow")
+            return
+        }
+        (doc as! Document).makeAndShowCSVdataWindow()
+        (doc as! Document).showWindows()
+    }
+
     @IBAction func extractParameters(sender: AnyObject) {
         //called from Process menu
         self.extractParametersIntoSetFromColumn()
@@ -50,11 +60,12 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     
     // MARK: - Document
+    
     func documentMakeDirty()
     {
         guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
         {
-            print("No document")
+            print("No document documentMakeDirty")
             return
         }
         (doc as! Document).updateChangeCount(.ChangeDone)
@@ -73,32 +84,15 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     override var representedObject: AnyObject? {
         didSet {
         // Update the view, if already loaded.
-            self.columnsClearAndRebuild()
-            self.tableViewCSVdata.reloadData()
+            //self.columnsClearAndRebuild()
+            //self.tableViewCSVdata.reloadData()
             self.tableViewHeaders.reloadData()
             
             
         }
     }
 
-    // MARK: - CSV data table
     
-    func columnsClearAndRebuild(){
-        
-        while self.tableViewCSVdata.tableColumns.count > 0
-        {
-            self.tableViewCSVdata.removeTableColumn(tableViewCSVdata.tableColumns.last!)
-        }
-        for var c = 0; c < (self.representedObject as! CSVdata).headers.count; c++
-        {
-            let col_title = (self.representedObject as! CSVdata).headers[c]
-            let col = NSTableColumn(identifier: col_title)
-            col.title = col_title
-            self.tableViewCSVdata.addTableColumn(col)
-            
-        }
-
-    }
 
     // MARK: - TableView overrides
 
@@ -354,12 +348,10 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         //add name to headers array
         (self.representedObject as! CSVdata).headers.append(self.textFieldColumnRecodedName.stringValue)
         //Safe to add column to table now
-        let col = NSTableColumn(identifier: self.textFieldColumnRecodedName.stringValue)
-        col.title = self.textFieldColumnRecodedName.stringValue
-        self.tableViewCSVdata.addTableColumn(col)
-        
+        let colName = self.textFieldColumnRecodedName.stringValue
+        NSNotificationCenter.defaultCenter().postNotificationName("addColumnWithIdentifier", object: colName)
+
         //reload etc
-        self.tableViewCSVdata.reloadData()
         self.tableViewHeaders.reloadData()
         self.resetExtractedParameters()
         
