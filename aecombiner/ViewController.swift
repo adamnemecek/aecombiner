@@ -33,6 +33,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     @IBOutlet weak var tableViewExtractedParameters: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
+    @IBOutlet weak var checkBoxIsNumbers: NSButton!
+    @IBOutlet weak var checkBoxUseValues: NSButton!
     
     // MARK: - @IBAction
     @IBAction func showDataWindow(sender: AnyObject) {
@@ -58,6 +60,10 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         self.doTheRecodeParametersAndAddNewColumn()
     }
     
+    @IBAction func sortExtractedParameters(sender: NSButton) {
+        self.sortParameters(sender.tag)
+        sender.tag = sender.tag == 0 ? 1 : 0
+    }
     
     // MARK: - Document
     
@@ -210,6 +216,46 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     
     // MARK: - Column parameters
+    
+    func sortParameters(direction:Int)
+    {
+        let indexToSort = (self.checkBoxUseValues.state == NSOnState ? 1 : 0)
+        
+        if self.checkBoxIsNumbers.state == NSOnState
+        {
+            switch direction {
+            case 0:
+                self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
+                    return Double(leftTuple[indexToSort])>Double(rightTuple[indexToSort])
+                })
+            case 1:
+                self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
+                    return Double(leftTuple[indexToSort])<Double(rightTuple[indexToSort])
+                })
+                
+            default:
+                return
+            }
+        }
+        else
+        {
+            switch direction {
+            case 0:
+                self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
+                    return leftTuple[indexToSort]>rightTuple[indexToSort]
+                })
+            case 1:
+                self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
+                    return leftTuple[indexToSort]<rightTuple[indexToSort]
+                })
+                
+            default:
+                return
+            }
+        }
+        self.tableViewExtractedParameters.reloadData()
+    }
+    
     func resetExtractedParameters()
     {
         self.arrayExtractedParameters = [[String]]()
