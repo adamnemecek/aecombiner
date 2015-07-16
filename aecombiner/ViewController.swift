@@ -36,6 +36,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     @IBOutlet weak var checkBoxIsNumbers: NSButton!
     @IBOutlet weak var checkBoxUseValues: NSButton!
     
+    @IBOutlet weak var buttonRemoveSelectedParameter: NSButton!
+    
+    
     // MARK: - @IBAction
     @IBAction func showDataWindow(sender: AnyObject) {
         guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
@@ -54,6 +57,10 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     @IBAction func addSelectedParameter(sender: AnyObject) {
         self.addColumnAndSelectedParameter()
+    }
+    
+    @IBAction func removeSelectedParameter(sender: NSButton) {
+        self.removeColumnAndSelectedParameter()
     }
 
     @IBAction func recodeParametersAndAddNewColumn(sender: AnyObject) {
@@ -207,7 +214,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         case "tableViewHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-            
+        case "tableViewSelectedColumnAndParameters":
+            self.buttonRemoveSelectedParameter.enabled = tableView.selectedRow != -1
         default:
             break;
         }
@@ -282,15 +290,35 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         return (colS,paramS)
     }
     
+    func updateTableViewSelectedColumnAndParameters()
+    {
+        self.tableViewSelectedColumnAndParameters.reloadData()
+        self.buttonRemoveSelectedParameter.enabled = false
+
+    }
+    
     func addColumnAndSelectedParameter()
     {
         guard let tuple = self.selectedColumnAndSelectedParameter()
-        else
+            else
         {
             return
         }
         self.arraySelectedColumnAndParameters.append([tuple.column,tuple.parameter])
-        self.tableViewSelectedColumnAndParameters.reloadData()
+        self.updateTableViewSelectedColumnAndParameters()
+    }
+    
+    func removeColumnAndSelectedParameter()
+    {
+        let selectedRowInTable = self.tableViewSelectedColumnAndParameters.selectedRow
+        guard selectedRowInTable >= 0
+            else
+        {
+            return
+        }
+        self.arraySelectedColumnAndParameters.removeAtIndex(selectedRowInTable)
+        self.updateTableViewSelectedColumnAndParameters()
+
     }
     
     func selectedColumnForExtractedParametersTableView() -> Int?
