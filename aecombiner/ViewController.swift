@@ -40,15 +40,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     
     // MARK: - @IBAction
-    @IBAction func showDataWindow(sender: AnyObject) {
-        guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
-        {
-            print("No document showDataWindow")
-            return
-        }
-        (doc as! Document).makeAndShowCSVdataWindow()
-        (doc as! Document).showWindows()
-    }
 
     @IBAction func extractParameters(sender: AnyObject) {
         //called from Process menu
@@ -99,7 +90,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         // Update the view, if already loaded.
             //self.columnsClearAndRebuild()
             //self.tableViewCSVdata.reloadData()
-            self.tableViewHeaders.reloadData()
+            //self.tableViewHeaders.reloadData()
             
             
         }
