@@ -28,5 +28,16 @@ class DashboardViewController: NSViewController {
         doc.makeAndShowCSVdataWindow()
         doc.showWindows()
     }
-
+    
+    @IBAction func showRecodeColumnWindow(sender: AnyObject) {
+        guard let doc = NSDocumentController.sharedDocumentController().currentDocument as? Document
+            else
+        {
+            print("No document showRecodeColumnWindow")
+            return
+        }
+        doc.makeAndShowRecodeWindow()
+        doc.showWindows()
+    }
+    
 }
