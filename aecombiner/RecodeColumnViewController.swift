@@ -48,10 +48,6 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
         sender.tag = sender.tag == 0 ? 1 : 0
     }
     
-    @IBAction func closeSheet(sender: NSButton) {
-        let win = self.view.window!.sheetParent!
-        win.endSheet(self.view.window!)
-    }
     
     // MARK: - Represented Object
     func updateRepresentedObjectToCSVData(csvdata:CSVdata)
@@ -136,6 +132,13 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
         }
     }
     
+    func cellForHeadersTable(tableView tableView: NSTableView, row: Int) ->NSTableCellView
+    {
+        let cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
+        cellView.textField!.stringValue = (self.representedObject as! CSVdata).headers[row]
+        return cellView
+    }
+    
     func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
@@ -146,8 +149,7 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
            switch tvidentifier
             {
             case "tableViewHeaders":
-                cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = (self.representedObject as! CSVdata).headers[row]
+                cellView = self.cellForHeadersTable(tableView: tableView, row: row)
             case "tableViewExtractedParameters":
                 switch tableColumn!.identifier
                 {

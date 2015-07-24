@@ -86,8 +86,8 @@
 		C5557D391B5948C600C7E94D /* SelectParameters */ = {
 			isa = PBXGroup;
 			children = (
-				C5557D351B5948A600C7E94D /* SelectParametersWindowController.swift */,
 				C5557D371B5948BC00C7E94D /* SelectParametersViewController.swift */,
+				C5557D351B5948A600C7E94D /* SelectParametersWindowController.swift */,
 			);
 			name = SelectParameters;
 			sourceTree = "<group>";
@@ -114,9 +114,9 @@
 			children = (
 				C5CBBC3D1B3C0BFA008FB844 /* Document.swift */,
 				C5CBBC411B3C0BFA008FB844 /* Main.storyboard */,
+				8ECA4AEC1B528E2600278606 /* CSVdataViewController */,
 				C5557D391B5948C600C7E94D /* SelectParameters */,
 				C5557D311B59466C00C7E94D /* RecodeColumn */,
-				8ECA4AEC1B528E2600278606 /* CSVdataViewController */,
 				8E10726D1B40768D00E4E409 /* CSVdata.swift */,
 				C5CBBC3F1B3C0BFA008FB844 /* Images.xcassets */,
 				C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */,

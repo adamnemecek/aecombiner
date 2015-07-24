@@ -41,9 +41,14 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         
         switch segue.identifier!
         {
-            case "RecodeColumnViewController":
+        case "RecodeColumnViewController":
             let recoder = (segue.destinationController as! RecodeColumnViewController)
             recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
+        case "SelectParametersViewController":
+            let recoder = (segue.destinationController as! SelectParametersViewController)
+            recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
+            
+            
         default:
             break
         }
