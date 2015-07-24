@@ -10,9 +10,7 @@
 		8E10726E1B40768D00E4E409 /* CSVdata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E10726D1B40768D00E4E409 /* CSVdata.swift */; };
 		8ECA4AE81B528C9700278606 /* CSVdataWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECA4AE61B528C9700278606 /* CSVdataWindowController.swift */; };
 		8ECA4AEB1B528E1000278606 /* CSVdataViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECA4AEA1B528E1000278606 /* CSVdataViewController.swift */; };
-		C5557D2E1B5939A100C7E94D /* DashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5557D2D1B5939A100C7E94D /* DashboardViewController.swift */; };
 		C5557D301B59466200C7E94D /* RecodeColumnWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5557D2F1B59466200C7E94D /* RecodeColumnWindowController.swift */; };
-		C5557D331B5947F900C7E94D /* DashboardWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5557D321B5947F900C7E94D /* DashboardWindowController.swift */; };
 		C5557D361B5948A600C7E94D /* SelectParametersWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5557D351B5948A600C7E94D /* SelectParametersWindowController.swift */; };
 		C5557D381B5948BC00C7E94D /* SelectParametersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5557D371B5948BC00C7E94D /* SelectParametersViewController.swift */; };
 		C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */; };
@@ -36,9 +34,7 @@
 		8E10726D1B40768D00E4E409 /* CSVdata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdata.swift; sourceTree = "<group>"; };
 		8ECA4AE61B528C9700278606 /* CSVdataWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdataWindowController.swift; sourceTree = "<group>"; };
 		8ECA4AEA1B528E1000278606 /* CSVdataViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdataViewController.swift; sourceTree = "<group>"; };
-		C5557D2D1B5939A100C7E94D /* DashboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashboardViewController.swift; sourceTree = "<group>"; };
 		C5557D2F1B59466200C7E94D /* RecodeColumnWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecodeColumnWindowController.swift; sourceTree = "<group>"; };
-		C5557D321B5947F900C7E94D /* DashboardWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashboardWindowController.swift; sourceTree = "<group>"; };
 		C5557D351B5948A600C7E94D /* SelectParametersWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectParametersWindowController.swift; sourceTree = "<group>"; };
 		C5557D371B5948BC00C7E94D /* SelectParametersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectParametersViewController.swift; sourceTree = "<group>"; };
 		C5CBBC341B3C0BFA008FB844 /* aecombiner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aecombiner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,15 +83,6 @@
 			name = RecodeColumn;
 			sourceTree = "<group>";
 		};
-		C5557D341B59482D00C7E94D /* Dashboard */ = {
-			isa = PBXGroup;
-			children = (
-				C5557D2D1B5939A100C7E94D /* DashboardViewController.swift */,
-				C5557D321B5947F900C7E94D /* DashboardWindowController.swift */,
-			);
-			name = Dashboard;
-			sourceTree = "<group>";
-		};
 		C5557D391B5948C600C7E94D /* SelectParameters */ = {
 			isa = PBXGroup;
 			children = (
@@ -128,7 +115,6 @@
 				C5CBBC3D1B3C0BFA008FB844 /* Document.swift */,
 				C5CBBC411B3C0BFA008FB844 /* Main.storyboard */,
 				C5557D391B5948C600C7E94D /* SelectParameters */,
-				C5557D341B59482D00C7E94D /* Dashboard */,
 				C5557D311B59466C00C7E94D /* RecodeColumn */,
 				8ECA4AEC1B528E2600278606 /* CSVdataViewController */,
 				8E10726D1B40768D00E4E409 /* CSVdata.swift */,
@@ -249,8 +235,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5CBBC3C1B3C0BFA008FB844 /* RecodeColumnViewController.swift in Sources */,
-				C5557D331B5947F900C7E94D /* DashboardWindowController.swift in Sources */,
-				C5557D2E1B5939A100C7E94D /* DashboardViewController.swift in Sources */,
 				C5557D361B5948A600C7E94D /* SelectParametersWindowController.swift in Sources */,
 				8ECA4AEB1B528E1000278606 /* CSVdataViewController.swift in Sources */,
 				C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */,

@@ -48,6 +48,18 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
         sender.tag = sender.tag == 0 ? 1 : 0
     }
     
+    @IBAction func closeSheet(sender: NSButton) {
+        let win = self.view.window!.sheetParent!
+        win.endSheet(self.view.window!)
+    }
+    
+    // MARK: - Represented Object
+    func updateRepresentedObjectToCSVData(csvdata:CSVdata)
+    {
+        self.representedObject = csvdata
+    }
+    
+    
     // MARK: - Document
     
     func documentMakeDirty()
@@ -66,7 +78,9 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.representedObject = CSVdata()
+        self.tableViewHeaders?.reloadData()
+        self.tableViewExtractedParameters?.reloadData()
+
 
     }
 

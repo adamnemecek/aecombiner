@@ -33,19 +33,19 @@ class Document: NSDocument {
     override func makeWindowControllers() {
         // Returns the Storyboard that contains your Document window.
         
-        self.makeAndShowDashboardWindow()
+        //self.makeAndShowDashboardWindow()
         self.makeAndShowCSVdataWindow()
         
         self.showWindows()
     }
 
    
-    func makeAndShowDashboardWindow()
+/*    func makeAndShowDashboardWindow()
     {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
         let windowController = storyboard.instantiateControllerWithIdentifier("DashboardWindow") as! DashboardWindowController
         self.addWindowController(windowController)
-    }
+    }*/
     
     func makeAndShowRecodeWindow()
     {
