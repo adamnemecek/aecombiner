@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+class RecodeColumnViewController: HeadingsViewController {
     
 
     // MARK: - class vars
@@ -26,10 +26,7 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
     
     // MARK: - @IBOutlet
 
-    //@IBOutlet weak var tableViewCSVdata: NSTableView!
-    @IBOutlet weak var tableViewHeaders: NSTableView!
     @IBOutlet weak var tableViewExtractedParameters: NSTableView!
-    @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
     @IBOutlet weak var checkBoxIsNumbers: NSButton!
     @IBOutlet weak var checkBoxUseValues: NSButton!
@@ -49,32 +46,12 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
     }
     
     
-    // MARK: - Represented Object
-    func updateRepresentedObjectToCSVData(csvdata:CSVdata)
-    {
-        self.representedObject = csvdata
-    }
-    
-    
-    // MARK: - Document
-    
-    func documentMakeDirty()
-    {
-        guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
-        {
-            print("No document documentMakeDirty")
-            return
-        }
-        (doc as! Document).updateChangeCount(.ChangeDone)
-    }
-    
     
     // MARK: - overrides
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.tableViewHeaders?.reloadData()
         self.tableViewExtractedParameters?.reloadData()
 
 
@@ -116,14 +93,14 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
        // print(obj, appendNewline: true)
     }
 
-    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+    override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         guard let tvidentifier = tableView.identifier else
         {
             return 0
         }
         switch tvidentifier
         {
-        case "tableViewHeaders":
+        case "tableViewRecodeHeaders":
             return (self.representedObject as! CSVdata).headers.count
         case "tableViewExtractedParameters":
             return self.arrayExtractedParameters.count
@@ -132,14 +109,7 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
         }
     }
     
-    func cellForHeadersTable(tableView tableView: NSTableView, row: Int) ->NSTableCellView
-    {
-        let cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
-        cellView.textField!.stringValue = (self.representedObject as! CSVdata).headers[row]
-        return cellView
-    }
-    
-    func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    override func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
@@ -148,7 +118,7 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
         }
            switch tvidentifier
             {
-            case "tableViewHeaders":
+            case "tableViewRecodeHeaders":
                 cellView = self.cellForHeadersTable(tableView: tableView, row: row)
             case "tableViewExtractedParameters":
                 switch tableColumn!.identifier
@@ -174,11 +144,11 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
     }
     
     
-    func tableViewSelectionDidChange(notification: NSNotification) {
+    override func tableViewSelectionDidChange(notification: NSNotification) {
         let tableView = notification.object as! NSTableView
         switch tableView.identifier!
         {
-        case "tableViewHeaders":
+        case "tableViewRecodeHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
         default:
@@ -189,7 +159,12 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
     
     
     // MARK: - Column parameters
+    func stringForRecodedColumn(columnIndex:Int) -> String
+    {
+        return self.stringForColumnName(columnIndex)+kStringRecodedColumnNameSuffix
+    }
     
+
     func sortParameters(direction:Int)
     {
         let indexToSort = (self.checkBoxUseValues.state == NSOnState ? 1 : 0)
@@ -237,37 +212,10 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
     }
     
     
-    func selectedColumnForExtractedParametersTableView() -> Int?
-    {
-        let columnIndex = self.tableViewHeaders.selectedRow
-        guard columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
-            else
-        {
-            print("out of range in selectedColumnForExtractedParametersTableView")
-            return nil
-        }
-        return columnIndex
-    }
-    
-    func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
-    {
-        return columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
-    }
-    
-    func stringForRecodedColumn(columnIndex:Int) -> String
-    {
-        guard self.requestedColumnIndexIsOK(columnIndex) else
-        {
-            print("columnIndex out of range in stringForRecodedColumn")
-            return kStringRecodedColumnNameSuffix
-        }
-        return (self.representedObject as! CSVdata).headers[columnIndex]+kStringRecodedColumnNameSuffix
-    }
-    
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        guard let columnIndex = self.selectedColumnForExtractedParametersTableView() else
+        guard let columnIndex = self.selectedColumnFromHeadersTableView() else
         {
             print("columnIndex out of range in extractParametersIntoSetFromColumn")
             return
@@ -304,7 +252,7 @@ class RecodeColumnViewController: NSViewController, NSTableViewDataSource, NSTab
     
     func doTheRecodeParametersAndAddNewColumn()
     {
-        guard let columnIndex = self.selectedColumnForExtractedParametersTableView() where self.arrayExtractedParameters.count > 0
+        guard let columnIndex = self.selectedColumnFromHeadersTableView() where self.arrayExtractedParameters.count > 0
             else
         {
             print("out of range in doTheRecodeParametersAndAddNewColumn")
