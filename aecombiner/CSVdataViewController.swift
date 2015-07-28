@@ -33,7 +33,31 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             
         }
     }
-
+    // MARK: - segue
+    override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
+        guard segue.identifier != nil else {
+            return
+        }
+        
+        switch segue.identifier!
+        {
+        case "HeadingsViewController":
+            let recoder = (segue.destinationController as! HeadingsViewController)
+            recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
+        case "RecodeColumnViewController":
+            let recoder = (segue.destinationController as! RecodeColumnViewController)
+            recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
+        case "SelectParametersViewController":
+            let recoder = (segue.destinationController as! SelectParametersViewController)
+            recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
+            
+            
+        default:
+            break
+        }
+    }
+    
+    
     // MARK: - CSV data table
    func columnsClearAndRebuild(){
         

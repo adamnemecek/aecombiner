@@ -33,18 +33,24 @@ class Document: NSDocument {
     override func makeWindowControllers() {
         // Returns the Storyboard that contains your Document window.
         
+        //self.makeAndShowDashboardWindow()
         self.makeAndShowCSVdataWindow()
-        self.makeAndShowMainWindow()
         
         self.showWindows()
     }
 
-    // MARK: - @IBAction
-    
-    func makeAndShowMainWindow()
+   
+/*    func makeAndShowDashboardWindow()
     {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
-        let windowController = storyboard.instantiateControllerWithIdentifier("Document Window Controller") as! NSWindowController
+        let windowController = storyboard.instantiateControllerWithIdentifier("DashboardWindow") as! DashboardWindowController
+        self.addWindowController(windowController)
+    }*/
+    
+    func makeAndShowRecodeWindow()
+    {
+        let storyboard = NSStoryboard(name: "Main", bundle: nil)
+        let windowController = storyboard.instantiateControllerWithIdentifier("RecodeWindow") as! RecodeColumnWindowController
         self.addWindowController(windowController)
         windowController.window?.contentViewController?.representedObject = self.csvDataModel
     }
@@ -56,9 +62,11 @@ class Document: NSDocument {
         let csvDataWindowController = storyboard.instantiateControllerWithIdentifier("CSVdataWindowController") as! CSVdataWindowController
         self.addWindowController(csvDataWindowController)
         csvDataWindowController.window?.contentViewController?.representedObject = self.csvDataModel
+
     }
 
-    
+    // MARK: - Data
+
     override func dataOfType(typeName: String) throws -> NSData {
         var outError: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
         // Insert code here to write your document to data of the specified type. If outError != nil, ensure that you create and set an appropriate error when returning nil.

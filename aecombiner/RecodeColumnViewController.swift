@@ -8,12 +8,11 @@
 
 import Cocoa
 
-class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+class RecodeColumnViewController: HeadingsViewController {
     
 
     // MARK: - class vars
     var arrayExtractedParameters = [[String]]()
-    var arraySelectedColumnAndParameters = [[String]]()
     
 
     // MARK: - class constants
@@ -27,41 +26,15 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     // MARK: - @IBOutlet
 
-    //@IBOutlet weak var tableViewCSVdata: NSTableView!
-    @IBOutlet weak var tableViewHeaders: NSTableView!
-    @IBOutlet weak var tableViewSelectedColumnAndParameters: NSTableView!
     @IBOutlet weak var tableViewExtractedParameters: NSTableView!
-    @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
     @IBOutlet weak var checkBoxIsNumbers: NSButton!
     @IBOutlet weak var checkBoxUseValues: NSButton!
     
-    @IBOutlet weak var buttonRemoveSelectedParameter: NSButton!
     
     
     // MARK: - @IBAction
-    @IBAction func showDataWindow(sender: AnyObject) {
-        guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
-        {
-            print("No document showDataWindow")
-            return
-        }
-        (doc as! Document).makeAndShowCSVdataWindow()
-        (doc as! Document).showWindows()
-    }
 
-    @IBAction func extractParameters(sender: AnyObject) {
-        //called from Process menu
-        self.extractParametersIntoSetFromColumn()
-    }
-    
-    @IBAction func addSelectedParameter(sender: AnyObject) {
-        self.addColumnAndSelectedParameter()
-    }
-    
-    @IBAction func removeSelectedParameter(sender: NSButton) {
-        self.removeColumnAndSelectedParameter()
-    }
 
     @IBAction func recodeParametersAndAddNewColumn(sender: AnyObject) {
         self.doTheRecodeParametersAndAddNewColumn()
@@ -72,17 +45,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         sender.tag = sender.tag == 0 ? 1 : 0
     }
     
-    // MARK: - Document
-    
-    func documentMakeDirty()
-    {
-        guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
-        {
-            print("No document documentMakeDirty")
-            return
-        }
-        (doc as! Document).updateChangeCount(.ChangeDone)
-    }
     
     
     // MARK: - overrides
@@ -90,17 +52,16 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.representedObject = CSVdata()
+        self.tableViewExtractedParameters?.reloadData()
+
 
     }
 
     override var representedObject: AnyObject? {
         didSet {
         // Update the view, if already loaded.
-            //self.columnsClearAndRebuild()
-            //self.tableViewCSVdata.reloadData()
-            self.tableViewHeaders.reloadData()
-            
+            self.tableViewHeaders?.reloadData()
+            self.tableViewExtractedParameters?.reloadData()
             
         }
     }
@@ -132,28 +93,23 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
        // print(obj, appendNewline: true)
     }
 
-    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+    override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         guard let tvidentifier = tableView.identifier else
         {
             return 0
         }
         switch tvidentifier
         {
-        case "tableViewCSVdata":
-            return (self.representedObject as! CSVdata).csvData.count
-        case "tableViewHeaders":
+        case "tableViewRecodeHeaders":
             return (self.representedObject as! CSVdata).headers.count
         case "tableViewExtractedParameters":
             return self.arrayExtractedParameters.count
-        case "tableViewSelectedColumnAndParameters":
-            return self.arraySelectedColumnAndParameters.count
-            
         default:
             return 0
         }
     }
     
-    func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    override func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
@@ -162,14 +118,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
            switch tvidentifier
             {
-            case "tableViewCSVdata":
-                cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
-                // Set the stringValue of the cell's text field to the nameArray value at row
-                let colIndex = tableView.columnWithIdentifier((tableColumn?.identifier)!)
-                cellView.textField!.stringValue = (self.representedObject as! CSVdata).csvData[row][colIndex]
-            case "tableViewHeaders":
-                cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = (self.representedObject as! CSVdata).headers[row]
+            case "tableViewRecodeHeaders":
+                cellView = self.cellForHeadersTable(tableView: tableView, row: row)
             case "tableViewExtractedParameters":
                 switch tableColumn!.identifier
                 {
@@ -183,20 +133,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 default:
                     break
                 }
-            case "tableViewSelectedColumnAndParameters":
-                let col_parameter = self.arraySelectedColumnAndParameters[row]
-                switch tableColumn!.identifier
-                {
-                case "column":
-                    cellView = tableView.makeViewWithIdentifier("selectedParameterCellC", owner: self) as! NSTableCellView
-                    cellView.textField!.stringValue = col_parameter[kSelectedParametersArrayColumnIndex]
-                case "parameter":
-                    cellView = tableView.makeViewWithIdentifier("selectedParameterCellP", owner: self) as! NSTableCellView
-                    cellView.textField!.stringValue = col_parameter[kSelectedParametersArrayParameterIndex]
-                default:
-                    break
-                }
-                
+            
             default:
                 break;
             }
@@ -207,15 +144,13 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     
-    func tableViewSelectionDidChange(notification: NSNotification) {
+    override func tableViewSelectionDidChange(notification: NSNotification) {
         let tableView = notification.object as! NSTableView
         switch tableView.identifier!
         {
-        case "tableViewHeaders":
+        case "tableViewRecodeHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-        case "tableViewSelectedColumnAndParameters":
-            self.buttonRemoveSelectedParameter.enabled = tableView.selectedRow != -1
         default:
             break;
         }
@@ -224,7 +159,12 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     
     // MARK: - Column parameters
+    func stringForRecodedColumn(columnIndex:Int) -> String
+    {
+        return self.stringForColumnName(columnIndex)+kStringRecodedColumnNameSuffix
+    }
     
+
     func sortParameters(direction:Int)
     {
         let indexToSort = (self.checkBoxUseValues.state == NSOnState ? 1 : 0)
@@ -271,87 +211,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         self.textFieldColumnRecodedName.stringValue = ""
     }
     
-    func selectedColumnAndSelectedParameter() -> (column:String, parameter:String)?
-    {
-        let columnIndex = self.tableViewHeaders.selectedRow
-        let parameterRow = self.tableViewExtractedParameters.selectedRow
-        guard
-                columnIndex >= 0 &&
-                columnIndex < (self.representedObject as! CSVdata).headers.count &&
-                parameterRow >= 0 &&
-                parameterRow < (self.representedObject as! CSVdata).csvData[columnIndex].count
-        else
-        {
-            print("out of range in selectedColumnAndSelectedParameter")
-            return nil
-        }
-        let colS = (self.representedObject as! CSVdata).headers[columnIndex]
-        let paramS = self.arrayExtractedParameters[parameterRow][kParametersArrayParametersIndex]
-        return (colS,paramS)
-    }
-    
-    func updateTableViewSelectedColumnAndParameters()
-    {
-        self.tableViewSelectedColumnAndParameters.reloadData()
-        self.buttonRemoveSelectedParameter.enabled = false
-
-    }
-    
-    func addColumnAndSelectedParameter()
-    {
-        guard let tuple = self.selectedColumnAndSelectedParameter()
-            else
-        {
-            return
-        }
-        self.arraySelectedColumnAndParameters.append([tuple.column,tuple.parameter])
-        self.updateTableViewSelectedColumnAndParameters()
-    }
-    
-    func removeColumnAndSelectedParameter()
-    {
-        let selectedRowInTable = self.tableViewSelectedColumnAndParameters.selectedRow
-        guard selectedRowInTable >= 0
-            else
-        {
-            return
-        }
-        self.arraySelectedColumnAndParameters.removeAtIndex(selectedRowInTable)
-        self.updateTableViewSelectedColumnAndParameters()
-
-    }
-    
-    func selectedColumnForExtractedParametersTableView() -> Int?
-    {
-        let columnIndex = self.tableViewHeaders.selectedRow
-        guard columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
-            else
-        {
-            print("out of range in selectedColumnForExtractedParametersTableView")
-            return nil
-        }
-        return columnIndex
-    }
-    
-    func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
-    {
-        return columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
-    }
-    
-    func stringForRecodedColumn(columnIndex:Int) -> String
-    {
-        guard self.requestedColumnIndexIsOK(columnIndex) else
-        {
-            print("columnIndex out of range in stringForRecodedColumn")
-            return kStringRecodedColumnNameSuffix
-        }
-        return (self.representedObject as! CSVdata).headers[columnIndex]+kStringRecodedColumnNameSuffix
-    }
     
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        guard let columnIndex = self.selectedColumnForExtractedParametersTableView() else
+        guard let columnIndex = self.selectedColumnFromHeadersTableView() else
         {
             print("columnIndex out of range in extractParametersIntoSetFromColumn")
             return
@@ -388,7 +252,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     func doTheRecodeParametersAndAddNewColumn()
     {
-        guard let columnIndex = self.selectedColumnForExtractedParametersTableView() where self.arrayExtractedParameters.count > 0
+        guard let columnIndex = self.selectedColumnFromHeadersTableView() where self.arrayExtractedParameters.count > 0
             else
         {
             print("out of range in doTheRecodeParametersAndAddNewColumn")

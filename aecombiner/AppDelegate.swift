@@ -21,6 +21,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
-
+    @IBAction func closeSheetForButton(button:NSButton)
+    {
+        guard   let win = button.window,
+                let sheetP = button.window?.sheetParent else
+        {
+            return
+        }
+        sheetP.endSheet(win)
+    }
 }
-
