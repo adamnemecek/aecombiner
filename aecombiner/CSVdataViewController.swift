@@ -14,25 +14,24 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     @IBOutlet weak var tableViewCSVdata: NSTableView!
 
     
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
-        self.representedObject = CSVdata()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "addColumnWithIdentifier:", name: "addColumnWithIdentifier", object: nil)
-
-    }
-    
-    override var representedObject: AnyObject? {
+    var csvDataObject: CSVdata = CSVdata() {
         didSet {
             // Update the view, if already loaded.
             self.columnsClearAndRebuild()
             self.tableViewCSVdata.reloadData()
-            
-            
         }
     }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do view setup here.
+        self.csvDataObject = CSVdata()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "addColumnWithIdentifier:", name: "addColumnWithIdentifier", object: nil)
+
+    }
+    
+    
+    
     // MARK: - segue
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
         guard segue.identifier != nil else {
@@ -42,14 +41,14 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         switch segue.identifier!
         {
         case "HeadingsViewController":
-            let recoder = (segue.destinationController as! HeadingsViewController)
-            recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
+            _ = (segue.destinationController as! HeadingsViewController)
+            //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
         case "RecodeColumnViewController":
-            let recoder = (segue.destinationController as! RecodeColumnViewController)
-            recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
+            _ = (segue.destinationController as! RecodeColumnViewController)
+            //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
         case "SelectParametersViewController":
-            let recoder = (segue.destinationController as! SelectParametersViewController)
-            recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
+            _ = (segue.destinationController as! SelectParametersViewController)
+            //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
             
             
         default:
@@ -65,15 +64,21 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         {
             self.tableViewCSVdata.removeTableColumn(tableViewCSVdata.tableColumns.last!)
         }
-        for var c = 0; c < (self.representedObject as! CSVdata).headers.count; c++
+        for var c = 0; c < self.csvDataObject.headers.count; c++
         {
-            let col_title = (self.representedObject as! CSVdata).headers[c]
+            let col_title = self.csvDataObject.headers[c]
             let col = NSTableColumn(identifier: col_title)
             col.title = col_title
             self.tableViewCSVdata.addTableColumn(col)
             
         }
         
+    }
+    
+    func deleteColumnWithIdentifier(identifier: String)
+    {
+        guard let column = self.tableViewCSVdata.tableColumnWithIdentifier(identifier) else {return}
+        self.tableViewCSVdata.removeTableColumn(column)
     }
     
     func addColumnWithIdentifier(notification: NSNotification)
@@ -97,7 +102,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         switch tvidentifier
         {
         case "tableViewCSVdata":
-            return (self.representedObject as! CSVdata).csvData.count
+            return self.csvDataObject.csvData.count
         default:
             return 0
         }
@@ -116,7 +121,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
             // Set the stringValue of the cell's text field to the nameArray value at row
             let colIndex = tableView.columnWithIdentifier((tableColumn?.identifier)!)
-            cellView.textField!.stringValue = (self.representedObject as! CSVdata).csvData[row][colIndex]
+            cellView.textField!.stringValue = self.csvDataObject.csvData[row][colIndex]
             
         default:
             break;

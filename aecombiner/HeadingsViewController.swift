@@ -14,10 +14,37 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBOutlet weak var tableViewHeaders: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
-    // MARK: - Represented Object
+   
+    
+    /* MARK: - Represented Object
     func updateRepresentedObjectToCSVData(csvdata:CSVdata)
     {
         self.representedObject = csvdata
+    }
+    */
+    
+    //MARK: - Supers overrides
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        // Do view setup here.
+        self.tableViewHeaders?.reloadData()
+    }
+
+    
+    func myCSVdataViewController() -> CSVdataViewController?
+    {
+        return (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
+    }
+
+    func myCSVdataObject() -> CSVdata
+    {
+        guard let csv = myCSVdataViewController()?.csvDataObject else {return CSVdata()}
+        return csv
     }
     
     // MARK: - @IBAction
@@ -26,36 +53,27 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         
     }
 
-    // MARK: - Column parameters
-   func selectedColumnFromHeadersTableView() -> Int?
-    {
+    @IBAction func deleteHeading(sender: AnyObject) {
         let columnIndex = self.tableViewHeaders.selectedRow
-        guard columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
-            else
+        guard let dvc = self.myCSVdataViewController() where self.requestedColumnIndexIsOK(columnIndex)
+            else {return}
+        // must add the column to Array BEFORE adding column to table
+        for var r = 0; r<self.myCSVdataObject().csvData.count; r++
         {
-            print("out of range in selectedColumnFromHeadersTableView")
-            return nil
+            var rowArray = self.myCSVdataObject().csvData[r]
+            rowArray.removeAtIndex(columnIndex)
+            self.myCSVdataObject().csvData[r] = rowArray
         }
-        return columnIndex
+        //remove from headers array
+        self.myCSVdataObject().headers.removeAtIndex(columnIndex)
+        //Safe to add column to table now
+        dvc.tableViewCSVdata.removeTableColumn(dvc.tableViewCSVdata.tableColumns[columnIndex])
+        dvc.tableViewCSVdata.reloadData()
+        self.documentMakeDirty()
     }
     
-   func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
-    {
-        return columnIndex >= 0 && columnIndex < (self.representedObject as! CSVdata).headers.count
-    }
-    
-    func stringForColumnName(columnIndex:Int) -> String
-    {
-        guard self.requestedColumnIndexIsOK(columnIndex) else
-        {
-            print("columnIndex out of range in stringForColumnName")
-            return ""
-        }
-        return (self.representedObject as! CSVdata).headers[columnIndex]
-    }
-    
-
     // MARK: - Document
+    
     
     func documentMakeDirty()
     {
@@ -68,14 +86,36 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     }
     
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
-        self.tableViewHeaders?.reloadData()
-
+    
+    // MARK: - Column parameters
+   func selectedColumnFromHeadersTableView() -> Int?
+    {
+        guard self.requestedColumnIndexIsOK(self.tableViewHeaders.selectedRow)
+            else
+        {
+            print("out of range in selectedColumnFromHeadersTableView")
+            return nil
+        }
+        return self.tableViewHeaders.selectedRow
     }
     
+   func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
+    {
+        return columnIndex >= 0 && columnIndex < self.myCSVdataObject().headers.count
+    }
     
+    func stringForColumnName(columnIndex:Int) -> String
+    {
+        guard self.requestedColumnIndexIsOK(columnIndex) else
+        {
+            print("columnIndex out of range in stringForColumnName")
+            return ""
+        }
+        return (self.myCSVdataObject().headers[columnIndex])
+    }
+    
+
+
     
     // MARK: - TableView overrides
         
@@ -87,7 +127,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         switch tvidentifier
         {
         case "tableViewHeaders":
-            return (self.representedObject as! CSVdata).headers.count
+            return self.myCSVdataObject().headers.count
         default:
             return 0
         }
@@ -96,7 +136,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     func cellForHeadersTable(tableView tableView: NSTableView, row: Int) ->NSTableCellView
     {
         let cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
-        cellView.textField!.stringValue = (self.representedObject as! CSVdata).headers[row]
+        cellView.textField!.stringValue = self.myCSVdataObject().headers[row]
         return cellView
     }
     
@@ -134,7 +174,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         switch tableView.identifier!
         {
         case "tableViewHeaders":
-            self.textFieldColumnRecodedName.stringValue = self.stringForColumnName(columnIndex)
+            self.textFieldColumnRecodedName?.stringValue = self.stringForColumnName(columnIndex)
         default:
             break
         }

@@ -25,12 +25,12 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     @IBOutlet weak var buttonRemoveSelectedParameter: NSButton!
     
-    // MARK: - Represented Object
+    /* MARK: - Represented Object
     override func updateRepresentedObjectToCSVData(csvdata:CSVdata)
     {
         self.representedObject = csvdata
     }
-
+*/
     // MARK: - @IBAction
     
     
@@ -62,14 +62,14 @@ class SelectParametersViewController: RecodeColumnViewController {
         self.tableViewExtractedParameters?.reloadData()
     }
     
-    override var representedObject: AnyObject? {
+    /* override var representedObject: AnyObject? {
         didSet {
             // Update the view, if already loaded.
             self.tableViewHeaders?.reloadData()
             self.tableViewExtractedParameters?.reloadData()
             
         }
-    }
+    }*/
     
     
     
@@ -84,7 +84,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         switch tvidentifier
         {
         case "tableViewSelectedHeaders":
-            return (self.representedObject as! CSVdata).headers.count
+            return self.myCSVdataObject().headers.count
         case "tableViewSelectedExtractedParameters":
             return self.arrayExtractedParameters.count
         case "tableViewSelectedColumnAndParameters":
@@ -168,15 +168,15 @@ class SelectParametersViewController: RecodeColumnViewController {
         let parameterRow = self.tableViewExtractedParameters.selectedRow
         guard
             columnIndex >= 0 &&
-                columnIndex < (self.representedObject as! CSVdata).headers.count &&
+                columnIndex < self.myCSVdataObject().headers.count &&
                 parameterRow >= 0 &&
-                parameterRow < (self.representedObject as! CSVdata).csvData[columnIndex].count
+                parameterRow < self.myCSVdataObject().csvData[columnIndex].count
             else
         {
             print("out of range in selectedColumnAndSelectedParameter")
             return nil
         }
-        let colS = (self.representedObject as! CSVdata).headers[columnIndex]
+        let colS = self.myCSVdataObject().headers[columnIndex]
         let paramS = self.arrayExtractedParameters[parameterRow][kParametersArrayParametersIndex]
         return (colS,paramS)
     }

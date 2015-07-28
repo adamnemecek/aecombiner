@@ -28,8 +28,8 @@ class RecodeColumnViewController: HeadingsViewController {
 
     @IBOutlet weak var tableViewExtractedParameters: NSTableView!
     
-    @IBOutlet weak var checkBoxIsNumbers: NSButton!
-    @IBOutlet weak var checkBoxUseValues: NSButton!
+    @IBOutlet weak var segmentedTextNumbers: NSSegmentedControl!
+    @IBOutlet weak var segmentedParameterValue: NSSegmentedControl!
     
     
     
@@ -57,6 +57,7 @@ class RecodeColumnViewController: HeadingsViewController {
 
     }
 
+    /*
     override var representedObject: AnyObject? {
         didSet {
         // Update the view, if already loaded.
@@ -65,7 +66,7 @@ class RecodeColumnViewController: HeadingsViewController {
             
         }
     }
-
+*/
     
 
     // MARK: - TableView overrides
@@ -101,7 +102,7 @@ class RecodeColumnViewController: HeadingsViewController {
         switch tvidentifier
         {
         case "tableViewRecodeHeaders":
-            return (self.representedObject as! CSVdata).headers.count
+            return self.myCSVdataObject().headers.count
         case "tableViewExtractedParameters":
             return self.arrayExtractedParameters.count
         default:
@@ -167,48 +168,39 @@ class RecodeColumnViewController: HeadingsViewController {
 
     func sortParameters(direction:Int)
     {
-        let indexToSort = (self.checkBoxUseValues.state == NSOnState ? 1 : 0)
+        //let wayToSort = (direction, textOrNum:self.segmentedTextNumbers.selectedSegment)
+        let indexToSort = self.segmentedParameterValue.selectedSegment
         
-        if self.checkBoxIsNumbers.state == NSOnState
+        switch (direction, self.segmentedTextNumbers.selectedSegment)
         {
-            switch direction {
-            case 0:
-                self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
-                    return Double(leftTuple[indexToSort])>Double(rightTuple[indexToSort])
-                })
-            case 1:
-                self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
-                    return Double(leftTuple[indexToSort])<Double(rightTuple[indexToSort])
-                })
-                
-            default:
-                return
-            }
+        case (0,1):
+            self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
+                return Double(leftTuple[indexToSort])>Double(rightTuple[indexToSort])
+            })
+        case (1,1):
+            self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
+                return Double(leftTuple[indexToSort])<Double(rightTuple[indexToSort])
+            })
+        case (0,0):
+            self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
+                return leftTuple[indexToSort]>rightTuple[indexToSort]
+            })
+        case (1,0):
+            self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
+                return leftTuple[indexToSort]<rightTuple[indexToSort]
+            })
+        default:
+            return
         }
-        else
-        {
-            switch direction {
-            case 0:
-                self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
-                    return leftTuple[indexToSort]>rightTuple[indexToSort]
-                })
-            case 1:
-                self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
-                    return leftTuple[indexToSort]<rightTuple[indexToSort]
-                })
-                
-            default:
-                return
-            }
-        }
+        
         self.tableViewExtractedParameters.reloadData()
     }
     
     func resetExtractedParameters()
     {
         self.arrayExtractedParameters = [[String]]()
-        self.tableViewExtractedParameters.reloadData()
-        self.textFieldColumnRecodedName.stringValue = ""
+        self.tableViewExtractedParameters?.reloadData()
+        self.textFieldColumnRecodedName?.stringValue = ""
     }
     
     
@@ -221,9 +213,9 @@ class RecodeColumnViewController: HeadingsViewController {
             return
         }
         var set = Set<String>()
-        self.textFieldColumnRecodedName.stringValue = self.stringForRecodedColumn(columnIndex)
+        self.textFieldColumnRecodedName?.stringValue = self.stringForRecodedColumn(columnIndex)
         
-        for parameter in (self.representedObject as! CSVdata).csvData
+        for parameter in self.myCSVdataObject().csvData
         {
             // parameter is a [string] array of row columns
             set.insert(parameter[columnIndex])
@@ -261,9 +253,9 @@ class RecodeColumnViewController: HeadingsViewController {
         
         
         //give a name if none
-        if self.textFieldColumnRecodedName.stringValue.isEmpty
+        if (self.textFieldColumnRecodedName?.stringValue.isEmpty != nil)
         {
-            self.textFieldColumnRecodedName.stringValue = self.stringForRecodedColumn(columnIndex)
+            self.textFieldColumnRecodedName?.stringValue = self.stringForRecodedColumn(columnIndex)
         }
         
         //make a temporary dictionary
@@ -274,19 +266,19 @@ class RecodeColumnViewController: HeadingsViewController {
         }
         
         // must add the column to Array BEFORE adding column to table
-        for var r = 0; r<(self.representedObject as! CSVdata).csvData.count; r++
+        for var r = 0; r<self.myCSVdataObject().csvData.count; r++
         {
-            var rowArray = (self.representedObject as! CSVdata).csvData[r]
+            var rowArray = self.myCSVdataObject().csvData[r]
             //ADD CORRECT PARAMETER AFTER LOOKUP
             let valueToRecode = rowArray[columnIndex]
             let recodedValue = (paramsDict[valueToRecode] ?? "")
             rowArray.append(recodedValue)
-            (self.representedObject as! CSVdata).csvData[r] = rowArray
+            self.myCSVdataObject().csvData[r] = rowArray
         }
         //add name to headers array
-        (self.representedObject as! CSVdata).headers.append(self.textFieldColumnRecodedName.stringValue)
+        self.myCSVdataObject().headers.append((self.textFieldColumnRecodedName?.stringValue)!)
         //Safe to add column to table now
-        let colName = self.textFieldColumnRecodedName.stringValue
+        let colName = self.textFieldColumnRecodedName?.stringValue
         NSNotificationCenter.defaultCenter().postNotificationName("addColumnWithIdentifier", object: colName)
 
         //reload etc

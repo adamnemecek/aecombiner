@@ -45,7 +45,7 @@ class Document: NSDocument {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
         let windowController = storyboard.instantiateControllerWithIdentifier("DashboardWindow") as! DashboardWindowController
         self.addWindowController(windowController)
-    }*/
+    }
     
     func makeAndShowRecodeWindow()
     {
@@ -54,14 +54,14 @@ class Document: NSDocument {
         self.addWindowController(windowController)
         windowController.window?.contentViewController?.representedObject = self.csvDataModel
     }
-
+*/
     
     func makeAndShowCSVdataWindow()
     {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
         let csvDataWindowController = storyboard.instantiateControllerWithIdentifier("CSVdataWindowController") as! CSVdataWindowController
         self.addWindowController(csvDataWindowController)
-        csvDataWindowController.window?.contentViewController?.representedObject = self.csvDataModel
+        (csvDataWindowController.window?.contentViewController as? CSVdataViewController)?.csvDataObject = self.csvDataModel
 
     }
 
