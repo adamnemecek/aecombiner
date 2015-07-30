@@ -30,7 +30,17 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     }
     
-    
+    // MARK: - document
+    func documentMakeDirty()
+    {
+        guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
+        {
+            print("No document documentMakeDirty")
+            return
+        }
+        (doc as! Document).updateChangeCount(.ChangeDone)
+    }
+
     
     // MARK: - segue
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
@@ -58,6 +68,13 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     
     // MARK: - CSV data table
+    
+    func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
+    {
+        return columnIndex >= 0 && columnIndex < self.csvDataObject.headers.count
+    }
+
+    
    func columnsClearAndRebuild(){
         
         while self.tableViewCSVdata.tableColumns.count > 0
@@ -74,6 +91,25 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         }
         
     }
+    
+    func deleteColumnAtIndex(columnIndex: Int)
+    {
+        // must add the column to Array BEFORE adding column to table
+        for var r = 0; r<self.csvDataObject.csvData.count; r++
+        {
+            var rowArray = self.csvDataObject.csvData[r]
+            rowArray.removeAtIndex(columnIndex)
+            self.csvDataObject.csvData[r] = rowArray
+        }
+        //remove from headers array
+        self.csvDataObject.headers.removeAtIndex(columnIndex)
+        //Safe to delete column to table now
+        self.tableViewCSVdata.removeTableColumn(self.tableViewCSVdata.tableColumns[columnIndex])
+        self.tableViewCSVdata.reloadData()
+        self.documentMakeDirty()
+
+    }
+    
     
     func deleteColumnWithIdentifier(identifier: String)
     {

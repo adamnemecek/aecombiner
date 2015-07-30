@@ -57,18 +57,6 @@ class RecodeColumnViewController: HeadingsViewController {
 
     }
 
-    /*
-    override var representedObject: AnyObject? {
-        didSet {
-        // Update the view, if already loaded.
-            self.tableViewHeaders?.reloadData()
-            self.tableViewExtractedParameters?.reloadData()
-            
-        }
-    }
-*/
-    
-
     // MARK: - TableView overrides
 
     func control(control: NSControl, textShouldEndEditing fieldEditor: NSText) -> Bool {
