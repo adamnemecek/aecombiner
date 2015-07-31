@@ -1,5 +1,5 @@
 //
-//  Document.swift
+//  CSVdataDocument.swift
 //  aecombiner
 //
 //  Created by David JM Lewis on 25/06/2015.
@@ -10,10 +10,13 @@ import Cocoa
 
 
 
-class Document: NSDocument {
-
+class CSVdataDocument: NSDocument {
     var csvDataModel = CSVdata()
     
+    class func makeDocumentDirtyForView(view:NSView)
+    {
+        view.window?.windowController?.document?.updateChangeCount(.ChangeDone)
+    }
     
     override init() {
         super.init()
@@ -31,32 +34,14 @@ class Document: NSDocument {
     }
 
     override func makeWindowControllers() {
-        // Returns the Storyboard that contains your Document window.
+        // Returns the Storyboard that contains your CSVdataDocument window.
         
-        //self.makeAndShowDashboardWindow()
         self.makeAndShowCSVdataWindow()
         
         self.showWindows()
     }
 
-   
-/*    func makeAndShowDashboardWindow()
-    {
-        let storyboard = NSStoryboard(name: "Main", bundle: nil)
-        let windowController = storyboard.instantiateControllerWithIdentifier("DashboardWindow") as! DashboardWindowController
-        self.addWindowController(windowController)
-    }
-    
-    func makeAndShowRecodeWindow()
-    {
-        let storyboard = NSStoryboard(name: "Main", bundle: nil)
-        let windowController = storyboard.instantiateControllerWithIdentifier("RecodeWindow") as! RecodeColumnWindowController
-        self.addWindowController(windowController)
-        windowController.window?.contentViewController?.representedObject = self.csvDataModel
-    }
-*/
-    
-    func makeAndShowCSVdataWindow()
+       func makeAndShowCSVdataWindow()
     {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
         let csvDataWindowController = storyboard.instantiateControllerWithIdentifier("CSVdataWindowController") as! CSVdataWindowController

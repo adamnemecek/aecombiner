@@ -33,12 +33,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     // MARK: - document
     func documentMakeDirty()
     {
-        guard let doc = NSDocumentController.sharedDocumentController().currentDocument else
-        {
-            print("No document documentMakeDirty")
-            return
-        }
-        (doc as! Document).updateChangeCount(.ChangeDone)
+        CSVdataDocument.makeDocumentDirtyForView(self.view)
+
     }
 
     
@@ -69,6 +65,21 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     // MARK: - CSV data table
     
+    func createSetOfParameters(fromColumn columnIndex:Int)->Set<String>?
+    {
+        var set: Set<String>? = Set<String>()
+        for parameter in self.csvDataObject.csvData
+        {
+            // parameter is a [string] array of row columns
+            set!.insert(parameter[columnIndex])
+        }
+        if set!.count == 0
+        {
+            set = nil
+        }
+        return set
+    }
+    
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
     {
         return columnIndex >= 0 && columnIndex < self.csvDataObject.headers.count
@@ -83,18 +94,54 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         }
         for var c = 0; c < self.csvDataObject.headers.count; c++
         {
-            let col_title = self.csvDataObject.headers[c]
-            let col = NSTableColumn(identifier: col_title)
-            col.title = col_title
-            self.tableViewCSVdata.addTableColumn(col)
+            self.tableViewCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(self.csvDataObject.headers[c]))
             
         }
         
     }
     
+    func renameColumnAtIndex(columnIndex: Int, newName:String)
+    {
+        guard columnIndex >= 0 && !newName.isEmpty else {return}
+        self.csvDataObject.headers[columnIndex] = newName
+        self.tableViewCSVdata.tableColumns[columnIndex].title = newName
+        self.tableViewCSVdata.reloadData()
+    }
+
+    
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:[[String]])
+    {
+        //make a temporary dictionary
+        var paramsDict = [String : String]()
+        for paramNameAndValueArray in paramsArray
+        {
+            paramsDict[paramNameAndValueArray[0]] = paramNameAndValueArray[1]
+        }
+        
+        // must add the column to Array BEFORE adding column to table
+        for var r = 0; r<self.csvDataObject.csvData.count; r++
+        {
+            var rowArray = self.csvDataObject.csvData[r]
+            //ADD CORRECT PARAMETER AFTER LOOKUP
+            let valueToRecode = rowArray[columnIndex]
+            let recodedValue = (paramsDict[valueToRecode] ?? "")
+            rowArray.append(recodedValue)
+            self.csvDataObject.csvData[r] = rowArray
+        }
+        //add name to headers array
+        self.csvDataObject.headers.append(title)
+        //Safe to add column to table now
+        self.tableViewCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(title))
+        self.tableViewCSVdata.reloadData()
+        self.tableViewCSVdata.scrollColumnToVisible(self.tableViewCSVdata.numberOfColumns-1)
+        self.documentMakeDirty()
+    }
+    
     func deleteColumnAtIndex(columnIndex: Int)
     {
-        // must add the column to Array BEFORE adding column to table
+        guard columnIndex >= 0 && columnIndex <= self.csvDataObject.headers.count else {return}
+        
+        // must delete the column from Array BEFORE deleting  table
         for var r = 0; r<self.csvDataObject.csvData.count; r++
         {
             var rowArray = self.csvDataObject.csvData[r]
@@ -110,19 +157,17 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     }
     
-    
-    func deleteColumnWithIdentifier(identifier: String)
+    func columnWithUniqueIdentifierAndTitle(title:String)->NSTableColumn
     {
-        guard let column = self.tableViewCSVdata.tableColumnWithIdentifier(identifier) else {return}
-        self.tableViewCSVdata.removeTableColumn(column)
+        let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
+        col.title = title
+        return col
     }
     
     func addColumnWithIdentifier(notification: NSNotification)
     {
-        let column_identifier = notification.object as! String
-        let col = NSTableColumn(identifier:column_identifier)
-        col.title = column_identifier
-        self.tableViewCSVdata.addTableColumn(col)
+        guard let title = notification.object as? String else {return}
+        self.tableViewCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(title))
         self.tableViewCSVdata.reloadData()
         self.tableViewCSVdata.scrollColumnToVisible(self.tableViewCSVdata.numberOfColumns-1)
     }

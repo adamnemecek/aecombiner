@@ -48,7 +48,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     }
     
     
-    // MARK: - Document
+    // MARK: - CSVdataDocument
     
     
     
@@ -77,14 +77,14 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier else
+        guard let tvidentifier = tableView.identifier,let csvdo = self.myCSVdataObject()  else
         {
             return 0
         }
         switch tvidentifier
         {
         case "tableViewSelectedHeaders":
-            return self.myCSVdataObject().headers.count
+            return csvdo.headers.count
         case "tableViewSelectedExtractedParameters":
             return self.arrayExtractedParameters.count
         case "tableViewSelectedColumnAndParameters":
@@ -159,24 +159,19 @@ class SelectParametersViewController: RecodeColumnViewController {
     }
     
     
-    // MARK: - Column parameters
-    
-    
+    // MARK: - Column parameters    
     func selectedColumnAndSelectedParameter() -> (column:String, parameter:String)?
     {
         let columnIndex = self.tableViewHeaders.selectedRow
         let parameterRow = self.tableViewExtractedParameters.selectedRow
+        guard let csvdo = self.myCSVdataObject() else {return nil}
         guard
             columnIndex >= 0 &&
-                columnIndex < self.myCSVdataObject().headers.count &&
-                parameterRow >= 0 &&
-                parameterRow < self.myCSVdataObject().csvData[columnIndex].count
-            else
-        {
-            print("out of range in selectedColumnAndSelectedParameter")
-            return nil
-        }
-        let colS = self.myCSVdataObject().headers[columnIndex]
+            columnIndex < csvdo.headers.count &&
+            parameterRow >= 0 &&
+            parameterRow < csvdo.csvData[columnIndex].count
+        else {return nil}
+        let colS = csvdo.headers[columnIndex]
         let paramS = self.arrayExtractedParameters[parameterRow][kParametersArrayParametersIndex]
         return (colS,paramS)
     }
@@ -185,7 +180,6 @@ class SelectParametersViewController: RecodeColumnViewController {
     {
         self.tableViewSelectedColumnAndParameters.reloadData()
         self.buttonRemoveSelectedParameter.enabled = false
-        
     }
     
     func addColumnAndSelectedParameter()

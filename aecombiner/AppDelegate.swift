@@ -31,3 +31,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         sheetP.endSheet(win)
     }
 }
+

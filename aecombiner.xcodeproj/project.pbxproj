@@ -14,7 +14,7 @@
 		C5557D381B5948BC00C7E94D /* SelectParametersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5557D371B5948BC00C7E94D /* SelectParametersViewController.swift */; };
 		C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */; };
 		C5CBBC3C1B3C0BFA008FB844 /* RecodeColumnViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */; };
-		C5CBBC3E1B3C0BFA008FB844 /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC3D1B3C0BFA008FB844 /* Document.swift */; };
+		C5CBBC3E1B3C0BFA008FB844 /* CSVdataDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC3D1B3C0BFA008FB844 /* CSVdataDocument.swift */; };
 		C5CBBC401B3C0BFA008FB844 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5CBBC3F1B3C0BFA008FB844 /* Images.xcassets */; };
 		C5CBBC431B3C0BFA008FB844 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C5CBBC411B3C0BFA008FB844 /* Main.storyboard */; };
 /* End PBXBuildFile section */
@@ -39,7 +39,7 @@
 		C5CBBC381B3C0BFA008FB844 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecodeColumnViewController.swift; sourceTree = "<group>"; };
-		C5CBBC3D1B3C0BFA008FB844 /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
+		C5CBBC3D1B3C0BFA008FB844 /* CSVdataDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVdataDocument.swift; sourceTree = "<group>"; };
 		C5CBBC3F1B3C0BFA008FB844 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		C5CBBC421B3C0BFA008FB844 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C5CBBC481B3C0BFA008FB844 /* aecombinerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = aecombinerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -84,11 +84,11 @@
 			isa = PBXGroup;
 			children = (
 				C5CBBC411B3C0BFA008FB844 /* Main.storyboard */,
-				C5CBBC3D1B3C0BFA008FB844 /* Document.swift */,
+				8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */,
 				C52666271B664EC6006C251E /* HeadingsViewController.swift */,
 				C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */,
 				C5557D371B5948BC00C7E94D /* SelectParametersViewController.swift */,
-				8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */,
+				C5CBBC3D1B3C0BFA008FB844 /* CSVdataDocument.swift */,
 				8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */,
 				C5CBBC3F1B3C0BFA008FB844 /* Images.xcassets */,
 				C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */,
@@ -213,7 +213,7 @@
 				C5557D381B5948BC00C7E94D /* SelectParametersViewController.swift in Sources */,
 				8E10726E1B40768D00E4E409 /* CSVdata.swift in Sources */,
 				8E69F3101B67DA4100BDB720 /* CSVdataViewController.swift in Sources */,
-				C5CBBC3E1B3C0BFA008FB844 /* Document.swift in Sources */,
+				C5CBBC3E1B3C0BFA008FB844 /* CSVdataDocument.swift in Sources */,
 				C52666291B664EC6006C251E /* HeadingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
