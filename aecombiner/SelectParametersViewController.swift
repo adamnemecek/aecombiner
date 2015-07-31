@@ -164,6 +164,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     {
         let columnIndex = self.tableViewHeaders.selectedRow
         let parameterRow = self.tableViewExtractedParameters.selectedRow
+        
         guard let csvdo = self.myCSVdataObject() else {return nil}
         guard
             columnIndex >= 0 &&
