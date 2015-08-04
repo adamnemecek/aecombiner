@@ -160,22 +160,6 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     // MARK: - Column parameters    
-    func selectedColumnAndSelectedParameter() -> (column:String, parameter:String)?
-    {
-        let columnIndex = self.tableViewHeaders.selectedRow
-        let parameterRow = self.tableViewExtractedParameters.selectedRow
-        
-        guard let csvdo = self.myCSVdataObject() else {return nil}
-        guard
-            columnIndex >= 0 &&
-            columnIndex < csvdo.headers.count &&
-            parameterRow >= 0 &&
-            parameterRow < csvdo.csvData[columnIndex].count
-        else {return nil}
-        let colS = csvdo.headers[columnIndex]
-        let paramS = self.arrayExtractedParameters[parameterRow][kParametersArrayParametersIndex]
-        return (colS,paramS)
-    }
     
     func updateTableViewSelectedColumnAndParameters()
     {
@@ -185,12 +169,24 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     func addColumnAndSelectedParameter()
     {
-        guard let tuple = self.selectedColumnAndSelectedParameter()
-            else
+        guard let csvdo = self.myCSVdataObject() else {return}
+        let columnIndex = self.tableViewHeaders.selectedRow
+        let parameterRows = self.tableViewExtractedParameters.selectedRowIndexes
+
+        guard
+            columnIndex >= 0 &&
+            columnIndex < csvdo.headers.count &&
+            parameterRows.count > 0
+            else {return}
+        
+        for parameterIndex in parameterRows
         {
-            return
+            if parameterIndex >= 0 && parameterIndex < csvdo.csvData[columnIndex].count
+            {
+                self.arraySelectedColumnAndParameters.append([csvdo.headers[columnIndex],self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
+            }
         }
-        self.arraySelectedColumnAndParameters.append([tuple.column,tuple.parameter])
+
         self.updateTableViewSelectedColumnAndParameters()
     }
     
