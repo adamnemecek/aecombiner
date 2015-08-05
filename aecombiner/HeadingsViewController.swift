@@ -29,10 +29,10 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         return self.myCSVdataObject() != nil && columnIndex >= 0 && columnIndex < self.myCSVdataObject()?.headers.count
     }
     
-    func stringForColumnName(columnIndex:Int) -> String
+    func stringForColumnIndex(columnIndex:Int?) -> String
     {
-        guard let csvdo = self.myCSVdataObject() where self.requestedColumnIndexIsOK(columnIndex) else {return ""}
-        return (csvdo.headers[columnIndex])
+        guard let index = columnIndex, let csvdo = self.myCSVdataObject() where self.requestedColumnIndexIsOK(index) else {return "???"}
+        return (csvdo.headers[index])
     }
     
     //MARK: - Supers overrides
@@ -102,11 +102,11 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         }
     }
     
+    
     func cellForHeadersTable(tableView tableView: NSTableView, row: Int) ->NSTableCellView
     {
         let cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
-        guard let csvdo = self.myCSVdataObject() else {return cellView}
-        cellView.textField!.stringValue = csvdo.headers[row]
+        cellView.textField!.stringValue = self.stringForColumnIndex(row)
         return cellView
     }
     
@@ -139,7 +139,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         switch tableViewID
         {
         case "tableViewHeaders":
-            self.textFieldColumnRecodedName?.stringValue = self.stringForColumnName(self.tableViewHeaders.selectedRow)
+            self.textFieldColumnRecodedName?.stringValue = self.stringForColumnIndex(self.tableViewHeaders.selectedRow)
         default:
             break
         }

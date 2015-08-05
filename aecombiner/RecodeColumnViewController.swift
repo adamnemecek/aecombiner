@@ -28,8 +28,8 @@ class RecodeColumnViewController: HeadingsViewController {
 
     @IBOutlet weak var tableViewExtractedParameters: NSTableView!
     
-    @IBOutlet weak var segmentedTextNumbers: NSSegmentedControl!
-    @IBOutlet weak var segmentedParameterValue: NSSegmentedControl!
+    @IBOutlet weak var segmentedSortAsTextOrNumbers: NSSegmentedControl!
+    @IBOutlet weak var segmentedSortParameterOrValue: NSSegmentedControl!
     
     
     
@@ -41,7 +41,7 @@ class RecodeColumnViewController: HeadingsViewController {
     }
     
     @IBAction func sortExtractedParameters(sender: NSButton) {
-        self.sortParameters(sender.tag)
+        self.sortParametersOrValuesFirstPart(sender.tag)
         sender.tag = sender.tag == 0 ? 1 : 0
     }
     
@@ -150,16 +150,20 @@ class RecodeColumnViewController: HeadingsViewController {
     // MARK: - Column parameters
     func stringForRecodedColumn(columnIndex:Int) -> String
     {
-        return self.stringForColumnName(columnIndex)+kStringRecodedColumnNameSuffix
+        return self.stringForColumnIndex(columnIndex)+kStringRecodedColumnNameSuffix
     }
     
-
-    func sortParameters(direction:Int)
+    
+    
+    func sortParametersOrValuesFirstPart(direction:Int)
     {
-        //let wayToSort = (direction, textOrNum:self.segmentedTextNumbers.selectedSegment)
-        let indexToSort = self.segmentedParameterValue.selectedSegment
-        
-        switch (direction, self.segmentedTextNumbers.selectedSegment)
+        // in this VC we have a segment to select PorV
+        self .sortParametersOrValues(parametersOrValueIndex: self.segmentedSortParameterOrValue!.selectedSegment, direction: direction)
+    }
+    
+    func sortParametersOrValues(parametersOrValueIndex indexToSort: Int, direction: Int)
+    {
+        switch (direction, self.segmentedSortAsTextOrNumbers.selectedSegment)
         {
         case (0,1):
             self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in

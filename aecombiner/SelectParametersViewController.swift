@@ -12,7 +12,8 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     // MARK: - class vars
-    var arraySelectedColumnAndParameters = [[String]]()
+    var arrayANDparameters = [[String]]()
+    var arrayORparameters = [[String]]()
     
     
     // MARK: - class constants
@@ -21,10 +22,11 @@ class SelectParametersViewController: RecodeColumnViewController {
     // MARK: - @IBOutlet
     
     //@IBOutlet weak var tableViewCSVdata: NSTableView!
-    @IBOutlet weak var tableViewSelectedColumnAndParameters: NSTableView!
-    
-    @IBOutlet weak var buttonRemoveSelectedParameter: NSButton!
-    
+    @IBOutlet weak var tableViewANDparameters: NSTableView!
+    @IBOutlet weak var buttonRemoveANDParameter: NSButton!
+    @IBOutlet weak var tableViewORparameters: NSTableView!
+    @IBOutlet weak var buttonRemoveORParameter: NSButton!
+
     /* MARK: - Represented Object
     override func updateRepresentedObjectToCSVData(csvdata:CSVdata)
     {
@@ -39,14 +41,18 @@ class SelectParametersViewController: RecodeColumnViewController {
         self.extractParametersIntoSetFromColumn()
     }
     
-    @IBAction func addSelectedParameter(sender: AnyObject) {
-        self.addColumnAndSelectedParameter()
+    @IBAction func addSelectedParameter(sender: NSButton) {
+        self.addColumnAndSelectedParameter(sender.identifier!)
     }
     
     @IBAction func removeSelectedParameter(sender: NSButton) {
-        self.removeColumnAndSelectedParameter()
+        self.removeColumnAndSelectedParameter(sender.identifier!)
     }
     
+    @IBAction func extractRowsBasedOnParameters(sender: NSButton) {
+        
+        //self.myCSVdataViewController()?.extractRowsBasedOnParameters
+    }
     
     // MARK: - CSVdataDocument
     
@@ -71,7 +77,12 @@ class SelectParametersViewController: RecodeColumnViewController {
         }
     }*/
     
-    
+    override func sortParametersOrValuesFirstPart(direction:Int)
+    {
+        // in this VC we dont have a segment to select PorV so return 0 == Param
+        self .sortParametersOrValues(parametersOrValueIndex: 0, direction: direction)
+    }
+
     
     // MARK: - TableView overrides
     
@@ -87,8 +98,10 @@ class SelectParametersViewController: RecodeColumnViewController {
             return csvdo.headers.count
         case "tableViewSelectedExtractedParameters":
             return self.arrayExtractedParameters.count
-        case "tableViewSelectedColumnAndParameters":
-            return self.arraySelectedColumnAndParameters.count
+        case "tableViewANDparameters":
+            return self.arrayANDparameters.count
+        case "tableViewORparameters":
+            return self.arrayORparameters.count
             
         default:
             return 0
@@ -119,13 +132,15 @@ class SelectParametersViewController: RecodeColumnViewController {
             default:
                 break
             }
-        case "tableViewSelectedColumnAndParameters":
-            let col_parameter = self.arraySelectedColumnAndParameters[row]
+        case "tableViewANDparameters", "tableViewORparameters":
+            let col_parameter = tvidentifier == "tableViewANDparameters" ? self.arrayANDparameters[row] : self.arrayORparameters[row]
+            let columnNumber = Int(col_parameter[kSelectedParametersArrayColumnIndex])
+            
             switch tableColumn!.identifier
             {
             case "column":
                 cellView = tableView.makeViewWithIdentifier("selectedParameterCellC", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = col_parameter[kSelectedParametersArrayColumnIndex]
+                cellView.textField!.stringValue = self.stringForColumnIndex(columnNumber)
             case "parameter":
                 cellView = tableView.makeViewWithIdentifier("selectedParameterCellP", owner: self) as! NSTableCellView
                 cellView.textField!.stringValue = col_parameter[kSelectedParametersArrayParameterIndex]
@@ -150,8 +165,10 @@ class SelectParametersViewController: RecodeColumnViewController {
         case "tableViewSelectedHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-        case "tableViewSelectedColumnAndParameters":
-            self.buttonRemoveSelectedParameter.enabled = tableView.selectedRow != -1
+        case "tableViewANDparameters":
+            self.buttonRemoveANDParameter.enabled = tableView.selectedRow != -1
+        case "tableViewORparameters":
+            self.buttonRemoveORParameter.enabled = tableView.selectedRow != -1
         default:
             break;
         }
@@ -161,13 +178,23 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     // MARK: - Column parameters    
     
-    func updateTableViewSelectedColumnAndParameters()
+    func updateTableViewSelectedColumnAndParameters(arrayIdentifier: String)
     {
-        self.tableViewSelectedColumnAndParameters.reloadData()
-        self.buttonRemoveSelectedParameter.enabled = false
+        switch arrayIdentifier
+        {
+        case "removeANDarray", "addANDarray":
+            self.tableViewANDparameters.reloadData()
+            self.buttonRemoveANDParameter.enabled = false
+        case "removeORarray", "addORarray":
+            self.tableViewORparameters.reloadData()
+            self.buttonRemoveORParameter.enabled = false
+        default:
+            break
+        }
+
     }
     
-    func addColumnAndSelectedParameter()
+    func addColumnAndSelectedParameter(arrayIdentifier: String)
     {
         guard let csvdo = self.myCSVdataObject() else {return}
         let columnIndex = self.tableViewHeaders.selectedRow
@@ -183,24 +210,39 @@ class SelectParametersViewController: RecodeColumnViewController {
         {
             if parameterIndex >= 0 && parameterIndex < csvdo.csvData[columnIndex].count
             {
-                self.arraySelectedColumnAndParameters.append([csvdo.headers[columnIndex],self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
+                switch arrayIdentifier
+                {
+                case "addANDarray":
+                    self.arrayANDparameters.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
+                case "addORarray":
+                    self.arrayORparameters.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
+                default:
+                    break
+                }
             }
         }
 
-        self.updateTableViewSelectedColumnAndParameters()
+        self.updateTableViewSelectedColumnAndParameters(arrayIdentifier)
     }
     
-    func removeColumnAndSelectedParameter()
+    func removeColumnAndSelectedParameter(arrayIdentifier: String)
     {
-        let selectedRowInTable = self.tableViewSelectedColumnAndParameters.selectedRow
+        let selectedRowInTable = arrayIdentifier == "removeANDarray" ? self.tableViewANDparameters.selectedRow : self.tableViewORparameters.selectedRow
         guard selectedRowInTable >= 0
             else
         {
             return
         }
-        self.arraySelectedColumnAndParameters.removeAtIndex(selectedRowInTable)
-        self.updateTableViewSelectedColumnAndParameters()
-        
+        switch arrayIdentifier
+        {
+        case "removeANDarray":
+            self.arrayANDparameters.removeAtIndex(selectedRowInTable)
+        case "removeORarray":
+            self.arrayORparameters.removeAtIndex(selectedRowInTable)
+        default:
+            break
+        }
+        self.updateTableViewSelectedColumnAndParameters(arrayIdentifier)
     }
     
     

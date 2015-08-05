@@ -65,6 +65,16 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     // MARK: - CSV data table
     
+    func extractRowsBasedOnParameters(ANDparameters ANDparameters:[[String]], ORparameters:[[String]])
+    {
+        var extractedRows = [[String]]()
+        for parameter in self.csvDataObject.csvData
+        {
+            // parameter is a [string] array of row columns
+
+        }
+    }
+    
     func createSetOfParameters(fromColumn columnIndex:Int)->Set<String>?
     {
         var set: Set<String>? = Set<String>()
