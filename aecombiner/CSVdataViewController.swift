@@ -65,13 +65,23 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     // MARK: - CSV data table
     
-    func extractRowsBasedOnParameters(ANDparameters ANDparameters:[[String]], ORparameters:[[String]])
+    func extractRowsBasedOnParameters(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
     {
+        var rowMatched = false
         var extractedRows = [[String]]()
-        for parameter in self.csvDataObject.csvData
+        for rowOfColumns in self.csvDataObject.csvData
         {
             // parameter is a [string] array of row columns
-
+            for predicate in ANDpredicates
+            {
+                // the predicate is a [][] of column#,matching text
+                if rowOfColumns[Int(predicate[0])!] == predicate[1]
+                {
+                    rowMatched = true
+                    extractedRows.append(rowOfColumns)
+                    break
+                }
+            }
         }
     }
     
