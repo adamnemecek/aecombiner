@@ -12,8 +12,8 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     // MARK: - class vars
-    var arrayANDparameters = [[String]]()
-    var arrayORparameters = [[String]]()
+    var arrayANDpredicates = [[String]]()
+    var arrayORpredicates = [[String]]()
     
     
     // MARK: - class constants
@@ -51,7 +51,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     @IBAction func extractRowsBasedOnParameters(sender: NSButton) {
         
-        //self.myCSVdataViewController()?.extractRowsBasedOnParameters
+        self.myCSVdataViewController()?.extractRowsBasedOnParameters(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
     }
     
     // MARK: - CSVdataDocument
@@ -99,9 +99,9 @@ class SelectParametersViewController: RecodeColumnViewController {
         case "tableViewSelectedExtractedParameters":
             return self.arrayExtractedParameters.count
         case "tableViewANDparameters":
-            return self.arrayANDparameters.count
+            return self.arrayANDpredicates.count
         case "tableViewORparameters":
-            return self.arrayORparameters.count
+            return self.arrayORpredicates.count
             
         default:
             return 0
@@ -133,7 +133,7 @@ class SelectParametersViewController: RecodeColumnViewController {
                 break
             }
         case "tableViewANDparameters", "tableViewORparameters":
-            let col_parameter = tvidentifier == "tableViewANDparameters" ? self.arrayANDparameters[row] : self.arrayORparameters[row]
+            let col_parameter = tvidentifier == "tableViewANDparameters" ? self.arrayANDpredicates[row] : self.arrayORpredicates[row]
             let columnNumber = Int(col_parameter[kSelectedParametersArrayColumnIndex])
             
             switch tableColumn!.identifier
@@ -213,9 +213,9 @@ class SelectParametersViewController: RecodeColumnViewController {
                 switch arrayIdentifier
                 {
                 case "addANDarray":
-                    self.arrayANDparameters.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
+                    self.arrayANDpredicates.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
                 case "addORarray":
-                    self.arrayORparameters.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
+                    self.arrayORpredicates.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
                 default:
                     break
                 }
@@ -236,9 +236,9 @@ class SelectParametersViewController: RecodeColumnViewController {
         switch arrayIdentifier
         {
         case "removeANDarray":
-            self.arrayANDparameters.removeAtIndex(selectedRowInTable)
+            self.arrayANDpredicates.removeAtIndex(selectedRowInTable)
         case "removeORarray":
-            self.arrayORparameters.removeAtIndex(selectedRowInTable)
+            self.arrayORpredicates.removeAtIndex(selectedRowInTable)
         default:
             break
         }

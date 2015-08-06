@@ -67,22 +67,56 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     func extractRowsBasedOnParameters(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
     {
-        var rowMatched = false
         var extractedRows = [[String]]()
         for rowOfColumns in self.csvDataObject.csvData
         {
-            // parameter is a [string] array of row columns
-            for predicate in ANDpredicates
+            //assume row is matched
+            var rowMatchedAND = true
+            var rowMatchedOR = true
+
+            // rowOfColumns is a [string] array of row columns
+            // the predicate is a [column#][query text]
+            //do AND first as if just one is unmatched then we reject the row
+            for predicateAND in ANDpredicates
             {
-                // the predicate is a [][] of column#,matching text
-                if rowOfColumns[Int(predicate[0])!] == predicate[1]
+                if rowOfColumns[Int(predicateAND[0])!] != predicateAND[1]
                 {
-                    rowMatched = true
-                    extractedRows.append(rowOfColumns)
+                    //we break this ANDpredicates loop with rowMatched false
+                    rowMatchedAND = false
                     break
                 }
             }
+            
+            // if we ended the AND loop without setting row matched false, and have OR predicates to match
+            if rowMatchedAND == true && ORpredicates.count > 0
+            {
+                //as we have OR predicates we must flip its value, so any OR can reset to true
+                rowMatchedOR = false
+                // check ORpredicates, just one true will exit and flip the rowMatched
+                for predicateOR in ORpredicates
+                {
+                    if rowOfColumns[Int(predicateOR[0])!] == predicateOR[1]
+                    {
+                        //we break this ORpredicates loop and flip the rowMatchedOR
+                        rowMatchedOR = true
+                        break
+                    }
+                }
+            }
+            
+            // if we ended the AND and OR loops without setting row matched false, add row
+            if rowMatchedOR && rowMatchedAND
+            {
+                extractedRows.append(rowOfColumns)
+            }
         }
+        
+        if extractedRows.count > 0
+        {
+            
+        }
+        self.tableViewCSVdata.reloadData()
+
     }
     
     func createSetOfParameters(fromColumn columnIndex:Int)->Set<String>?
