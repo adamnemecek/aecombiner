@@ -11,8 +11,12 @@ import Cocoa
 
 
 class CSVdataDocument: NSDocument {
-    var csvDataModel = CSVdata()
-    
+    var csvDataModel: CSVdata = CSVdata() {
+        didSet {
+            // Update the view, if already loaded.
+            self.csvdataviewcontrollerForDocument()?.columnsClearAndRebuild()
+        }
+    }
     class func makeDocumentDirtyForView(view:NSView)
     {
         view.window?.windowController?.document?.updateChangeCount(.ChangeDone)
@@ -46,7 +50,7 @@ class CSVdataDocument: NSDocument {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
         let csvDataWindowController = storyboard.instantiateControllerWithIdentifier("CSVdataWindowController") as! CSVdataWindowController
         self.addWindowController(csvDataWindowController)
-        (csvDataWindowController.window?.contentViewController as? CSVdataViewController)?.csvDataObject = self.csvDataModel
+        (csvDataWindowController.window?.contentViewController as? CSVdataViewController)?.myCSVdataDocument = self
 
     }
 
@@ -68,6 +72,78 @@ class CSVdataDocument: NSDocument {
     }
     
     // MARK: - Data
+    func numberOfRowsOfData()->Int
+    {
+        return self.csvDataModel.csvData.count
+    }
+    
+    func numberOfColumnsInData()->Int{
+        return self.csvDataModel.headers.count
+    }
+    
+    func deleteColumnAtIndex(columnIndex: Int)
+    {
+        guard columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return}
+        
+        // must delete the column from Array BEFORE deleting  table
+        for var r = 0; r<self.csvDataModel.csvData.count; r++
+        {
+            var rowArray = self.csvDataModel.csvData[r]
+            rowArray.removeAtIndex(columnIndex)
+            self.csvDataModel.csvData[r] = rowArray
+        }
+        //remove from headers array
+        self.csvDataModel.headers.removeAtIndex(columnIndex)        
+    }
+
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:[[String]])
+    {
+        //make a temporary dictionary
+        var paramsDict = [String : String]()
+        for paramNameAndValueArray in paramsArray
+        {
+            paramsDict[paramNameAndValueArray[0]] = paramNameAndValueArray[1]
+        }
+        
+        // must add the column to Array BEFORE adding column to table
+        for var r = 0; r<self.csvDataModel.csvData.count; r++
+        {
+            var rowArray = self.csvDataModel.csvData[r]
+            //ADD CORRECT PARAMETER AFTER LOOKUP
+            let valueToRecode = rowArray[columnIndex]
+            let recodedValue = (paramsDict[valueToRecode] ?? "")
+            rowArray.append(recodedValue)
+            self.csvDataModel.csvData[r] = rowArray
+        }
+        //add name to headers array
+        self.csvDataModel.headers.append(title)
+    }
+
+    func columnWithUniqueIdentifierAndTitle(title:String)->NSTableColumn
+    {
+        let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
+        col.title = title
+        return col
+    }
+
+    func columnsClearAndRebuild(tableViewCSVdata:NSTableView){
+        
+        while tableViewCSVdata.tableColumns.count > 0
+        {
+            tableViewCSVdata.removeTableColumn(tableViewCSVdata.tableColumns.last!)
+        }
+        for var c = 0; c < numberOfColumnsInData(); c++
+        {
+            tableViewCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(self.csvDataModel.headers[c]))
+            
+        }
+        tableViewCSVdata.reloadData()
+    }
+
+    func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
+    {
+        return columnIndex >= 0 && columnIndex < self.numberOfColumnsInData()
+    }
 
     override func dataOfType(typeName: String) throws -> NSData {
         var outError: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
@@ -106,5 +182,88 @@ class CSVdataDocument: NSDocument {
         
     }
 
+    
+    func extractRowsBasedOnParameters(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
+    {
+        var extractedRows = [[String]]()
+        for rowOfColumns in self.csvDataModel.csvData
+        {
+            //assume row is matched
+            var rowMatchedAND = true
+            var rowMatchedOR = true
+            
+            // rowOfColumns is a [string] array of row columns
+            // the predicate is a [column#][query text]
+            //do AND first as if just one is unmatched then we reject the row
+            for predicateAND in ANDpredicates
+            {
+                if rowOfColumns[Int(predicateAND[0])!] != predicateAND[1]
+                {
+                    //we break this ANDpredicates loop with rowMatched false
+                    rowMatchedAND = false
+                    break
+                }
+            }
+            
+            // if we ended the AND loop without setting row matched false, and have OR predicates to match
+            if rowMatchedAND == true && ORpredicates.count > 0
+            {
+                //as we have OR predicates we must flip its value, so any OR can reset to true
+                rowMatchedOR = false
+                // check ORpredicates, just one true will exit and flip the rowMatched
+                for predicateOR in ORpredicates
+                {
+                    if rowOfColumns[Int(predicateOR[0])!] == predicateOR[1]
+                    {
+                        //we break this ORpredicates loop and flip the rowMatchedOR
+                        rowMatchedOR = true
+                        break
+                    }
+                }
+            }
+            
+            // if we ended the AND and OR loops without setting row matched false, add row
+            if rowMatchedOR && rowMatchedAND
+            {
+                extractedRows.append(rowOfColumns)
+            }
+        }
+        
+        if extractedRows.count > 0
+        {
+            self.createNewDocumentFromExtractedRows(extractedRows)
+        }        
+    }
+    
+    func createNewDocumentFromExtractedRows(extractedRows:[[String]])
+    {
+        do {
+            let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
+            if doc is CSVdataDocument
+            {
+                (doc as! CSVdataDocument).csvDataModel = CSVdata(headers: self.csvDataModel.headers, csvdata: extractedRows)
+                (doc as! CSVdataDocument).updateChangeCount(.ChangeDone)
+            }
+        } catch {
+            print("Error making new doc")
+        }
+    }
+
+    func createSetOfParameters(fromColumn columnIndex:Int)->Set<String>?
+    {
+        var set: Set<String>? = Set<String>()
+        for parameter in self.csvDataModel.csvData
+        {
+            // parameter is a [string] array of row columns
+            set!.insert(parameter[columnIndex])
+        }
+        if set!.count == 0
+        {
+            set = nil
+        }
+        return set
+    }
+
+    
 }
 

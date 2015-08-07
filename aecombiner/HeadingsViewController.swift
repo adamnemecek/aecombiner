@@ -26,7 +26,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
     {
-        return self.myCSVdataObject() != nil && columnIndex >= 0 && columnIndex < self.myCSVdataObject()?.headers.count
+        return self.myCSVdataObject() != nil && columnIndex >= 0 && columnIndex < self.myCSVdataViewController()?.numberOfColumnsInData()
     }
     
     func stringForColumnIndex(columnIndex:Int?) -> String
@@ -56,7 +56,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     func myCSVdataObject() -> CSVdata?
     {
         //guard let csv = myCSVdataViewController()?.csvDataObject else {return CSVdata()}
-        return myCSVdataViewController()?.csvDataObject
+        return myCSVdataViewController()?.myCSVdataDocument.csvDataModel
     }
     
     // MARK: - @IBAction
@@ -89,14 +89,14 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     // MARK: - TableView overrides
         
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier, let csvdo = self.myCSVdataObject() else
+        guard let tvidentifier = tableView.identifier, let csvdo = self.myCSVdataViewController() else
         {
             return 0
         }
         switch tvidentifier
         {
         case "tableViewHeaders":
-            return csvdo.headers.count
+            return csvdo.numberOfColumnsInData()
         default:
             return 0
         }

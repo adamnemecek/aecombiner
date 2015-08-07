@@ -23,17 +23,17 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
 
     // MARK: - overrides
-    var csvDataObject: CSVdata = CSVdata() {
+    var myCSVdataDocument: CSVdataDocument = CSVdataDocument() {
         didSet {
             // Update the view, if already loaded.
             self.columnsClearAndRebuild()
         }
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        self.csvDataObject = CSVdata()
+        //self.myCSVdataDocument.csvDataModel = CSVdata()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "addColumnWithIdentifier:", name: "addColumnWithIdentifier", object: nil)
 
     }
@@ -72,113 +72,42 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     
     // MARK: - CSV data table
-    
+    /*
+    func myCSVdataDocument()->CSVdataDocument?
+    {
+        return self.view.window?.windowController?.document as? CSVdataDocument
+    }
+    */
+    func numberOfColumnsInData()->Int{
+        return self.myCSVdataDocument.numberOfColumnsInData()
+    }
+
     func extractRowsBasedOnParameters(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
     {
-        var extractedRows = [[String]]()
-        for rowOfColumns in self.csvDataObject.csvData
-        {
-            //assume row is matched
-            var rowMatchedAND = true
-            var rowMatchedOR = true
-
-            // rowOfColumns is a [string] array of row columns
-            // the predicate is a [column#][query text]
-            //do AND first as if just one is unmatched then we reject the row
-            for predicateAND in ANDpredicates
-            {
-                if rowOfColumns[Int(predicateAND[0])!] != predicateAND[1]
-                {
-                    //we break this ANDpredicates loop with rowMatched false
-                    rowMatchedAND = false
-                    break
-                }
-            }
-            
-            // if we ended the AND loop without setting row matched false, and have OR predicates to match
-            if rowMatchedAND == true && ORpredicates.count > 0
-            {
-                //as we have OR predicates we must flip its value, so any OR can reset to true
-                rowMatchedOR = false
-                // check ORpredicates, just one true will exit and flip the rowMatched
-                for predicateOR in ORpredicates
-                {
-                    if rowOfColumns[Int(predicateOR[0])!] == predicateOR[1]
-                    {
-                        //we break this ORpredicates loop and flip the rowMatchedOR
-                        rowMatchedOR = true
-                        break
-                    }
-                }
-            }
-            
-            // if we ended the AND and OR loops without setting row matched false, add row
-            if rowMatchedOR && rowMatchedAND
-            {
-                extractedRows.append(rowOfColumns)
-            }
-        }
-        
-        if extractedRows.count > 0
-        {
-            do {
-                let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
-                if doc is CSVdataDocument
-                {
-                    (doc as! CSVdataDocument).csvDataModel = CSVdata(headers: self.csvDataObject.headers, csvdata: extractedRows)
-                    //(doc as! CSVdataDocument).csvdataviewcontrollerForDocument()?.columnsClearAndRebuild()
-                    //(doc as! CSVdataDocument).csvdataviewcontrollerForDocument()?.tableViewCSVdata.reloadData()
-
-                }
-            } catch {
-                print("Error making new doc")
-            }
-            
-            
-        }
+        self.myCSVdataDocument.extractRowsBasedOnParameters(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
         self.tableViewCSVdata.reloadData()
-
     }
     
     func createSetOfParameters(fromColumn columnIndex:Int)->Set<String>?
     {
-        var set: Set<String>? = Set<String>()
-        for parameter in self.csvDataObject.csvData
-        {
-            // parameter is a [string] array of row columns
-            set!.insert(parameter[columnIndex])
-        }
-        if set!.count == 0
-        {
-            set = nil
-        }
-        return set
+        return self.myCSVdataDocument.createSetOfParameters(fromColumn: columnIndex)
     }
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
     {
-        return columnIndex >= 0 && columnIndex < self.csvDataObject.headers.count
+        return self.myCSVdataDocument.requestedColumnIndexIsOK(columnIndex)
     }
 
     
    func columnsClearAndRebuild(){
         
-        while self.tableViewCSVdata.tableColumns.count > 0
-        {
-            self.tableViewCSVdata.removeTableColumn(tableViewCSVdata.tableColumns.last!)
-        }
-        for var c = 0; c < self.csvDataObject.headers.count; c++
-        {
-            self.tableViewCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(self.csvDataObject.headers[c]))
-            
-        }
-        self.tableViewCSVdata.reloadData()
+        self.myCSVdataDocument.columnsClearAndRebuild(self.tableViewCSVdata)
     }
     
     func renameColumnAtIndex(columnIndex: Int, newName:String)
     {
         guard columnIndex >= 0 && !newName.isEmpty else {return}
-        self.csvDataObject.headers[columnIndex] = newName
+        self.myCSVdataDocument.csvDataModel.headers[columnIndex] = newName
         self.tableViewCSVdata.tableColumns[columnIndex].title = newName
         self.tableViewCSVdata.reloadData()
     }
@@ -186,27 +115,10 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:[[String]])
     {
-        //make a temporary dictionary
-        var paramsDict = [String : String]()
-        for paramNameAndValueArray in paramsArray
-        {
-            paramsDict[paramNameAndValueArray[0]] = paramNameAndValueArray[1]
-        }
+        self.myCSVdataDocument.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray)
         
-        // must add the column to Array BEFORE adding column to table
-        for var r = 0; r<self.csvDataObject.csvData.count; r++
-        {
-            var rowArray = self.csvDataObject.csvData[r]
-            //ADD CORRECT PARAMETER AFTER LOOKUP
-            let valueToRecode = rowArray[columnIndex]
-            let recodedValue = (paramsDict[valueToRecode] ?? "")
-            rowArray.append(recodedValue)
-            self.csvDataObject.csvData[r] = rowArray
-        }
-        //add name to headers array
-        self.csvDataObject.headers.append(title)
         //Safe to add column to table now
-        self.tableViewCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(title))
+        self.tableViewCSVdata.addTableColumn(self.myCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
         self.tableViewCSVdata.reloadData()
         self.tableViewCSVdata.scrollColumnToVisible(self.tableViewCSVdata.numberOfColumns-1)
         self.documentMakeDirty()
@@ -214,17 +126,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     func deleteColumnAtIndex(columnIndex: Int)
     {
-        guard columnIndex >= 0 && columnIndex <= self.csvDataObject.headers.count else {return}
+        self.myCSVdataDocument.deleteColumnAtIndex(columnIndex)
         
-        // must delete the column from Array BEFORE deleting  table
-        for var r = 0; r<self.csvDataObject.csvData.count; r++
-        {
-            var rowArray = self.csvDataObject.csvData[r]
-            rowArray.removeAtIndex(columnIndex)
-            self.csvDataObject.csvData[r] = rowArray
-        }
-        //remove from headers array
-        self.csvDataObject.headers.removeAtIndex(columnIndex)
         //Safe to delete column to table now
         self.tableViewCSVdata.removeTableColumn(self.tableViewCSVdata.tableColumns[columnIndex])
         self.tableViewCSVdata.reloadData()
@@ -232,17 +135,11 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     }
     
-    func columnWithUniqueIdentifierAndTitle(title:String)->NSTableColumn
-    {
-        let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
-        col.title = title
-        return col
-    }
     
     func addColumnWithIdentifier(notification: NSNotification)
     {
         guard let title = notification.object as? String else {return}
-        self.tableViewCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(title))
+        self.tableViewCSVdata.addTableColumn(self.myCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
         self.tableViewCSVdata.reloadData()
         self.tableViewCSVdata.scrollColumnToVisible(self.tableViewCSVdata.numberOfColumns-1)
     }
@@ -258,7 +155,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         switch tvidentifier
         {
         case "tableViewCSVdata":
-            return self.csvDataObject.csvData.count
+            return self.myCSVdataDocument.numberOfRowsOfData()
         default:
             return 0
         }
@@ -277,7 +174,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
             // Set the stringValue of the cell's text field to the nameArray value at row
             let colIndex = tableView.columnWithIdentifier((tableColumn?.identifier)!)
-            cellView.textField!.stringValue = self.csvDataObject.csvData[row][colIndex]
+            cellView.textField!.stringValue = self.myCSVdataDocument.csvDataModel.csvData[row][colIndex]
             
         default:
             break;

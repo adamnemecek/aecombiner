@@ -88,14 +88,14 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier,let csvdo = self.myCSVdataObject()  else
+        guard let tvidentifier = tableView.identifier,let csvdo = self.myCSVdataViewController()  else
         {
             return 0
         }
         switch tvidentifier
         {
         case "tableViewSelectedHeaders":
-            return csvdo.headers.count
+            return csvdo.numberOfColumnsInData()
         case "tableViewSelectedExtractedParameters":
             return self.arrayExtractedParameters.count
         case "tableViewANDparameters":
@@ -196,19 +196,19 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     func addColumnAndSelectedParameter(arrayIdentifier: String)
     {
-        guard let csvdo = self.myCSVdataObject() else {return}
+        guard let csvdo = self.myCSVdataViewController() else {return}
         let columnIndex = self.tableViewHeaders.selectedRow
         let parameterRows = self.tableViewExtractedParameters.selectedRowIndexes
 
         guard
             columnIndex >= 0 &&
-            columnIndex < csvdo.headers.count &&
+            columnIndex < csvdo.numberOfColumnsInData() &&
             parameterRows.count > 0
             else {return}
         
         for parameterIndex in parameterRows
         {
-            if parameterIndex >= 0 && parameterIndex < csvdo.csvData[columnIndex].count
+            if parameterIndex >= 0 && parameterIndex < self.arrayExtractedParameters.count
             {
                 switch arrayIdentifier
                 {

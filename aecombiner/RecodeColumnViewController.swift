@@ -83,14 +83,14 @@ class RecodeColumnViewController: HeadingsViewController {
     }
 
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier, let csvdo = self.myCSVdataObject() else
+        guard let tvidentifier = tableView.identifier, let csvdo = self.myCSVdataViewController() else
         {
             return 0
         }
         switch tvidentifier
         {
         case "tableViewRecodeHeaders":
-            return csvdo.headers.count
+            return csvdo.numberOfColumnsInData()
         case "tableViewExtractedParameters":
             return self.arrayExtractedParameters.count
         default:
