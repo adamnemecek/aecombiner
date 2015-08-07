@@ -27,6 +27,14 @@ class CSVdata {
         self.processedDataOK = false
     }
     
+    convenience init (headers:[String], csvdata:[[String]])
+    {
+        self.init()
+        self.headers = headers
+        self.csvData = csvdata
+        processedDataOK = true
+    }
+    
     convenience init (data: NSData)
     {
         self.init()

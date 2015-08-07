@@ -11,14 +11,22 @@ import Cocoa
 class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
 
     
+    // MARK: - @IBOutlet
     @IBOutlet weak var tableViewCSVdata: NSTableView!
 
+    // MARK: - @IBActions
     
+    @IBAction func rebuildColumns(sender: AnyObject) {
+        self.columnsClearAndRebuild() 
+    }
+    
+    
+
+    // MARK: - overrides
     var csvDataObject: CSVdata = CSVdata() {
         didSet {
             // Update the view, if already loaded.
             self.columnsClearAndRebuild()
-            self.tableViewCSVdata.reloadData()
         }
     }
     
@@ -113,6 +121,19 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         
         if extractedRows.count > 0
         {
+            do {
+                let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
+                if doc is CSVdataDocument
+                {
+                    (doc as! CSVdataDocument).csvDataModel = CSVdata(headers: self.csvDataObject.headers, csvdata: extractedRows)
+                    //(doc as! CSVdataDocument).csvdataviewcontrollerForDocument()?.columnsClearAndRebuild()
+                    //(doc as! CSVdataDocument).csvdataviewcontrollerForDocument()?.tableViewCSVdata.reloadData()
+
+                }
+            } catch {
+                print("Error making new doc")
+            }
+            
             
         }
         self.tableViewCSVdata.reloadData()
@@ -151,7 +172,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             self.tableViewCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(self.csvDataObject.headers[c]))
             
         }
-        
+        self.tableViewCSVdata.reloadData()
     }
     
     func renameColumnAtIndex(columnIndex: Int, newName:String)

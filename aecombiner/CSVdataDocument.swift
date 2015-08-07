@@ -50,6 +50,23 @@ class CSVdataDocument: NSDocument {
 
     }
 
+    func csvdataviewcontrollerForDocument()->CSVdataViewController?
+    {
+        if self.windowControllers.count > 0
+        {
+            let vc = self.windowControllers[0].window?.contentViewController
+            if vc == nil
+            {
+                return nil
+            }
+            else
+            {
+                return vc as? CSVdataViewController
+            }
+        }
+        return nil
+    }
+    
     // MARK: - Data
 
     override func dataOfType(typeName: String) throws -> NSData {
