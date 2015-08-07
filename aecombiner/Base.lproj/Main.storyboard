@@ -1055,9 +1055,9 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="pni-Di-dgY">
-                                <rect key="frame" x="258" y="322" width="66" height="32"/>
-                                <buttonCell key="cell" type="push" title="Sort" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yxe-uH-n9I">
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pni-Di-dgY">
+                                <rect key="frame" x="258" y="322" width="134" height="32"/>
+                                <buttonCell key="cell" type="push" title="Sort Parameter" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yxe-uH-n9I">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -1197,18 +1197,15 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
-                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BY2-WM-vfo">
-                                <rect key="frame" x="326" y="327" width="145" height="24"/>
-                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="eL0-57-fQ0">
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hsk-0c-bmM">
+                                <rect key="frame" x="565" y="321" width="103" height="32"/>
+                                <buttonCell key="cell" type="push" title="Sort Value" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IHl-GK-gKI">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <segments>
-                                        <segment label="Parameter" selected="YES"/>
-                                        <segment label="Value" tag="1"/>
-                                    </segments>
-                                </segmentedCell>
-                            </segmentedControl>
+                                </buttonCell>
+                            </button>
                             <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iQB-OF-IYM">
-                                <rect key="frame" x="503" y="327" width="161" height="24"/>
+                                <rect key="frame" x="404" y="327" width="161" height="24"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="1i7-cB-oJh">
                                     <font key="font" metaFont="system"/>
                                     <segments>
@@ -1220,7 +1217,6 @@
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="segmentedSortAsTextOrNumbers" destination="BY2-WM-vfo" id="uia-d3-pkN"/>
                         <outlet property="segmentedSortParameterOrValue" destination="iQB-OF-IYM" id="lWL-eW-pFJ"/>
                         <outlet property="tableViewExtractedParameters" destination="UMZ-uz-X3z" id="OTo-GV-iah"/>
                         <outlet property="tableViewHeaders" destination="iox-zj-bfs" id="RgM-5E-a52"/>
@@ -1473,9 +1469,9 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="Z2o-DF-7Ms">
-                                <rect key="frame" x="258" y="333" width="66" height="32"/>
-                                <buttonCell key="cell" type="push" title="Sort" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="id0-fU-IE6">
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Z2o-DF-7Ms">
+                                <rect key="frame" x="258" y="333" width="134" height="32"/>
+                                <buttonCell key="cell" type="push" title="Sort Parameter" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="id0-fU-IE6">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -1644,7 +1640,7 @@
                                 </connections>
                             </button>
                             <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="auW-4G-rw0">
-                                <rect key="frame" x="324" y="338" width="161" height="24"/>
+                                <rect key="frame" x="420" y="338" width="161" height="24"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="rbC-sv-DCS">
                                     <font key="font" metaFont="system"/>
                                     <segments>

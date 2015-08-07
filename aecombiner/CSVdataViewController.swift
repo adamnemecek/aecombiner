@@ -78,6 +78,11 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.view.window?.windowController?.document as? CSVdataDocument
     }
     */
+    func stringForColumnIndex(columnIndex:Int?) -> String
+    {
+        return self.myCSVdataDocument.stringForColumnIndex(columnIndex)
+    }
+
     func numberOfColumnsInData()->Int{
         return self.myCSVdataDocument.numberOfColumnsInData()
     }

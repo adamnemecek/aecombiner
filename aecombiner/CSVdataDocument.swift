@@ -264,6 +264,11 @@ class CSVdataDocument: NSDocument {
         return set
     }
 
-    
+    func stringForColumnIndex(columnIndex:Int?) -> String
+    {
+        guard let index = columnIndex where columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return "???"}
+        return (self.csvDataModel.headers[index])
+    }
+
 }
 

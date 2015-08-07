@@ -77,12 +77,6 @@ class SelectParametersViewController: RecodeColumnViewController {
         }
     }*/
     
-    override func sortParametersOrValuesFirstPart(direction:Int)
-    {
-        // in this VC we dont have a segment to select PorV so return 0 == Param
-        self .sortParametersOrValues(parametersOrValueIndex: 0, direction: direction)
-    }
-
     
     // MARK: - TableView overrides
     

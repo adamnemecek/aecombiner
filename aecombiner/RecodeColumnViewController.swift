@@ -29,7 +29,7 @@ class RecodeColumnViewController: HeadingsViewController {
     @IBOutlet weak var tableViewExtractedParameters: NSTableView!
     
     @IBOutlet weak var segmentedSortAsTextOrNumbers: NSSegmentedControl!
-    @IBOutlet weak var segmentedSortParameterOrValue: NSSegmentedControl!
+    //@IBOutlet weak var segmentedSortParameterOrValue: NSSegmentedControl!
     
     
     
@@ -41,7 +41,8 @@ class RecodeColumnViewController: HeadingsViewController {
     }
     
     @IBAction func sortExtractedParameters(sender: NSButton) {
-        self.sortParametersOrValuesFirstPart(sender.tag)
+        self.sortParametersOrValues(buttonTitle: sender.title, direction: sender.tag)
+        //use tag as direction
         sender.tag = sender.tag == 0 ? 1 : 0
     }
     
@@ -78,9 +79,6 @@ class RecodeColumnViewController: HeadingsViewController {
         return true
     }
     
-    override func controlTextDidEndEditing(obj: NSNotification) {
-       // print(obj, appendNewline: true)
-    }
 
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         guard let tvidentifier = tableView.identifier, let csvdo = self.myCSVdataViewController() else
@@ -140,12 +138,12 @@ class RecodeColumnViewController: HeadingsViewController {
         case "tableViewRecodeHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-        default:
+            self.textFieldColumnRecodedName?.stringValue = self.stringForColumnIndex(self.tableViewHeaders.selectedRow)
+      default:
             break;
         }
         
     }
-    
     
     // MARK: - Column parameters
     func stringForRecodedColumn(columnIndex:Int) -> String
@@ -155,14 +153,11 @@ class RecodeColumnViewController: HeadingsViewController {
     
     
     
-    func sortParametersOrValuesFirstPart(direction:Int)
-    {
-        // in this VC we have a segment to select PorV
-        self .sortParametersOrValues(parametersOrValueIndex: self.segmentedSortParameterOrValue!.selectedSegment, direction: direction)
-    }
     
-    func sortParametersOrValues(parametersOrValueIndex indexToSort: Int, direction: Int)
+    func sortParametersOrValues(buttonTitle buttonTitle: String, direction: Int)
     {
+        let indexToSort = buttonTitle == "Sort Parameter" ? 0 : 1
+        
         switch (direction, self.segmentedSortAsTextOrNumbers.selectedSegment)
         {
         case (0,1):
@@ -222,8 +217,10 @@ class RecodeColumnViewController: HeadingsViewController {
     
     func doTheRecodeParametersAndAddNewColumn()
     {
-        guard let csvVC = self.myCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView() where self.arrayExtractedParameters.count > 0
-            else {return}
+        guard self.arrayExtractedParameters.count > 0  else {return}
+        guard   let csvVC = self.myCSVdataViewController(),
+                let columnIndex = self.selectedColumnFromHeadersTableView()
+                else {return}
         //give a name if none
         let colTitle = self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(columnIndex) : self.textFieldColumnRecodedName!.stringValue
 

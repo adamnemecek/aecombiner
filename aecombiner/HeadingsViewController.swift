@@ -26,13 +26,14 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
     {
-        return self.myCSVdataObject() != nil && columnIndex >= 0 && columnIndex < self.myCSVdataViewController()?.numberOfColumnsInData()
+        guard let vc =  self.myCSVdataViewController() else {return false}
+        return vc.requestedColumnIndexIsOK(columnIndex)
     }
     
     func stringForColumnIndex(columnIndex:Int?) -> String
     {
-        guard let index = columnIndex, let csvdo = self.myCSVdataObject() where self.requestedColumnIndexIsOK(index) else {return "???"}
-        return (csvdo.headers[index])
+        guard let csvdo = self.myCSVdataViewController() else {return "???"}
+        return csvdo.stringForColumnIndex(columnIndex)
     }
     
     //MARK: - Supers overrides
@@ -53,12 +54,6 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         return (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
     }
 
-    func myCSVdataObject() -> CSVdata?
-    {
-        //guard let csv = myCSVdataViewController()?.csvDataObject else {return CSVdata()}
-        return myCSVdataViewController()?.myCSVdataDocument.csvDataModel
-    }
-    
     // MARK: - @IBAction
     
     @IBAction func renameColumn(sender: AnyObject) {
@@ -83,16 +78,14 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     func documentMakeDirty()
     {
-        CSVdataDocument.makeDocumentDirtyForView(self.view)
+        self.myCSVdataViewController()?.documentMakeDirty()
     }
         
     // MARK: - TableView overrides
         
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier, let csvdo = self.myCSVdataViewController() else
-        {
-            return 0
-        }
+        guard let tvidentifier = tableView.identifier, let csvdo = self.myCSVdataViewController() else { return 0 }
+        
         switch tvidentifier
         {
         case "tableViewHeaders":
@@ -138,10 +131,8 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
 
         switch tableViewID
         {
-        case "tableViewHeaders":
-            self.textFieldColumnRecodedName?.stringValue = self.stringForColumnIndex(self.tableViewHeaders.selectedRow)
-        default:
-            break
+            default:
+                break
         }
         
     }
