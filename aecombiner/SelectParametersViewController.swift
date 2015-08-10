@@ -49,6 +49,11 @@ class SelectParametersViewController: RecodeColumnViewController {
         self.removeColumnAndSelectedParameter(sender.identifier!)
     }
     
+    @IBAction func clearANORarray(sender: NSButton) {
+        self.clearANDorORarray(sender.identifier!)
+    }
+    
+    
     @IBAction func extractRowsBasedOnParameters(sender: NSButton) {
         
         self.myCSVdataViewController()?.extractRowsBasedOnParameters(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
@@ -176,10 +181,10 @@ class SelectParametersViewController: RecodeColumnViewController {
     {
         switch arrayIdentifier
         {
-        case "removeANDarray", "addANDarray":
+        case "removeANDarray", "addANDarray", "clearANDarray":
             self.tableViewANDparameters.reloadData()
             self.buttonRemoveANDParameter.enabled = false
-        case "removeORarray", "addORarray":
+        case "removeORarray", "addORarray", "clearORarray":
             self.tableViewORparameters.reloadData()
             self.buttonRemoveORParameter.enabled = false
         default:
@@ -239,5 +244,19 @@ class SelectParametersViewController: RecodeColumnViewController {
         self.updateTableViewSelectedColumnAndParameters(arrayIdentifier)
     }
     
+    func clearANDorORarray(arrayIdentifier: String)
+    {
+        switch arrayIdentifier
+        {
+        case "clearANDarray":
+            self.arrayANDpredicates.removeAll()
+        case "clearORarray":
+            self.arrayORpredicates.removeAll()
+        default:
+            break
+        }
+        self.updateTableViewSelectedColumnAndParameters(arrayIdentifier)
+    }
     
+
 }

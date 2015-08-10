@@ -13,6 +13,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     // MARK: - @IBOutlet
     @IBOutlet weak var tableViewCSVdata: NSTableView!
+    @IBOutlet weak var segmentSortTextOrValue: NSSegmentedControl!
 
     // MARK: - @IBActions
     
@@ -149,8 +150,17 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.tableViewCSVdata.scrollColumnToVisible(self.tableViewCSVdata.numberOfColumns-1)
     }
 
+
     // MARK: - TableView overrides
-    
+    func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
+        let columnIndex = tableView.columnWithIdentifier(tableColumn.identifier)
+        guard columnIndex >= 0 else {return}
+        guard let ascending = tableColumn.sortDescriptorPrototype?.ascending else {return}
+        self.myCSVdataDocument.sortParametersOrValues(indexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, ascending:ascending)
+        tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !ascending)
+        self.tableViewCSVdata.reloadData()
+
+    }
     
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         guard let tvidentifier = tableView.identifier else

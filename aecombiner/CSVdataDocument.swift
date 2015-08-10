@@ -8,7 +8,10 @@
 
 import Cocoa
 
-
+let kAscending = true
+let kDescending = false
+let kSortAsText = 0
+let kSortAsValue = 1
 
 class CSVdataDocument: NSDocument {
     var csvDataModel: CSVdata = CSVdata() {
@@ -123,6 +126,8 @@ class CSVdataDocument: NSDocument {
     {
         let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
         col.title = title
+        col.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: false)
+
         return col
     }
 
@@ -182,7 +187,31 @@ class CSVdataDocument: NSDocument {
         
     }
 
-    
+    func sortParametersOrValues(indexToSort indexToSort:Int, textOrvalue:Int, ascending: Bool)
+    {
+        switch (ascending, textOrvalue)
+        {
+        case (kAscending,kSortAsValue):
+            self.csvDataModel.csvData.sortInPlace({ (leftRow, rightRow) -> Bool in
+                return Double(leftRow[indexToSort])>Double(rightRow[indexToSort])
+            })
+        case (kDescending,kSortAsValue):
+            self.csvDataModel.csvData.sortInPlace({ (leftRow, rightRow) -> Bool in
+                return Double(leftRow[indexToSort])<Double(rightRow[indexToSort])
+            })
+        case (kAscending,kSortAsText):
+            self.csvDataModel.csvData.sortInPlace({ (leftRow, rightRow) -> Bool in
+                return leftRow[indexToSort]>rightRow[indexToSort]
+            })
+        case (kDescending,kSortAsText):
+            self.csvDataModel.csvData.sortInPlace({ (leftRow, rightRow) -> Bool in
+                return leftRow[indexToSort]<rightRow[indexToSort]
+            })
+        default:
+            return
+        }
+    }
+
     func extractRowsBasedOnParameters(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
     {
         var extractedRows = [[String]]()

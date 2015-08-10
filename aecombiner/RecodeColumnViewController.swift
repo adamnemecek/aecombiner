@@ -40,7 +40,7 @@ class RecodeColumnViewController: HeadingsViewController {
         self.doTheRecodeParametersAndAddNewColumn()
     }
     
-    @IBAction func sortExtractedParameters(sender: NSButton) {
+    @IBAction func sortExtractedParametersOrValues(sender: NSButton) {
         self.sortParametersOrValues(buttonTitle: sender.title, direction: sender.tag)
         //use tag as direction
         sender.tag = sender.tag == 0 ? 1 : 0
