@@ -75,6 +75,48 @@ class CSVdataDocument: NSDocument {
     }
     
     // MARK: - Data
+    
+    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String])
+    {
+        //create a dict with the keys the params we extracted for grouping
+        //give a blank array to hold the values associated with the grouping
+        var dictionaryOfParametersAndCombinedValues = [String : Double]()
+        for parameter in arrayOfParamatersInGroup
+        {
+            dictionaryOfParametersAndCombinedValues[parameter] = 0//we are just adding here
+        }
+        
+        for row in self.csvDataModel.csvData
+        {
+            //row is [][][]
+            let paramID = row[columnIndexForGrouping]
+            for columnIndexInGroup in columnIndexesToGroup
+            {
+                guard let value = Double(row[columnIndexInGroup]) else {continue}
+                guard dictionaryOfParametersAndCombinedValues[paramID] != nil else {continue}
+                dictionaryOfParametersAndCombinedValues[paramID] = dictionaryOfParametersAndCombinedValues[paramID]! + value
+            }
+        }
+
+        //join col names to make a mega name for the combination
+        var namesOfCombinedColumn = [String]()
+        for columnIndex in columnIndexesToGroup
+        {
+            namesOfCombinedColumn.append(self.csvDataModel.headers[columnIndex])
+        }
+        let nameOfNewColumn = "+".join(namesOfCombinedColumn)
+        
+        //createTheCSVdata
+        var cvsDataData = [[String]]()
+        for (parameter,value) in dictionaryOfParametersAndCombinedValues
+        {
+            cvsDataData.append([parameter, String(value)])
+        }
+        self.createNewDocumentFromExtractedRows(cvsData: cvsDataData, headers: [self.csvDataModel.headers[columnIndexForGrouping],nameOfNewColumn])
+    }
+    
+    
+    
     func numberOfRowsOfData()->Int
     {
         return self.csvDataModel.csvData.count
@@ -260,17 +302,17 @@ class CSVdataDocument: NSDocument {
         
         if extractedRows.count > 0
         {
-            self.createNewDocumentFromExtractedRows(extractedRows)
+            self.createNewDocumentFromExtractedRows(cvsData: extractedRows, headers: self.csvDataModel.headers)
         }        
     }
     
-    func createNewDocumentFromExtractedRows(extractedRows:[[String]])
+    func createNewDocumentFromExtractedRows(cvsData extractedRows:[[String]], headers:[String])
     {
         do {
             let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
             if doc is CSVdataDocument
             {
-                (doc as! CSVdataDocument).csvDataModel = CSVdata(headers: self.csvDataModel.headers, csvdata: extractedRows)
+                (doc as! CSVdataDocument).csvDataModel = CSVdata(headers: headers, csvdata: extractedRows)
                 (doc as! CSVdataDocument).updateChangeCount(.ChangeDone)
             }
         } catch {
