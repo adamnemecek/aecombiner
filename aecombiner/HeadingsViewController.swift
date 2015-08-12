@@ -7,14 +7,75 @@
 //
 
 import Cocoa
+import SpriteKit
 
 class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+    
+    // MARK: - Var
+    var chartScene:ChartScene? = nil
+    var chartTopNode: SKNode? = nil
+
+    
     // MARK: - @IBOutlet
     
     @IBOutlet weak var tableViewHeaders: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
-   
+    @IBOutlet weak var chartView: SKView!
+
+    @IBOutlet weak var buttonModel: NSButton!
+    
+    // MARK: - @Action
+    
+    @IBAction func modelParameter(sender: NSButton) {
+    
+        guard   let columnIndex = self.selectedColumnFromHeadersTableView(),
+                let scene = self.chartScene,
+                let parameters = self.myCSVdataViewController()?.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
+            else {return}
+        scene.removeAllChildren()
+        var xVal:Double = 10.0
+        for value in parameters.values
+        {
+            let node = SKSpriteNode(imageNamed: "ball")
+            node.setScale(0.05)
+            node.physicsBody?.dynamic = false
+            node.position = CGPoint(x: xVal, y: value*10)
+            scene.addChild(node)
+            xVal++
+        }
+    }
+    
+    
+    
+    
+    
+    // MARK: - Sprite
+    
+
+    
+    func showChartSceneInView(view view:SKView?) {
+        guard   let scene = ChartScene(fileNamed:"ChartScene"),
+                let chartview = view
+            else {
+                self.chartScene = nil
+                self.chartTopNode = nil
+                return}
+            /* Set the scale mode to scale to fit the window */
+            scene.scaleMode = .ResizeFill
+            chartview.presentScene(scene)
+            
+            /* Sprite Kit applies additional optimizations to improve rendering performance */
+            chartview.ignoresSiblingOrder = true
+            chartview.showsFPS = false
+            chartview.showsNodeCount = true
+            
+            self.chartScene = scene
+            let topNode = SKNode()
+            topNode.position = (CGPoint(x: 0.0, y: 0.0))
+            self.chartScene!.addChild(topNode)
+            self.chartTopNode = topNode
+    }
     
     // MARK: - Columns
     func selectedColumnFromHeadersTableView() -> Int?
@@ -26,7 +87,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
     {
-        guard let vc =  self.myCSVdataViewController() else {return false}
+        guard let vc = self.myCSVdataViewController() else {return false}
         return vc.requestedColumnIndexIsOK(columnIndex)
     }
     
@@ -39,7 +100,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     //MARK: - Supers overrides
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        self.showChartSceneInView(view: self.chartView)
     }
 
     override func viewDidAppear() {

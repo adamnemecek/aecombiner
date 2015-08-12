@@ -79,6 +79,10 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.view.window?.windowController?.document as? CSVdataDocument
     }
     */
+    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->(min:Double, max:Double,values:[Double])
+    {
+        return self.myCSVdataDocument.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
+    }
     
     func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String])
     {

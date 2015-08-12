@@ -56,6 +56,48 @@ class CSVdataDocument: NSDocument {
         (csvDataWindowController.window?.contentViewController as? CSVdataViewController)?.myCSVdataDocument = self
 
     }
+    
+    // MARK: - File I/O
+    
+    override func dataOfType(typeName: String) throws -> NSData {
+        var outError: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
+        // Insert code here to write your document to data of the specified type. If outError != nil, ensure that you create and set an appropriate error when returning nil.
+        // You can also choose to override fileWrapperOfType:error:, writeToURL:ofType:error:, or writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
+        outError = NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        switch typeName
+        {
+        case "csvFile":
+            if let value = self.csvDataModel.processCSVtoData() {
+                return value
+            }
+            throw outError
+        default:
+            throw outError
+        }
+    }
+    
+    override func readFromData(data: NSData, ofType typeName: String) throws {
+        var outError: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
+        // Insert code here to read your document from the given data of the specified type. If outError != nil, ensure that you create and set an appropriate error when returning false.
+        // You can also choose to override readFromFileWrapper:ofType:error: or readFromURL:ofType:error: instead.
+        // If you override either of these, you should also override -isEntireFileLoaded to return NO if the contents are lazily loaded.
+        outError = NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        switch typeName
+        {
+        case "csvFile":
+            self.csvDataModel = CSVdata(data: data)
+            if self.csvDataModel.processedDataOK {
+                return
+            }
+            throw outError
+        default:
+            throw outError
+        }
+        
+    }
+    
+
+    // MARK: - CSVdataViewController
 
     func csvdataviewcontrollerForDocument()->CSVdataViewController?
     {
@@ -75,6 +117,21 @@ class CSVdataDocument: NSDocument {
     }
     
     // MARK: - Data
+    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->(min:Double, max:Double,values:[Double])
+    {
+        var parametersArray = [Double]()
+        var minParam:Double = 0.0
+        var maxParam:Double = 0.0
+        for row in self.csvDataModel.csvData
+        {
+            guard let value = Double(row[columnIndex]) else {continue}
+            minParam = fmin(minParam,value)
+            maxParam = fmax(maxParam,value)
+            parametersArray.append(value)
+        }
+        return (minParam,maxParam,parametersArray)
+    }
+
     
     func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String])
     {
@@ -192,43 +249,6 @@ class CSVdataDocument: NSDocument {
         return columnIndex >= 0 && columnIndex < self.numberOfColumnsInData()
     }
 
-    override func dataOfType(typeName: String) throws -> NSData {
-        var outError: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
-        // Insert code here to write your document to data of the specified type. If outError != nil, ensure that you create and set an appropriate error when returning nil.
-        // You can also choose to override fileWrapperOfType:error:, writeToURL:ofType:error:, or writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
-        outError = NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
-        switch typeName
-        {
-        case "csvFile":
-            if let value = self.csvDataModel.processCSVtoData() {
-                return value
-            }
-            throw outError
-        default:
-            throw outError
-        }
-    }
-
-    override func readFromData(data: NSData, ofType typeName: String) throws {
-        var outError: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
-        // Insert code here to read your document from the given data of the specified type. If outError != nil, ensure that you create and set an appropriate error when returning false.
-        // You can also choose to override readFromFileWrapper:ofType:error: or readFromURL:ofType:error: instead.
-        // If you override either of these, you should also override -isEntireFileLoaded to return NO if the contents are lazily loaded.
-        outError = NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
-        switch typeName
-        {
-        case "csvFile":
-            self.csvDataModel = CSVdata(data: data)
-            if self.csvDataModel.processedDataOK {
-                return
-            }
-            throw outError
-        default:
-            throw outError
-        }
-        
-    }
-
     func sortParametersOrValues(indexToSort indexToSort:Int, textOrvalue:Int, ascending: Bool)
     {
         switch (ascending, textOrvalue)
@@ -340,6 +360,8 @@ class CSVdataDocument: NSDocument {
         guard let index = columnIndex where columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return "???"}
         return (self.csvDataModel.headers[index])
     }
+    
+
 
 }
 
