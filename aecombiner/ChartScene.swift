@@ -34,7 +34,6 @@ class ChartScene: SKScene {
         
         let sprite = SKSpriteNode(imageNamed: "ball")
         sprite.position = loc;
-        sprite.setScale(0.5)
         self.addChild(sprite)
 
     }
@@ -51,7 +50,6 @@ class ChartScene: SKScene {
         for value in parameters.values
         {
             let node = SKSpriteNode(imageNamed: "ball")
-            node.setScale(0.05)
             node.physicsBody?.dynamic = false
             node.position = CGPoint(x: xVal, y: value*10)
             self.addChild(node)

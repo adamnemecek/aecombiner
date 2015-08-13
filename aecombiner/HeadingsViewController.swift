@@ -29,21 +29,12 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     @IBAction func modelParameter(sender: NSButton) {
     
-        guard   let columnIndex = self.selectedColumnFromHeadersTableView(),
+        guard
+                let scene = self.chartScene,
+                let columnIndex = self.selectedColumnFromHeadersTableView(),
                 let parameters = self.myCSVdataViewController()?.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
         else {return}
-        //self.chartScene?.chartParameters(parameters: parameters)
-        self.chartScene?.removeAllChildren()
-        var xVal:Double = 10.0
-        for value in parameters.values
-        {
-            let node = SKSpriteNode(imageNamed: "ball")
-            node.setScale(0.05)
-            node.physicsBody?.dynamic = false
-            node.position = CGPoint(x: xVal, y: value*10)
-            self.chartScene?.addChild(node)
-            xVal++
-        }
+        scene.chartParameters(parameters: parameters)
 
     }
     
@@ -56,14 +47,16 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
 
     
     func showChartSceneInView(view view:SKView?) {
-        guard   let scene = ChartScene(fileNamed:"ChartScene"),
+        guard
                 let chartview = view
             else {
                 self.chartScene = nil
                 self.chartTopNode = nil
                 return}
+            let scene = ChartScene(size: chartview.frame.size)//fileNamed:"ChartScene"),
             /* Set the scale mode to scale to fit the window */
-            scene.scaleMode = .ResizeFill
+            scene.scaleMode = .Fill
+            scene.backgroundColor = NSColor.whiteColor()
             chartview.presentScene(scene)
             
             /* Sprite Kit applies additional optimizations to improve rendering performance */
