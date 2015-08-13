@@ -16,6 +16,10 @@ struct ChartParameters {
 }
 
 class ChartScene: SKScene {
+    
+    var xScaleFactor:Double = 1.0
+    var yScaleFactor:Double = 1.0
+    
     override func didMoveToView(view: SKView) {
         /* Setup your scene here
         let myLabel = SKLabelNode(fontNamed:"Chalkduster")
@@ -46,14 +50,16 @@ class ChartScene: SKScene {
     func chartParameters(parameters parameters:ChartParameters)
     {
         self.removeAllChildren()
-        var xVal:Double = 10.0
+        self.xScaleFactor = Double(self.size.width)/Double(parameters.values.count)
+        self.yScaleFactor = Double(self.size.height)/parameters.maxParam
+        var xVal:Double = 0.0
         for value in parameters.values
         {
             let node = SKSpriteNode(imageNamed: "ball")
             node.physicsBody?.dynamic = false
-            node.position = CGPoint(x: xVal, y: value*10)
+            node.position = CGPoint(x: xVal, y: value*self.yScaleFactor)
             self.addChild(node)
-            xVal++
+            xVal += self.xScaleFactor
         }
 
     }

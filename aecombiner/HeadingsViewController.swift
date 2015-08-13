@@ -55,7 +55,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
                 return}
             let scene = ChartScene(size: chartview.frame.size)//fileNamed:"ChartScene"),
             /* Set the scale mode to scale to fit the window */
-            scene.scaleMode = .Fill
+            scene.scaleMode = .ResizeFill
             scene.backgroundColor = NSColor.whiteColor()
             chartview.presentScene(scene)
             
