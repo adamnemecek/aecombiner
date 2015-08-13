@@ -117,19 +117,18 @@ class CSVdataDocument: NSDocument {
     }
     
     // MARK: - Data
-    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->(min:Double, max:Double,values:[Double])
+    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->ChartParameters
     {
-        var parametersArray = [Double]()
-        var minParam:Double = 0.0
-        var maxParam:Double = 0.0
+        var params = ChartParameters()
+        
         for row in self.csvDataModel.csvData
         {
             guard let value = Double(row[columnIndex]) else {continue}
-            minParam = fmin(minParam,value)
-            maxParam = fmax(maxParam,value)
-            parametersArray.append(value)
+            params.minParam = fmin(params.minParam,value)
+            params.maxParam = fmax(params.maxParam,value)
+            params.values.append(value)
         }
-        return (minParam,maxParam,parametersArray)
+        return params
     }
 
     

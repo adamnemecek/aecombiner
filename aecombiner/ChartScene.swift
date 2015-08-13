@@ -8,6 +8,13 @@
 
 import SpriteKit
 
+struct ChartParameters {
+    var maxParam:Double = 0.0
+    var minParam:Double = 0.0
+    var values = [Double]()
+    
+}
+
 class ChartScene: SKScene {
     override func didMoveToView(view: SKView) {
         /* Setup your scene here
@@ -34,5 +41,22 @@ class ChartScene: SKScene {
     
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
+    }
+    
+    
+    func chartParameters(parameters parameters:ChartParameters)
+    {
+        self.removeAllChildren()
+        var xVal:Double = 10.0
+        for value in parameters.values
+        {
+            let node = SKSpriteNode(imageNamed: "ball")
+            node.setScale(0.05)
+            node.physicsBody?.dynamic = false
+            node.position = CGPoint(x: xVal, y: value*10)
+            self.addChild(node)
+            xVal++
+        }
+
     }
 }

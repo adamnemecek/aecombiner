@@ -30,10 +30,10 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBAction func modelParameter(sender: NSButton) {
     
         guard   let columnIndex = self.selectedColumnFromHeadersTableView(),
-                let scene = self.chartScene,
                 let parameters = self.myCSVdataViewController()?.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
-            else {return}
-        scene.removeAllChildren()
+        else {return}
+        //self.chartScene?.chartParameters(parameters: parameters)
+        self.chartScene?.removeAllChildren()
         var xVal:Double = 10.0
         for value in parameters.values
         {
@@ -41,9 +41,10 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
             node.setScale(0.05)
             node.physicsBody?.dynamic = false
             node.position = CGPoint(x: xVal, y: value*10)
-            scene.addChild(node)
+            self.chartScene?.addChild(node)
             xVal++
         }
+
     }
     
     
