@@ -123,7 +123,10 @@ class CSVdataDocument: NSDocument {
         
         for row in self.csvDataModel.csvData
         {
-            guard let value = Double(row[columnIndex]) else {continue}
+            guard
+                row[columnIndex].characters.count>0,
+                let value = Double(row[columnIndex])
+                else {continue}
             params.minParam = fmin(params.minParam,value)
             params.maxParam = fmax(params.maxParam,value)
             params.values.append(value)

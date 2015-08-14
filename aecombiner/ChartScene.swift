@@ -10,15 +10,15 @@ import SpriteKit
 
 struct ChartParameters {
     var maxParam:Double = 0.0
-    var minParam:Double = 0.0
+    var minParam:Double = Double(Int.max)
     var values = [Double]()
     
 }
 
 class ChartScene: SKScene {
     
-    var xScaleFactor:Double = 1.0
-    var yScaleFactor:Double = 1.0
+    //var xScaleFactor:Double = 1.0
+    //var yScaleFactor:Double = 1.0
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here
@@ -47,19 +47,28 @@ class ChartScene: SKScene {
     }
     
     
-    func chartParameters(parameters parameters:ChartParameters)
+    func chartParameters(var parameters parameters:ChartParameters)
     {
+        parameters.values.sortInPlace()
         self.removeAllChildren()
-        self.xScaleFactor = Double(self.size.width)/Double(parameters.values.count)
-        self.yScaleFactor = Double(self.size.height)/parameters.maxParam
+        let border = self.size.width/20.0//border is twice the border for each side
+        let xScaleFactor = Double(self.size.width-border)/Double(parameters.values.count)
+        let yScaleFactor = Double(self.size.height-border)/(parameters.maxParam-parameters.minParam)
+        let topNode = SKNode()
+        self.addChild(topNode)
+        topNode.position = CGPoint(x: Double(border/2.0), y: Double(border/2.0)-(parameters.minParam*yScaleFactor))
         var xVal:Double = 0.0
-        for value in parameters.values
+        for var row:Int = 0; row<parameters.values.count; ++row
         {
+            let value = parameters.values[row]
             let node = SKSpriteNode(imageNamed: "ball")
+            node.color = NSColor.redColor()
+            node.colorBlendFactor = 1.0
+            node.zPosition = CGFloat(row)
             node.physicsBody?.dynamic = false
-            node.position = CGPoint(x: xVal, y: value*self.yScaleFactor)
-            self.addChild(node)
-            xVal += self.xScaleFactor
+            topNode.addChild(node)
+            node.position = CGPoint(x: xVal, y: value*yScaleFactor)
+            xVal += xScaleFactor
         }
 
     }
