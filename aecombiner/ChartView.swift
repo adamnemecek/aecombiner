@@ -7,11 +7,15 @@
 //
 
 import Foundation
-
 import SpriteKit
 
 class ChartView: SKView {
     
+    var topNode:ChartTopNode?
+    
+    
+
+
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         self.showChartSceneInView()
@@ -38,11 +42,15 @@ class ChartView: SKView {
         
     }
     
+    func reSortYourParameters()
+    {
+        self.topNode?.reSortYourParameters()
+    }
+
     
     func chartTheseParameters(var parameters parameters:ChartParameters, nameOfParameters:String)
     {
         guard let chartscene = self.scene else {return}
-        parameters.values.sortInPlace()
         chartscene.removeAllChildren()
         let border = chartscene.size.width/20.0//border is twice the border for each side
         let xScaleFactor = Double(chartscene.size.width-border)/Double(parameters.values.count)
@@ -50,6 +58,7 @@ class ChartView: SKView {
         let topNode = ChartTopNode(xScaleFactor: xScaleFactor, yScaleFactor: yScaleFactor, parameters: parameters, nameOfParameters: nameOfParameters, border: border, colour:NSColor.redColor())
         chartscene.addChild(topNode)
         topNode.autolocateAndChartParameters()
+        self.topNode = topNode
     }
     
     

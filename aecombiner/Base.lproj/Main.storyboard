@@ -875,7 +875,7 @@
                                                             <rect key="frame" x="1" y="1" width="509" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="msA-5T-v0R">
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="msA-5T-v0R">
                                                                     <rect key="frame" x="1" y="0.0" width="502" height="17"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="edY-Zq-xa1">
                                                                         <font key="font" metaFont="system"/>
@@ -887,7 +887,7 @@
                                                             <constraints>
                                                                 <constraint firstItem="msA-5T-v0R" firstAttribute="leading" secondItem="ljM-J2-bKL" secondAttribute="leading" constant="3" id="2Bu-ge-G7y"/>
                                                                 <constraint firstItem="msA-5T-v0R" firstAttribute="centerY" secondItem="ljM-J2-bKL" secondAttribute="centerY" id="Kkr-3h-Aq5"/>
-                                                                <constraint firstAttribute="trailing" secondItem="msA-5T-v0R" secondAttribute="trailing" constant="-461" id="QhX-2A-z1i"/>
+                                                                <constraint firstAttribute="trailing" secondItem="msA-5T-v0R" secondAttribute="trailing" constant="8" id="QhX-2A-z1i"/>
                                                             </constraints>
                                                             <connections>
                                                                 <outlet property="textField" destination="msA-5T-v0R" id="fZm-UW-DZh"/>
@@ -947,21 +947,6 @@
                             </button>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MB8-Qv-8PQ" customClass="ChartView" customModule="aecombiner" customModuleProvider="target">
                                 <rect key="frame" x="542" y="20" width="237" height="312"/>
-                                <subviews>
-                                    <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Lcq-rc-8Sb">
-                                        <rect key="frame" x="-2" y="-2" width="100" height="23"/>
-                                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="smallSquare" trackingMode="momentary" id="nkd-fb-JjZ">
-                                            <font key="font" metaFont="system"/>
-                                            <segments>
-                                                <segment width="32"/>
-                                                <segment width="32" tag="1"/>
-                                                <segment width="32">
-                                                    <nil key="label"/>
-                                                </segment>
-                                            </segments>
-                                        </segmentedCell>
-                                    </segmentedControl>
-                                </subviews>
                             </customView>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7Ki-0Z-w8m">
                                 <rect key="frame" x="458" y="13" width="79" height="32"/>
@@ -983,6 +968,18 @@
                                     <action selector="deleteHeading:" target="EBc-G2-mhh" id="Tfh-sX-kJe"/>
                                 </connections>
                             </button>
+                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Lcq-rc-8Sb">
+                                <rect key="frame" x="540" y="-2" width="33" height="24"/>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="momentary" id="nkd-fb-JjZ">
+                                    <font key="font" metaFont="system"/>
+                                    <segments>
+                                        <segment label="↕︎"/>
+                                    </segments>
+                                </segmentedCell>
+                                <connections>
+                                    <action selector="sortChartParameters:" target="EBc-G2-mhh" id="YI5-GG-ymy"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                     </view>
                     <connections>

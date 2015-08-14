@@ -22,6 +22,7 @@ class ChartTopNode: SKNode {
     var nameOfParameters = "Untitled"
     var border:CGFloat = 10.0
     var colour = NSColor.blackColor()
+    var sortDirection = kAscending
     
     convenience init (xScaleFactor:Double, yScaleFactor:Double, parameters:ChartParameters, nameOfParameters:String, border:CGFloat, colour:NSColor)
     {
@@ -34,6 +35,15 @@ class ChartTopNode: SKNode {
         self.colour = colour
     }
     
+    func reSortYourParameters()
+    {
+        switch self.sortDirection
+        {
+            case
+        }
+        self.parameters.values.sortInPlace()
+        self.autolocateAndChartParameters()
+    }
     
     func autolocateAndChartParameters()
     {
@@ -42,6 +52,7 @@ class ChartTopNode: SKNode {
         //reset the x to far left
         var xVal:Double = 0.0
         //process the parameters
+        self.removeAllChildren()
         for var row:Int = 0; row<self.parameters.values.count; ++row
         {
             let value = self.parameters.values[row]

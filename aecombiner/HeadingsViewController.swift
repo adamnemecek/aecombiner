@@ -20,7 +20,28 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
 
     @IBOutlet weak var buttonModel: NSButton!
     
-    // MARK: - @Action
+    // MARK: - @IBAction
+    @IBAction func sortChartParameters(sender: NSSegmentedControl) {
+        self.chartView?.reSortYourParameters()
+    }
+
+    @IBAction func renameColumn(sender: AnyObject) {
+        guard !self.textFieldColumnRecodedName.stringValue.isEmpty else
+        {
+            let alert = NSAlert()
+            alert.messageText = "Name cannot be empty"
+            alert.alertStyle = .CriticalAlertStyle
+            alert.runModal()
+            return
+        }
+        self.myCSVdataViewController()?.renameColumnAtIndex(self.tableViewHeaders.selectedRow, newName: self.textFieldColumnRecodedName.stringValue)
+    }
+    
+    @IBAction func deleteHeading(sender: AnyObject) {
+        self.myCSVdataViewController()?.deleteColumnAtIndex(self.tableViewHeaders.selectedRow)
+        self.tableViewHeaders.reloadData()
+    }
+    
     
     
     
@@ -75,25 +96,6 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         return (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
     }
 
-    // MARK: - @IBAction
-    
-    @IBAction func renameColumn(sender: AnyObject) {
-        guard !self.textFieldColumnRecodedName.stringValue.isEmpty else
-        {
-            let alert = NSAlert()
-            alert.messageText = "Name cannot be empty"
-            alert.alertStyle = .CriticalAlertStyle
-            alert.runModal()
-            return
-        }
-        self.myCSVdataViewController()?.renameColumnAtIndex(self.tableViewHeaders.selectedRow, newName: self.textFieldColumnRecodedName.stringValue)
-    }
-
-    @IBAction func deleteHeading(sender: AnyObject) {
-        self.myCSVdataViewController()?.deleteColumnAtIndex(self.tableViewHeaders.selectedRow)
-        self.tableViewHeaders.reloadData()
-    }
-    
     // MARK: - CSVdataDocument
     
     
