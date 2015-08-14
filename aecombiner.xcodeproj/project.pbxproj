@@ -15,6 +15,7 @@
 		C5772F651B7A09DC00C80DF7 /* GroupParametersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */; };
 		C587D34D1B7B592B00FA3854 /* ChartScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C587D34C1B7B592B00FA3854 /* ChartScene.sks */; };
 		C587D34F1B7B5E9400FA3854 /* ChartScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587D34E1B7B5E9400FA3854 /* ChartScene.swift */; };
+		C5AC44E91B7E3B3400A6B06D /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC44E81B7E3B3400A6B06D /* ChartView.swift */; };
 		C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */; };
 		C5CBBC3C1B3C0BFA008FB844 /* RecodeColumnViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */; };
 		C5CBBC3E1B3C0BFA008FB844 /* CSVdataDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC3D1B3C0BFA008FB844 /* CSVdataDocument.swift */; };
@@ -42,6 +43,7 @@
 		C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupParametersViewController.swift; sourceTree = "<group>"; };
 		C587D34C1B7B592B00FA3854 /* ChartScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ChartScene.sks; sourceTree = "<group>"; };
 		C587D34E1B7B5E9400FA3854 /* ChartScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartScene.swift; sourceTree = "<group>"; };
+		C5AC44E81B7E3B3400A6B06D /* ChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		C5CBBC341B3C0BFA008FB844 /* aecombiner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aecombiner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5CBBC381B3C0BFA008FB844 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 			children = (
 				C5CBBC411B3C0BFA008FB844 /* Main.storyboard */,
 				C587D34E1B7B5E9400FA3854 /* ChartScene.swift */,
+				C5AC44E81B7E3B3400A6B06D /* ChartView.swift */,
 				8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */,
 				C52666271B664EC6006C251E /* HeadingsViewController.swift */,
 				C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */,
@@ -228,6 +231,7 @@
 				C5557D381B5948BC00C7E94D /* SelectParametersViewController.swift in Sources */,
 				8E10726E1B40768D00E4E409 /* CSVdata.swift in Sources */,
 				8E69F3101B67DA4100BDB720 /* CSVdataViewController.swift in Sources */,
+				C5AC44E91B7E3B3400A6B06D /* ChartView.swift in Sources */,
 				C5CBBC3E1B3C0BFA008FB844 /* CSVdataDocument.swift in Sources */,
 				C5772F651B7A09DC00C80DF7 /* GroupParametersViewController.swift in Sources */,
 				C52666291B664EC6006C251E /* HeadingsViewController.swift in Sources */,

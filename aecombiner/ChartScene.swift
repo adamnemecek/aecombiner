@@ -15,10 +15,52 @@ struct ChartParameters {
     
 }
 
+class ChartTopNode: SKNode {
+    var xScaleFactor:Double = 1.0
+    var yScaleFactor:Double = 1.0
+    var parameters = ChartParameters()
+    var nameOfParameters = "Untitled"
+    var border:CGFloat = 10.0
+    var colour = NSColor.blackColor()
+    
+    convenience init (xScaleFactor:Double, yScaleFactor:Double, parameters:ChartParameters, nameOfParameters:String, border:CGFloat, colour:NSColor)
+    {
+        self.init()
+        self.xScaleFactor = xScaleFactor
+        self.yScaleFactor = yScaleFactor
+        self.parameters = parameters
+        self.nameOfParameters = nameOfParameters
+        self.border = border
+        self.colour = colour
+    }
+    
+    
+    func autolocateAndChartParameters()
+    {
+        //autolocate to bottom left axis
+        self.position = CGPoint(x: Double(self.border/2.0), y: Double(self.border/2.0)-(self.parameters.minParam*self.yScaleFactor))
+        //reset the x to far left
+        var xVal:Double = 0.0
+        //process the parameters
+        for var row:Int = 0; row<self.parameters.values.count; ++row
+        {
+            let value = self.parameters.values[row]
+            let node = SKSpriteNode(imageNamed: "ball")
+            node.color = self.colour
+            node.colorBlendFactor = 1.0
+            node.zPosition = CGFloat(row)
+            node.physicsBody?.dynamic = false
+            self.addChild(node)
+            node.position = CGPoint(x: xVal, y: value*self.yScaleFactor)
+            xVal += self.xScaleFactor
+        }
+
+    }
+}
+
+
 class ChartScene: SKScene {
     
-    //var xScaleFactor:Double = 1.0
-    //var yScaleFactor:Double = 1.0
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here
@@ -47,29 +89,4 @@ class ChartScene: SKScene {
     }
     
     
-    func chartParameters(var parameters parameters:ChartParameters)
-    {
-        parameters.values.sortInPlace()
-        self.removeAllChildren()
-        let border = self.size.width/20.0//border is twice the border for each side
-        let xScaleFactor = Double(self.size.width-border)/Double(parameters.values.count)
-        let yScaleFactor = Double(self.size.height-border)/(parameters.maxParam-parameters.minParam)
-        let topNode = SKNode()
-        self.addChild(topNode)
-        topNode.position = CGPoint(x: Double(border/2.0), y: Double(border/2.0)-(parameters.minParam*yScaleFactor))
-        var xVal:Double = 0.0
-        for var row:Int = 0; row<parameters.values.count; ++row
-        {
-            let value = parameters.values[row]
-            let node = SKSpriteNode(imageNamed: "ball")
-            node.color = NSColor.redColor()
-            node.colorBlendFactor = 1.0
-            node.zPosition = CGFloat(row)
-            node.physicsBody?.dynamic = false
-            topNode.addChild(node)
-            node.position = CGPoint(x: xVal, y: value*yScaleFactor)
-            xVal += xScaleFactor
-        }
-
-    }
 }
