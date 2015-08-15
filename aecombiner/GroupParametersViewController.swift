@@ -56,7 +56,7 @@ class GroupParametersViewController: RecodeColumnViewController {
             arrayOfExtractedParametersInGroup.append(parameter[kParametersArrayParametersIndex])
         }
         
-        csvdo.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup)
+        csvdo.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: self.popupAddOrMultiply.indexOfSelectedItem)
         
     }
     

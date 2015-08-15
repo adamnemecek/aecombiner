@@ -13,8 +13,19 @@ class ChartView: SKView {
     
     var topNode:ChartTopNode?
     
+    override func viewWillStartLiveResize() {
+        super.viewWillStartLiveResize()
+        self.scene?.hidden = true
+    }
     
+    override func viewDidEndLiveResize() {
+        super.viewDidEndLiveResize()
+        guard let topnode = self.topNode else {self.scene?.hidden = false;return}
+        self.chartTheseParameters(parameters: topnode.parameters, nameOfParameters: topnode.name)
+        self.scene?.hidden = false
+    }
 
+    
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -29,6 +40,7 @@ class ChartView: SKView {
     }
     
     func showChartSceneInView() {
+        self.layer?.backgroundColor = NSColor.clearColor().CGColor
         let scene = ChartScene(size: self.frame.size)//fileNamed:"ChartScene"),
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .ResizeFill
@@ -48,14 +60,14 @@ class ChartView: SKView {
     }
 
     
-    func chartTheseParameters(var parameters parameters:ChartParameters, nameOfParameters:String)
+    func chartTheseParameters(var parameters parameters:ChartParameters, nameOfParameters:String?)
     {
         guard let chartscene = self.scene else {return}
         chartscene.removeAllChildren()
         let border = chartscene.size.width/20.0//border is twice the border for each side
-        let xScaleFactor = Double(chartscene.size.width-border)/Double(parameters.values.count)
-        let yScaleFactor = Double(chartscene.size.height-border)/(parameters.maxParam-parameters.minParam)
-        let topNode = ChartTopNode(xScaleFactor: xScaleFactor, yScaleFactor: yScaleFactor, parameters: parameters, nameOfParameters: nameOfParameters, border: border, colour:NSColor.redColor())
+        let xSpacing = Double(chartscene.size.width-border)/Double(parameters.values.count)
+        let yScale:CGFloat = (chartscene.size.height-border)/CGFloat(parameters.maxParam-parameters.minParam)
+        let topNode = ChartTopNode(xSpacing: xSpacing, yScale: yScale, parameters: parameters, nameOfParameters: nameOfParameters, border: border, colour:NSColor.redColor())
         chartscene.addChild(topNode)
         topNode.autolocateAndChartParameters()
         self.topNode = topNode

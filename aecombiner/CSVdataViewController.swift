@@ -84,9 +84,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.myCSVdataDocument.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
     }
     
-    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String])
+    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int)
     {
-        self.myCSVdataDocument.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup)
+        self.myCSVdataDocument.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
         
     }
 
@@ -167,7 +167,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         let columnIndex = tableView.columnWithIdentifier(tableColumn.identifier)
         guard columnIndex >= 0 else {return}
         guard let ascending = tableColumn.sortDescriptorPrototype?.ascending else {return}
-        self.myCSVdataDocument.sortParametersOrValues(indexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, ascending:ascending)
+        let sortdirection = ascending ? kAscending : kDescending
+        self.myCSVdataDocument.sortParametersOrValues(indexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, direction:sortdirection)
         tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !ascending)
         self.tableViewCSVdata.reloadData()
 

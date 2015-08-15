@@ -21,7 +21,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBOutlet weak var buttonModel: NSButton!
     
     // MARK: - @IBAction
-    @IBAction func sortChartParameters(sender: NSSegmentedControl) {
+    @IBAction func sortChartParameters(sender: AnyObject) {
         self.chartView?.reSortYourParameters()
     }
 

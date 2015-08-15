@@ -8,10 +8,13 @@
 
 import Cocoa
 
-let kAscending = true
-let kDescending = false
+let kAscending = 1
+let kDescending = 0
+let kSortOriginal = -1
 let kSortAsText = 0
 let kSortAsValue = 1
+let kGroupAddition = 0
+let kGroupMultiplication = 1
 
 class CSVdataDocument: NSDocument {
     var csvDataModel: CSVdata = CSVdata() {
@@ -135,14 +138,24 @@ class CSVdataDocument: NSDocument {
     }
 
     
-    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String])
+    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int)
     {
+        var groupStartValue:Double
+        switch groupMethod
+        {
+        case kGroupAddition:
+            groupStartValue = 0.0
+        case kGroupMultiplication:
+            groupStartValue = 1.0
+        default:
+            groupStartValue = 1.0
+        }
         //create a dict with the keys the params we extracted for grouping
-        //give a blank array to hold the values associated with the grouping
+        //make a blank array to hold the values associated with the grouping for each member of the group
         var dictionaryOfParametersAndCombinedValues = [String : Double]()
         for parameter in arrayOfParamatersInGroup
         {
-            dictionaryOfParametersAndCombinedValues[parameter] = 0//we are just adding here
+            dictionaryOfParametersAndCombinedValues[parameter] = groupStartValue// 0 to add, 1 to multiply
         }
         
         for row in self.csvDataModel.csvData
@@ -153,17 +166,36 @@ class CSVdataDocument: NSDocument {
             {
                 guard let value = Double(row[columnIndexInGroup]) else {continue}
                 guard dictionaryOfParametersAndCombinedValues[paramID] != nil else {continue}
-                dictionaryOfParametersAndCombinedValues[paramID] = dictionaryOfParametersAndCombinedValues[paramID]! + value
+                switch groupMethod
+                {
+                case kGroupAddition:
+                    dictionaryOfParametersAndCombinedValues[paramID] = dictionaryOfParametersAndCombinedValues[paramID]! + value
+                case kGroupMultiplication:
+                    dictionaryOfParametersAndCombinedValues[paramID] = dictionaryOfParametersAndCombinedValues[paramID]! * value
+                default:
+                    break
+                }
             }
         }
 
         //join col names to make a mega name for the combination
+        //make an array first
         var namesOfCombinedColumn = [String]()
         for columnIndex in columnIndexesToGroup
         {
             namesOfCombinedColumn.append(self.csvDataModel.headers[columnIndex])
         }
-        let nameOfNewColumn = "+".join(namesOfCombinedColumn)
+        //join the array members with the correct maths symbol
+        var nameOfNewColumn:String = ""
+        switch groupMethod
+        {
+        case kGroupAddition:
+            nameOfNewColumn = "+".join(namesOfCombinedColumn)
+        case kGroupMultiplication:
+            nameOfNewColumn = "*".join(namesOfCombinedColumn)
+        default:
+            nameOfNewColumn = "?".join(namesOfCombinedColumn)
+        }
         
         //createTheCSVdata
         var cvsDataData = [[String]]()
@@ -171,6 +203,8 @@ class CSVdataDocument: NSDocument {
         {
             cvsDataData.append([parameter, String(value)])
         }
+        
+        //extract the rows and present
         self.createNewDocumentFromExtractedRows(cvsData: cvsDataData, headers: [self.csvDataModel.headers[columnIndexForGrouping],nameOfNewColumn])
     }
     
@@ -251,9 +285,9 @@ class CSVdataDocument: NSDocument {
         return columnIndex >= 0 && columnIndex < self.numberOfColumnsInData()
     }
 
-    func sortParametersOrValues(indexToSort indexToSort:Int, textOrvalue:Int, ascending: Bool)
+    func sortParametersOrValues(indexToSort indexToSort:Int, textOrvalue:Int, direction: Int)
     {
-        switch (ascending, textOrvalue)
+        switch (direction, textOrvalue)
         {
         case (kAscending,kSortAsValue):
             self.csvDataModel.csvData.sortInPlace({ (leftRow, rightRow) -> Bool in

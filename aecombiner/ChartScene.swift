@@ -16,21 +16,19 @@ struct ChartParameters {
 }
 
 class ChartTopNode: SKNode {
-    var xScaleFactor:Double = 1.0
-    var yScaleFactor:Double = 1.0
+    var xSpacing:Double = 1.0
     var parameters = ChartParameters()
-    var nameOfParameters = "Untitled"
     var border:CGFloat = 10.0
     var colour = NSColor.blackColor()
     var sortDirection = kAscending
     
-    convenience init (xScaleFactor:Double, yScaleFactor:Double, parameters:ChartParameters, nameOfParameters:String, border:CGFloat, colour:NSColor)
+    convenience init (xSpacing:Double, yScale:CGFloat, parameters:ChartParameters, nameOfParameters:String?, border:CGFloat, colour:NSColor)
     {
         self.init()
-        self.xScaleFactor = xScaleFactor
-        self.yScaleFactor = yScaleFactor
+        self.name = nameOfParameters
+        self.yScale = yScale
+        self.xSpacing = xSpacing
         self.parameters = parameters
-        self.nameOfParameters = nameOfParameters
         self.border = border
         self.colour = colour
     }
@@ -39,17 +37,23 @@ class ChartTopNode: SKNode {
     {
         switch self.sortDirection
         {
-            case
+        case kAscending:
+            self.parameters.values.sortInPlace(>)//{$0 > $1}
+            self.sortDirection = kDescending
+        case kDescending:
+            self.parameters.values.sortInPlace(<)//{$0 > $1}
+            self.sortDirection = kAscending
+      default:
+            break
         }
-        self.parameters.values.sortInPlace()
         self.autolocateAndChartParameters()
     }
     
     func autolocateAndChartParameters()
     {
         //autolocate to bottom left axis
-        self.position = CGPoint(x: Double(self.border/2.0), y: Double(self.border/2.0)-(self.parameters.minParam*self.yScaleFactor))
-        //reset the x to far left
+        self.position = CGPoint(x: Double(self.border/2.0), y: Double(self.border/2.0)-(self.parameters.minParam*Double(self.yScale)))
+        //set the x to bottom left
         var xVal:Double = 0.0
         //process the parameters
         self.removeAllChildren()
@@ -57,13 +61,16 @@ class ChartTopNode: SKNode {
         {
             let value = self.parameters.values[row]
             let node = SKSpriteNode(imageNamed: "ball")
+            node.userInteractionEnabled = true
             node.color = self.colour
             node.colorBlendFactor = 1.0
+            //correct for the top nodes yScale to avoid stretch of images
+            node.yScale = 1/self.yScale
             node.zPosition = CGFloat(row)
             node.physicsBody?.dynamic = false
             self.addChild(node)
-            node.position = CGPoint(x: xVal, y: value*self.yScaleFactor)
-            xVal += self.xScaleFactor
+            node.position = CGPoint(x: xVal, y: value)
+            xVal += self.xSpacing
         }
 
     }
@@ -74,24 +81,14 @@ class ChartScene: SKScene {
     
     
     override func didMoveToView(view: SKView) {
-        /* Setup your scene here
-        let myLabel = SKLabelNode(fontNamed:"Chalkduster")
-        myLabel.text = "Hello, World!";
-        myLabel.fontSize = 45;
-        myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
-        self.addChild(myLabel)
-*/
+        /* Setup your scene here*/
     }
     
     override func mouseDown(theEvent: NSEvent) {
         /* Called when a mouse click occurs */
         
-        let loc = theEvent.locationInNode(self)
-        print(loc)
+        _ = theEvent.locationInNode(self)
         
-        let sprite = SKSpriteNode(imageNamed: "ball")
-        sprite.position = loc;
-        self.addChild(sprite)
 
     }
     
