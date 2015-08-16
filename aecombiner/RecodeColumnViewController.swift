@@ -39,15 +39,7 @@ class RecodeColumnViewController: HeadingsViewController {
     @IBAction func recodeParametersAndAddNewColumn(sender: AnyObject) {
         self.doTheRecodeParametersAndAddNewColumn()
     }
-    
-    @IBAction func sortExtractedParametersOrValues(sender: NSButton) {
-        self.sortParametersOrValues(buttonTitle: sender.title, direction: sender.tag)
-        //use tag as direction
-        sender.tag = sender.tag == 0 ? 1 : 0
-    }
-    
-    
-    
+        
     // MARK: - overrides
 
     override func viewDidLoad() {
@@ -151,35 +143,16 @@ class RecodeColumnViewController: HeadingsViewController {
         return self.stringForColumnIndex(columnIndex)+kStringRecodedColumnNameSuffix
     }
     
-    
-    
-    
-    func sortParametersOrValues(buttonTitle buttonTitle: String, direction: Int)
+    override func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
     {
-        let indexToSort = buttonTitle == "Sort Parameter" ? 0 : 1
-        
-        switch (direction, self.segmentedSortAsTextOrNumbers.selectedSegment)
-        {
-        case (0,1):
-            self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
-                return Double(leftTuple[indexToSort])>Double(rightTuple[indexToSort])
-            })
-        case (1,1):
-            self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
-                return Double(leftTuple[indexToSort])<Double(rightTuple[indexToSort])
-            })
-        case (0,0):
-            self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
-                return leftTuple[indexToSort]>rightTuple[indexToSort]
-            })
-        case (1,0):
-            self.arrayExtractedParameters.sortInPlace({ (leftTuple, rightTuple) -> Bool in
-                return leftTuple[indexToSort]<rightTuple[indexToSort]
-            })
-        default:
-            return
-        }
-        
+        guard tableView.columnWithIdentifier(tableColumn.identifier) >= 0 else {return}
+        if tableColumn.sortDescriptorPrototype == nil {tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)}
+
+        let columnIndex = tableView.columnWithIdentifier(tableColumn.identifier)
+        let ascending = tableColumn.sortDescriptorPrototype!.ascending
+        let sortdirection = ascending ? kAscending : kDescending
+        generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.arrayExtractedParameters, columnIndexToSort: columnIndex, textOrvalue: self.segmentedSortAsTextOrNumbers.selectedSegment, direction: sortdirection)
+        tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !ascending)
         self.tableViewExtractedParameters.reloadData()
     }
     

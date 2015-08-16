@@ -59,10 +59,6 @@ class SelectParametersViewController: RecodeColumnViewController {
         self.myCSVdataViewController()?.extractRowsBasedOnParameters(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
     }
     
-    // MARK: - CSVdataDocument
-    
-    
-    
     // MARK: - overrides
     
     override func viewDidLoad() {
@@ -82,6 +78,25 @@ class SelectParametersViewController: RecodeColumnViewController {
         }
     }*/
     
+    override func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
+    {
+        guard let tvidentifier = tableView.identifier else {return}
+        switch tvidentifier
+        {
+        case "tableViewSelectedHeaders":
+            break
+        case "tableViewSelectedExtractedParameters":
+            super.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn)
+        case "tableViewANDparameters":
+            break
+        case "tableViewORparameters":
+            break
+        default:
+            break
+        }
+    
+    }
+
     
     // MARK: - TableView overrides
     

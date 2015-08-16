@@ -58,6 +58,18 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     }
     
     
+    // MARK: - Sorting Tables on header click
+    func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
+        self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn)
+    }
+    
+
+   func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
+    {
+        //subclasses override
+    }
+
+    
     // MARK: - Columns
     func selectedColumnFromHeadersTableView() -> Int?
     {

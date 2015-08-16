@@ -16,6 +16,26 @@ let kSortAsValue = 1
 let kGroupAddition = 0
 let kGroupMultiplication = 1
 
+
+func generic_SortArrayOfColumnsAsTextOrValues(inout arrayToSort arrayToSort:[[String]], columnIndexToSort:Int, textOrvalue:Int, direction: Int)
+{
+    switch (direction, textOrvalue)
+    {
+    case (kAscending,kSortAsValue):
+        arrayToSort.sortInPlace {Double($0[columnIndexToSort])>Double($1[columnIndexToSort])}
+    case (kDescending,kSortAsValue):
+        arrayToSort.sortInPlace {Double($0[columnIndexToSort])<Double($1[columnIndexToSort])}
+    case (kAscending,kSortAsText):
+        arrayToSort.sortInPlace {($0[columnIndexToSort] as NSString).localizedCaseInsensitiveCompare($1[columnIndexToSort]) == .OrderedAscending}
+    case (kDescending,kSortAsText):
+        arrayToSort.sortInPlace {($0[columnIndexToSort] as NSString).localizedCaseInsensitiveCompare($1[columnIndexToSort]) == .OrderedDescending}
+    default:
+        return
+    }
+}
+
+
+
 class CSVdataDocument: NSDocument {
     var csvDataModel: CSVdata = CSVdata() {
         didSet {
@@ -261,7 +281,7 @@ class CSVdataDocument: NSDocument {
     {
         let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
         col.title = title
-        col.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: false)
+        col.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)
 
         return col
     }
@@ -285,29 +305,9 @@ class CSVdataDocument: NSDocument {
         return columnIndex >= 0 && columnIndex < self.numberOfColumnsInData()
     }
 
-    func sortParametersOrValues(indexToSort indexToSort:Int, textOrvalue:Int, direction: Int)
+    func sortCSVrowsInColumnAsTextOrValues(columnIndexToSort columnIndexToSort:Int, textOrvalue:Int, direction: Int)
     {
-        switch (direction, textOrvalue)
-        {
-        case (kAscending,kSortAsValue):
-            self.csvDataModel.csvData.sortInPlace({ (leftRow, rightRow) -> Bool in
-                return Double(leftRow[indexToSort])>Double(rightRow[indexToSort])
-            })
-        case (kDescending,kSortAsValue):
-            self.csvDataModel.csvData.sortInPlace({ (leftRow, rightRow) -> Bool in
-                return Double(leftRow[indexToSort])<Double(rightRow[indexToSort])
-            })
-        case (kAscending,kSortAsText):
-            self.csvDataModel.csvData.sortInPlace({ (leftRow, rightRow) -> Bool in
-                return leftRow[indexToSort]>rightRow[indexToSort]
-            })
-        case (kDescending,kSortAsText):
-            self.csvDataModel.csvData.sortInPlace({ (leftRow, rightRow) -> Bool in
-                return leftRow[indexToSort]<rightRow[indexToSort]
-            })
-        default:
-            return
-        }
+        generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.csvDataModel.csvData, columnIndexToSort: columnIndexToSort, textOrvalue: textOrvalue, direction: direction)
     }
 
     func extractRowsBasedOnParameters(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])

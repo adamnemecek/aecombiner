@@ -47,30 +47,6 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
 
     
-    // MARK: - segue
-    override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
-        guard segue.identifier != nil else {
-            return
-        }
-        
-        switch segue.identifier!
-        {
-        case "HeadingsViewController":
-            _ = (segue.destinationController as! HeadingsViewController)
-            //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
-        case "RecodeColumnViewController":
-            _ = (segue.destinationController as! RecodeColumnViewController)
-            //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
-        case "SelectParametersViewController":
-            _ = (segue.destinationController as! SelectParametersViewController)
-            //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
-            
-            
-        default:
-            break
-        }
-    }
-    
     
     // MARK: - CSV data table
     /*
@@ -168,7 +144,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         guard columnIndex >= 0 else {return}
         guard let ascending = tableColumn.sortDescriptorPrototype?.ascending else {return}
         let sortdirection = ascending ? kAscending : kDescending
-        self.myCSVdataDocument.sortParametersOrValues(indexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, direction:sortdirection)
+        self.myCSVdataDocument.sortCSVrowsInColumnAsTextOrValues(columnIndexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, direction:sortdirection)
         tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !ascending)
         self.tableViewCSVdata.reloadData()
 
