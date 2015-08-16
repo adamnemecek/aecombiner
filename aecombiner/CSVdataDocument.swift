@@ -239,9 +239,9 @@ class CSVdataDocument: NSDocument {
         return self.csvDataModel.headers.count
     }
     
-    func deleteColumnAtIndex(columnIndex: Int)
+    func deletedColumnAtIndex(columnIndex: Int)->Bool
     {
-        guard columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return}
+        guard columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return false}
         
         // must delete the column from Array BEFORE deleting  table
         for var r = 0; r<self.csvDataModel.csvData.count; r++
@@ -251,7 +251,8 @@ class CSVdataDocument: NSDocument {
             self.csvDataModel.csvData[r] = rowArray
         }
         //remove from headers array
-        self.csvDataModel.headers.removeAtIndex(columnIndex)        
+        self.csvDataModel.headers.removeAtIndex(columnIndex)
+        return true
     }
 
     func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:[[String]])

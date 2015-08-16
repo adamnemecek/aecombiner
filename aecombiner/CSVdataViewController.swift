@@ -119,7 +119,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     func deleteColumnAtIndex(columnIndex: Int)
     {
-        self.myCSVdataDocument.deleteColumnAtIndex(columnIndex)
+        guard self.myCSVdataDocument.deletedColumnAtIndex(columnIndex) else {return}
         
         //Safe to delete column to table now
         self.tableViewCSVdata.removeTableColumn(self.tableViewCSVdata.tableColumns[columnIndex])
