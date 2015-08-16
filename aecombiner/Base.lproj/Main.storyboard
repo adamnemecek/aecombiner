@@ -788,7 +788,7 @@
                                     <rect key="frame" x="224" y="17" width="15" height="102"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <tableHeaderView key="headerView" id="tVX-Ev-zN2">
+                                <tableHeaderView key="headerView" toolTip="Click to sort. Click again to reverse sort." id="tVX-Ev-zN2">
                                     <rect key="frame" x="0.0" y="0.0" width="477" height="17"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
@@ -925,19 +925,6 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="MB8-Qv-8PQ" customClass="ChartView" customModule="aecombiner" customModuleProvider="target">
                                 <rect key="frame" x="410" y="52" width="369" height="280"/>
                             </customView>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Ki-0Z-w8m">
-                                <rect key="frame" x="404" y="13" width="65" height="32"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="53" id="LtT-BI-jRE"/>
-                                </constraints>
-                                <buttonCell key="cell" type="push" title="Plot" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pqB-c7-NdE">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="modelParameter:" target="EBc-G2-mhh" id="AiA-1w-c0W"/>
-                                </connections>
-                            </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MfQ-QC-egV">
                                 <rect key="frame" x="328" y="46" width="80" height="32"/>
                                 <buttonCell key="cell" type="push" title="Delete" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vv3-aU-Jzq">
@@ -958,45 +945,59 @@
                                     <action selector="closeSheetForButton:" target="L6x-yv-hse" id="ZlL-OB-UfJ"/>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5zl-L4-Eaa">
-                                <rect key="frame" x="469" y="13" width="79" height="32"/>
+                            <button toolTip="Plot values" translatesAutoresizingMaskIntoConstraints="NO" id="3tP-Zq-jYK">
+                                <rect key="frame" x="410" y="14" width="32" height="32"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="67" id="nlb-lh-Pre"/>
+                                    <constraint firstAttribute="width" constant="32" id="A3K-ZN-tSE"/>
                                 </constraints>
-                                <buttonCell key="cell" type="push" title="Sort Y" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L3c-KU-0KO">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="chart32" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="VzW-ln-5lU">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="sortChartParameters:" target="EBc-G2-mhh" id="HWF-MH-Rmo"/>
+                                    <action selector="modelParameter:" target="EBc-G2-mhh" id="zUg-Gw-bHC"/>
+                                </connections>
+                            </button>
+                            <button toolTip="Sort Y values (click again to reverse sort)" translatesAutoresizingMaskIntoConstraints="NO" id="baL-qW-eM4">
+                                <rect key="frame" x="452" y="14" width="32" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="t4z-wC-ymJ"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="sort32" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="qhJ-sB-hUz">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="sortChartParameters:" target="EBc-G2-mhh" id="jqJ-wi-NyX"/>
                                 </connections>
                             </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="IPK-9q-nQg" firstAttribute="top" secondItem="bds-JI-HXB" secondAttribute="bottom" constant="12" symbolic="YES" id="1wc-ZK-j71"/>
+                            <constraint firstItem="baL-qW-eM4" firstAttribute="top" secondItem="3tP-Zq-jYK" secondAttribute="top" id="2C8-Ug-hjV"/>
                             <constraint firstItem="IPK-9q-nQg" firstAttribute="leading" secondItem="bds-JI-HXB" secondAttribute="leading" id="6Wp-H0-NWj"/>
                             <constraint firstItem="chJ-Oy-uie" firstAttribute="leading" secondItem="M3C-eb-Xai" secondAttribute="leading" constant="20" symbolic="YES" id="7Ut-Jg-Hm7"/>
                             <constraint firstItem="chJ-Oy-uie" firstAttribute="top" secondItem="MB8-Qv-8PQ" secondAttribute="top" id="9Rl-jY-9ak"/>
                             <constraint firstItem="GMl-hh-Rdw" firstAttribute="leading" secondItem="bds-JI-HXB" secondAttribute="trailing" constant="8" symbolic="YES" id="Aah-Om-b8O"/>
-                            <constraint firstItem="5zl-L4-Eaa" firstAttribute="baseline" secondItem="7Ki-0Z-w8m" secondAttribute="baseline" id="BIH-Xu-WxX"/>
                             <constraint firstItem="MB8-Qv-8PQ" firstAttribute="leading" secondItem="MfQ-QC-egV" secondAttribute="trailing" constant="8" symbolic="YES" id="Fvk-PB-EMX"/>
                             <constraint firstItem="chJ-Oy-uie" firstAttribute="top" secondItem="M3C-eb-Xai" secondAttribute="top" constant="13" id="GDd-JB-Ft0"/>
+                            <constraint firstItem="baL-qW-eM4" firstAttribute="bottom" secondItem="3tP-Zq-jYK" secondAttribute="bottom" id="HFU-yR-ni6"/>
                             <constraint firstItem="MfQ-QC-egV" firstAttribute="leading" secondItem="GMl-hh-Rdw" secondAttribute="trailing" constant="8" id="Jh1-kK-yqA"/>
                             <constraint firstItem="MB8-Qv-8PQ" firstAttribute="bottom" secondItem="GMl-hh-Rdw" secondAttribute="bottom" id="Lp7-dR-tNM"/>
                             <constraint firstItem="bds-JI-HXB" firstAttribute="leading" secondItem="chJ-Oy-uie" secondAttribute="leading" id="Nkl-na-i6w"/>
+                            <constraint firstItem="baL-qW-eM4" firstAttribute="leading" secondItem="3tP-Zq-jYK" secondAttribute="trailing" constant="10" symbolic="YES" id="PhE-Qf-h4J"/>
                             <constraint firstAttribute="bottom" secondItem="IPK-9q-nQg" secondAttribute="bottom" constant="20" symbolic="YES" id="XyM-YV-Lqe"/>
                             <constraint firstItem="MB8-Qv-8PQ" firstAttribute="leading" secondItem="chJ-Oy-uie" secondAttribute="trailing" constant="8" symbolic="YES" id="Z27-lB-80c"/>
-                            <constraint firstItem="5zl-L4-Eaa" firstAttribute="leading" secondItem="7Ki-0Z-w8m" secondAttribute="trailing" constant="12" symbolic="YES" id="mpc-8K-ecY"/>
+                            <constraint firstItem="3tP-Zq-jYK" firstAttribute="top" secondItem="MB8-Qv-8PQ" secondAttribute="bottom" constant="6" id="ZCk-id-ebB"/>
+                            <constraint firstItem="baL-qW-eM4" firstAttribute="centerY" secondItem="IPK-9q-nQg" secondAttribute="centerY" id="mpg-lD-Chs"/>
                             <constraint firstItem="MfQ-QC-egV" firstAttribute="baseline" secondItem="bds-JI-HXB" secondAttribute="baseline" id="oPC-UU-pI2"/>
-                            <constraint firstItem="5zl-L4-Eaa" firstAttribute="baseline" secondItem="IPK-9q-nQg" secondAttribute="baseline" id="s4d-tE-bDa"/>
-                            <constraint firstItem="7Ki-0Z-w8m" firstAttribute="leading" secondItem="MB8-Qv-8PQ" secondAttribute="leading" id="sXH-Ug-vb6"/>
                             <constraint firstItem="bds-JI-HXB" firstAttribute="top" secondItem="chJ-Oy-uie" secondAttribute="bottom" constant="12" id="tYq-u8-FnX"/>
                             <constraint firstAttribute="trailing" secondItem="MB8-Qv-8PQ" secondAttribute="trailing" constant="20" symbolic="YES" id="wrz-1N-ziL"/>
                             <constraint firstItem="GMl-hh-Rdw" firstAttribute="top" secondItem="bds-JI-HXB" secondAttribute="top" id="xkW-p8-OGB"/>
+                            <constraint firstItem="3tP-Zq-jYK" firstAttribute="leading" secondItem="MB8-Qv-8PQ" secondAttribute="leading" id="ywb-G8-VPN"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="buttonModel" destination="7Ki-0Z-w8m" id="2C5-5u-gYo"/>
                         <outlet property="chartView" destination="MB8-Qv-8PQ" id="tjJ-SC-6ps"/>
                         <outlet property="tableViewHeaders" destination="nxT-l4-6wV" id="Udk-Tj-CVC"/>
                         <outlet property="textFieldColumnRecodedName" destination="GMl-hh-Rdw" id="W94-eJ-mM6"/>
@@ -2128,9 +2129,11 @@
         </scene>
     </scenes>
     <resources>
+        <image name="chart32" width="32" height="32"/>
         <image name="column32" width="32" height="32"/>
         <image name="extract32" width="32" height="32"/>
         <image name="group32" width="32" height="32"/>
         <image name="recode32" width="32" height="32"/>
+        <image name="sort32" width="32" height="32"/>
     </resources>
 </document>
