@@ -90,7 +90,7 @@ class CSVdataDocument: NSDocument {
         switch typeName
         {
         case "csvFile":
-            if let value = self.csvDataModel.processCSVtoData() {
+            if let value = self.csvDataModel.processCSVtoData(delimiter: commaDelimiter) {
                 return value
             }
             throw outError
@@ -108,7 +108,7 @@ class CSVdataDocument: NSDocument {
         switch typeName
         {
         case "csvFile":
-            self.csvDataModel = CSVdata(data: data)
+            self.csvDataModel = CSVdata(dataCSV: data)
             if self.csvDataModel.processedDataOK {
                 return
             }
@@ -119,6 +119,14 @@ class CSVdataDocument: NSDocument {
         
     }
     
+    func exportDataTabDelimitedTo(fileURL fileURL:NSURL?)
+    {
+        guard let theURL = fileURL else {return}
+        let data = self.csvDataModel.processCSVtoData(delimiter: tabDelimiter)
+        guard let okData = data else {return}
+        
+        okData.writeToURL(theURL, atomically: true)
+    }
 
     // MARK: - CSVdataViewController
 
@@ -158,7 +166,7 @@ class CSVdataDocument: NSDocument {
     }
 
     
-    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:[[String]], nameOfColumn:String)
     {
         var groupStartValue:Double
         switch groupMethod
@@ -218,16 +226,21 @@ class CSVdataDocument: NSDocument {
         }
         
         //createTheCSVdata
-        var cvsDataData = [[String]]()
+        var csvDataData = [[String]]()
         for (parameter,value) in dictionaryOfParametersAndCombinedValues
         {
-            cvsDataData.append([parameter, String(value)])
+            csvDataData.append([parameter, String(value)])
         }
         
-        //extract the rows and present
-        self.createNewDocumentFromExtractedRows(cvsData: cvsDataData, headers: [self.csvDataModel.headers[columnIndexForGrouping],nameOfNewColumn])
+        return (csvDataData, nameOfNewColumn)
     }
     
+    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int)
+    {
+        //extract the rows and present
+        let combinedDataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
+        self.createNewDocumentFromExtractedRows(cvsData: combinedDataAndName.cvsDataData, headers: [self.csvDataModel.headers[columnIndexForGrouping],combinedDataAndName.nameOfColumn])
+    }
     
     
     func numberOfRowsOfData()->Int

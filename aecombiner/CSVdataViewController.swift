@@ -47,7 +47,6 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
 
     
-    
     // MARK: - CSV data table
     /*
     func myCSVdataDocument()->CSVdataDocument?

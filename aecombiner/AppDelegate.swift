@@ -21,7 +21,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
-    @IBAction func closeSheetForButton(button:NSButton)
+    // MARK: - @IBActions
+    @IBAction func importFile(sender: NSToolbarItem)
+    {
+        let panel = NSOpenPanel()
+        var types = [String]()
+        types.append("txt")
+        panel.allowedFileTypes = types
+        if panel.runModal() == NSFileHandlingPanelOKButton
+        {
+            guard
+                let theURL = panel.URL
+                //let data = NSData(contentsOfURL: theURL)
+                else {return}
+            do {
+                var usedencoding = NSStringEncoding()
+                let csvstring = try NSString(contentsOfURL: theURL, usedEncoding: &usedencoding)
+                let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
+                if doc is CSVdataDocument
+                {
+                    (doc as! CSVdataDocument).csvDataModel = CSVdata(stringTAB: csvstring)
+                    (doc as! CSVdataDocument).updateChangeCount(.ChangeDone)
+                }
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
+   @IBAction func closeSheetForButton(button:NSButton)
     {
         guard   let win = button.window,
                 let sheetP = button.window?.sheetParent else

@@ -13,12 +13,10 @@ class CSVdataWindowController: NSWindowController {
 
     // MARK: - @IBActions
     
-    @IBAction func toolbarItemPressed(sender: NSToolbarItem) {
+    @IBAction func exportTABpressed(sender: NSToolbarItem) {
         
-        
+        self.exportDocument(fileExtension: "txt")
     }
-    
-    
     
     override func windowDidLoad() {
         super.windowDidLoad()
@@ -27,7 +25,25 @@ class CSVdataWindowController: NSWindowController {
     }
     
     
+    func exportDocument(fileExtension fileExtension:String)
+    {
+        
+        let panel = NSSavePanel()
+        let title = ((self.window!.title as NSString).stringByDeletingPathExtension as NSString).stringByAppendingPathExtension(fileExtension)
+        panel.nameFieldStringValue = title!
     
+        var types = [String]()
+        types.append("txt")
+        panel.allowedFileTypes = types
+        panel.beginSheetModalForWindow(self.window!) { (result) -> Void in
+            if result == NSFileHandlingPanelOKButton
+            {
+                (self.document as? CSVdataDocument)?.exportDataTabDelimitedTo(fileURL: panel.URL)
+            }
+        }
+        
+    }
+
     
     // MARK: - segue
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
