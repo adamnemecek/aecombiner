@@ -8,6 +8,9 @@
 
 import SpriteKit
 
+let kChartTopLineName = "topline"
+
+
 struct ChartParameters {
     var maxParam:Double = 0.0
     var minParam:Double = Double(Int.max)
@@ -49,6 +52,13 @@ class ChartTopNode: SKNode {
         self.autolocateAndChartParameters()
     }
     
+    func relocateTopLine(yValue yValue:Double)
+    {
+        guard let topline = self.childNodeWithName(kChartTopLineName) else {return}
+        
+        topline.position = CGPoint(x: topline.position.x, y: topline.position.y+1.0)
+    }
+    
     func autolocateAndChartParameters()
     {
         //autolocate to bottom left axis
@@ -57,10 +67,20 @@ class ChartTopNode: SKNode {
         var xVal:Double = 0.0
         //process the parameters
         self.removeAllChildren()
+        
+        let topline = SKShapeNode(rect: CGRect(x: 0.0, y: 0.0, width: 100.0, height: 2.00))
+        topline.name = kChartTopLineName
+        topline.strokeColor = NSColor.redColor()
+        topline.fillColor = NSColor.redColor()
+        topline.yScale = 1/self.yScale
+        self.addChild(topline)
+        topline.position = CGPoint(x: 50.0, y: 50.0)
+        
         for var row:Int = 0; row<self.parameters.values.count; ++row
         {
             let value = self.parameters.values[row]
             let node = SKSpriteNode(imageNamed: "ball")
+            node.name = "dot"
             node.userInteractionEnabled = true
             node.color = self.colour
             node.colorBlendFactor = 1.0

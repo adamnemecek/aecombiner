@@ -54,6 +54,12 @@ class ChartView: SKView {
         
     }
     
+    @IBAction func relocateTopLine(sender: NSSlider)
+    {
+        self.topNode?.relocateTopLine(yValue: sender.doubleValue)
+    }
+
+    
     func reSortYourParameters()
     {
         self.topNode?.reSortYourParameters()
