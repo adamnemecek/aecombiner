@@ -10,22 +10,32 @@ import SpriteKit
 
 let kBorderDefaultSize = 20.0  // single border
 
-
-struct ChartParameters {
-    var maxParam:Double = 0.0
-    var minParam:Double = Double(Int.max)
-    var values = [Double]()
+struct ChartDataPoint {
+    var xValue:Double
+    var yValue:Double
     
+    init (xvalue:Double, yvalue:Double)
+    {
+        xValue = xvalue // usually the row in the data model
+        yValue = yvalue
+    }
+}
+
+struct ChartDataSet {
+    var maxYvalue:Double = 0.0
+    var minYvalue:Double = Double(Int.max)
+    var dataPoints = [ChartDataPoint]()
+    var nameOfDataSet:String = ""
 }
 
 class ChartTopNode: SKNode {
-    var axesExtent:(x:Double, y:Double) = (1.0,1.0)
-    var parameters = ChartParameters()
+    var axesExtent = ChartDataPoint(xvalue: 1.0, yvalue: 1.0)
+    var parameters = ChartDataSet()
     var border:Double = 10.0
     var colour = NSColor.blackColor()
     var sortDirection = kAscending
     
-    convenience init (sceneSize:(x:Double,y:Double), parameters:ChartParameters, nameOfParameters:String?, colour:NSColor)
+    convenience init (sceneSize:ChartDataPoint, parameters:ChartDataSet, nameOfParameters:String?, colour:NSColor)
     {
         self.init()
         self.name = nameOfParameters
@@ -40,10 +50,10 @@ class ChartTopNode: SKNode {
         switch self.sortDirection
         {
         case kAscending:
-            self.parameters.values.sortInPlace(>)//{$0 > $1}
+            self.parameters.dataPoints.sortInPlace(){$0.yValue > $1.yValue}
             self.sortDirection = kDescending
         case kDescending:
-            self.parameters.values.sortInPlace(<)//{$0 > $1}
+            self.parameters.dataPoints.sortInPlace(){$0.yValue < $1.yValue}
             self.sortDirection = kAscending
       default:
             break
@@ -54,19 +64,19 @@ class ChartTopNode: SKNode {
     func autolocateAndChartParameters()
     {
         // yScale is the range between min and max parameter divided into the Y axis length
-        self.yScale = CGFloat((self.axesExtent.y-self.border*2.0)/(parameters.maxParam-parameters.minParam))
+        self.yScale = CGFloat((self.axesExtent.yValue-self.border*2.0)/(parameters.maxYvalue-parameters.minYvalue))
         
         //xScale is the length of x axis / number of parameters to plot -1, minus 1 because we need the number of gaps between poins which = num points -1
-        self.xScale = CGFloat((self.axesExtent.x-self.border*2.0)/Double(parameters.values.count-1))
+        self.xScale = CGFloat((self.axesExtent.xValue-self.border*2.0)/Double(parameters.dataPoints.count-1))
         //process the parameters
         self.removeAllChildren()
         
         //autolocate to bottom left axis in superviews coords, taking account of yscale. We always start with x = 0 so no effect of xScale
-        self.position = CGPoint(x: self.border, y: (self.border)-(self.parameters.minParam*Double(self.yScale)))
+        self.position = CGPoint(x: self.border, y: (self.border)-(self.parameters.minYvalue*Double(self.yScale)))
 
-        for var row:Int = 0; row<self.parameters.values.count; ++row
+        for var row:Int = 0; row<self.parameters.dataPoints.count; ++row
         {
-            let value = self.parameters.values[row]
+            let value = self.parameters.dataPoints[row].yValue
             let node = SKSpriteNode(imageNamed: "ball")
             node.name = "dot"
             node.userInteractionEnabled = false
@@ -95,9 +105,19 @@ class ChartScene: SKScene {
     override func mouseDown(theEvent: NSEvent) {
         /* Called when a mouse click occurs */
         
-        _ = theEvent.locationInNode(self)
         
-
+        let rectNode = SKShapeNode(rectOfSize: CGSize(width: 10.0, height: 10.0))
+        rectNode.name = "rectNode"
+        rectNode.strokeColor = NSColor.redColor()
+        rectNode.position = theEvent.locationInNode(self)
+        self.addChild(rectNode)
+    }
+    
+    override func mouseDragged(theEvent: NSEvent) {
+        
+        guard let rectNode = self.childNodeWithName("rectNode") else {return}
+        rectNode.position = theEvent.locationInNode(self)
+        
     }
     
     override func update(currentTime: CFTimeInterval) {

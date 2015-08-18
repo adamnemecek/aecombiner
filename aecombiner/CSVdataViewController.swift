@@ -54,7 +54,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.view.window?.windowController?.document as? CSVdataDocument
     }
     */
-    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->ChartParameters
+    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
     {
         return self.myCSVdataDocument.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
     }

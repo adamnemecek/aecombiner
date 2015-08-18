@@ -61,11 +61,11 @@ class ChartView: SKView {
     }
 
     
-    func chartTheseParameters(parameters parameters:ChartParameters, nameOfParameters:String?)
+    func chartTheseParameters(parameters parameters:ChartDataSet, nameOfParameters:String?)
     {
         guard let chartscene = self.scene else {return}
         chartscene.removeAllChildren()
-        let topNode = ChartTopNode(sceneSize: (Double(chartscene.size.width),Double(chartscene.size.height)), parameters: parameters, nameOfParameters: nameOfParameters, colour:NSColor.redColor())
+        let topNode = ChartTopNode(sceneSize: ChartDataPoint(xvalue:Double(chartscene.size.width),yvalue:Double(chartscene.size.height)), parameters: parameters, nameOfParameters: nameOfParameters, colour:NSColor.redColor())
         
         chartscene.addChild(topNode)
         topNode.autolocateAndChartParameters()

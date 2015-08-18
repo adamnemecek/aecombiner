@@ -148,19 +148,21 @@ class CSVdataDocument: NSDocument {
     }
     
     // MARK: - Data
-    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->ChartParameters
+    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
     {
-        var params = ChartParameters()
+        var params = ChartDataSet()
         
-        for row in self.csvDataModel.csvData
+        for var r:Int = 0; r<self.csvDataModel.csvData.count; ++r
         {
+            let row = self.csvDataModel.csvData[r]
             guard
                 row[columnIndex].characters.count>0,
                 let value = Double(row[columnIndex])
                 else {continue}
-            params.minParam = fmin(params.minParam,value)
-            params.maxParam = fmax(params.maxParam,value)
-            params.values.append(value)
+            params.minYvalue = fmin(params.minYvalue,value)
+            params.maxYvalue = fmax(params.maxYvalue,value)
+            // we store the row number as the X value and when we sort on the Y value we can always map back to the row in the data for extracting other values. !! If we sort the CSVdata we are lost
+            params.dataPoints.append(ChartDataPoint(xvalue: Double(r), yvalue: value))
         }
         return params
     }
