@@ -324,7 +324,7 @@ class CSVdataDocument: NSDocument {
         generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.csvDataModel.csvData, columnIndexToSort: columnIndexToSort, textOrvalue: textOrvalue, direction: direction)
     }
 
-    func extractRowsBasedOnParameters(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
+    func extractRowsBasedOnPredicates(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
     {
         var extractedRows = [[String]]()
         for rowOfColumns in self.csvDataModel.csvData

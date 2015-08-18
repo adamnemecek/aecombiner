@@ -54,11 +54,6 @@ class ChartView: SKView {
         
     }
     
-    @IBAction func relocateTopLine(sender: NSSlider)
-    {
-        self.topNode?.relocateTopLine(yValue: sender.doubleValue)
-    }
-
     
     func reSortYourParameters()
     {
@@ -66,14 +61,12 @@ class ChartView: SKView {
     }
 
     
-    func chartTheseParameters(var parameters parameters:ChartParameters, nameOfParameters:String?)
+    func chartTheseParameters(parameters parameters:ChartParameters, nameOfParameters:String?)
     {
         guard let chartscene = self.scene else {return}
         chartscene.removeAllChildren()
-        let border = chartscene.size.width/20.0//border is twice the border for each side
-        let xSpacing = Double(chartscene.size.width-border)/Double(parameters.values.count)
-        let yScale:CGFloat = (chartscene.size.height-border)/CGFloat(parameters.maxParam-parameters.minParam)
-        let topNode = ChartTopNode(xSpacing: xSpacing, yScale: yScale, parameters: parameters, nameOfParameters: nameOfParameters, border: border, colour:NSColor.redColor())
+        let topNode = ChartTopNode(sceneSize: (Double(chartscene.size.width),Double(chartscene.size.height)), parameters: parameters, nameOfParameters: nameOfParameters, colour:NSColor.redColor())
+        
         chartscene.addChild(topNode)
         topNode.autolocateAndChartParameters()
         self.topNode = topNode

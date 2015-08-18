@@ -74,9 +74,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.myCSVdataDocument.numberOfColumnsInData()
     }
 
-    func extractRowsBasedOnParameters(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
+    func extractRowsBasedOnPredicates(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
     {
-        self.myCSVdataDocument.extractRowsBasedOnParameters(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+        self.myCSVdataDocument.extractRowsBasedOnPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
         self.tableViewCSVdata.reloadData()
     }
     

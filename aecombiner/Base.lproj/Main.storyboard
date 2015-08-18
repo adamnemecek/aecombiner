@@ -837,7 +837,7 @@
             <objects>
                 <viewController id="EBc-G2-mhh" customClass="HeadingsViewController" customModule="aecombiner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="M3C-eb-Xai">
-                        <rect key="frame" x="0.0" y="0.0" width="799" height="345"/>
+                        <rect key="frame" x="0.0" y="0.0" width="772" height="345"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="chJ-Oy-uie" userLabel="Bordered Scroll View - headers">
@@ -847,7 +847,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView identifier="tableViewHeaders" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="nxT-l4-6wV" userLabel="Table View Headers">
-                                            <rect key="frame" x="0.0" y="0.0" width="221" height="244"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="221" height="0.0"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -973,14 +973,6 @@
                                     <action selector="deleteHeading:" target="EBc-G2-mhh" id="DYu-xm-AQd"/>
                                 </connections>
                             </button>
-                            <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sxl-Ud-kbk">
-                                <rect key="frame" x="751" y="11" width="21" height="323"/>
-                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="1" tickMarkPosition="right" sliderType="linear" id="Hbj-MK-M7F">
-                                    <connections>
-                                        <action selector="relocateTopLine:" target="MB8-Qv-8PQ" id="E6W-SP-yIl"/>
-                                    </connections>
-                                </sliderCell>
-                            </slider>
                             <button toolTip="Plot values" translatesAutoresizingMaskIntoConstraints="NO" id="3tP-Zq-jYK">
                                 <rect key="frame" x="169" y="14" width="32" height="32"/>
                                 <constraints>
@@ -1010,12 +1002,9 @@
                             <constraint firstItem="MB8-Qv-8PQ" firstAttribute="leading" secondItem="GMl-hh-Rdw" secondAttribute="trailing" constant="8" symbolic="YES" id="LdA-Sb-Ex4"/>
                             <constraint firstItem="6xe-DW-eHE" firstAttribute="centerY" secondItem="IPK-9q-nQg" secondAttribute="centerY" id="P8B-F3-Kaa"/>
                             <constraint firstItem="MB8-Qv-8PQ" firstAttribute="centerY" secondItem="M3C-eb-Xai" secondAttribute="centerY" id="TDe-8v-Vqz"/>
-                            <constraint firstItem="Sxl-Ud-kbk" firstAttribute="leading" secondItem="MB8-Qv-8PQ" secondAttribute="trailing" constant="1" id="Xf3-qh-0ZZ"/>
-                            <constraint firstItem="Sxl-Ud-kbk" firstAttribute="bottom" secondItem="MB8-Qv-8PQ" secondAttribute="bottom" id="cCa-56-pYa"/>
-                            <constraint firstItem="Sxl-Ud-kbk" firstAttribute="top" secondItem="MB8-Qv-8PQ" secondAttribute="top" id="cwo-EC-QP1"/>
                             <constraint firstItem="MB8-Qv-8PQ" firstAttribute="leading" secondItem="chJ-Oy-uie" secondAttribute="trailing" constant="8" symbolic="YES" id="dzK-8D-EJ8"/>
                             <constraint firstItem="3tP-Zq-jYK" firstAttribute="leading" secondItem="6xe-DW-eHE" secondAttribute="trailing" constant="26" id="hn7-Gb-6I1"/>
-                            <constraint firstAttribute="trailing" secondItem="MB8-Qv-8PQ" secondAttribute="trailing" constant="47" id="iBk-gA-qsG"/>
+                            <constraint firstAttribute="trailing" secondItem="MB8-Qv-8PQ" secondAttribute="trailing" constant="20" id="iBk-gA-qsG"/>
                             <constraint firstItem="bds-JI-HXB" firstAttribute="leading" secondItem="IPK-9q-nQg" secondAttribute="leading" id="pmP-O0-RyA"/>
                             <constraint firstItem="MB8-Qv-8PQ" firstAttribute="top" secondItem="chJ-Oy-uie" secondAttribute="top" id="qzs-VO-MeR"/>
                             <constraint firstItem="6xe-DW-eHE" firstAttribute="leading" secondItem="GMl-hh-Rdw" secondAttribute="leading" id="rYJ-AQ-Y5L"/>
@@ -1033,7 +1022,7 @@
                 </viewController>
                 <customObject id="L6x-yv-hse" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-0.5" y="1017.5"/>
+            <point key="canvasLocation" x="-14" y="1017.5"/>
         </scene>
         <!--Recode Column View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -1702,7 +1691,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="extractRowsBasedOnParameters:" target="8yo-SX-OPZ" id="Lhd-ct-mhQ"/>
+                                    <action selector="extractRowsBasedOnPredicates:" target="8yo-SX-OPZ" id="Lhd-ct-mhQ"/>
                                 </connections>
                             </button>
                             <button identifier="clearORarray" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6yo-rt-19C">

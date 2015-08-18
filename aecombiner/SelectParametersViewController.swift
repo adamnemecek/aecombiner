@@ -54,9 +54,9 @@ class SelectParametersViewController: RecodeColumnViewController {
     }
     
     
-    @IBAction func extractRowsBasedOnParameters(sender: NSButton) {
+    @IBAction func extractRowsBasedOnPredicates(sender: NSButton) {
         
-        self.myCSVdataViewController()?.extractRowsBasedOnParameters(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
+        self.myCSVdataViewController()?.extractRowsBasedOnPredicates(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
     }
     
     // MARK: - overrides

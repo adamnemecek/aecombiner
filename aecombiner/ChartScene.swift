@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-let kChartTopLineName = "topline"
+let kBorderDefaultSize = 20.0  // single border
 
 
 struct ChartParameters {
@@ -19,20 +19,19 @@ struct ChartParameters {
 }
 
 class ChartTopNode: SKNode {
-    var xSpacing:Double = 1.0
+    var axesExtent:(x:Double, y:Double) = (1.0,1.0)
     var parameters = ChartParameters()
-    var border:CGFloat = 10.0
+    var border:Double = 10.0
     var colour = NSColor.blackColor()
     var sortDirection = kAscending
     
-    convenience init (xSpacing:Double, yScale:CGFloat, parameters:ChartParameters, nameOfParameters:String?, border:CGFloat, colour:NSColor)
+    convenience init (sceneSize:(x:Double,y:Double), parameters:ChartParameters, nameOfParameters:String?, colour:NSColor)
     {
         self.init()
         self.name = nameOfParameters
-        self.yScale = yScale
-        self.xSpacing = xSpacing
+        self.axesExtent = sceneSize
         self.parameters = parameters
-        self.border = border
+        self.border = kBorderDefaultSize // single border
         self.colour = colour
     }
     
@@ -52,45 +51,34 @@ class ChartTopNode: SKNode {
         self.autolocateAndChartParameters()
     }
     
-    func relocateTopLine(yValue yValue:Double)
-    {
-        guard let topline = self.childNodeWithName(kChartTopLineName) else {return}
-        
-        topline.position = CGPoint(x: topline.position.x, y: topline.position.y+1.0)
-    }
-    
     func autolocateAndChartParameters()
     {
-        //autolocate to bottom left axis
-        self.position = CGPoint(x: Double(self.border/2.0), y: Double(self.border/2.0)-(self.parameters.minParam*Double(self.yScale)))
-        //set the x to bottom left
-        var xVal:Double = 0.0
+        // yScale is the range between min and max parameter divided into the Y axis length
+        self.yScale = CGFloat((self.axesExtent.y-self.border*2.0)/(parameters.maxParam-parameters.minParam))
+        
+        //xScale is the length of x axis / number of parameters to plot -1, minus 1 because we need the number of gaps between poins which = num points -1
+        self.xScale = CGFloat((self.axesExtent.x-self.border*2.0)/Double(parameters.values.count-1))
         //process the parameters
         self.removeAllChildren()
         
-        let topline = SKShapeNode(rect: CGRect(x: 0.0, y: 0.0, width: 100.0, height: 2.00))
-        topline.name = kChartTopLineName
-        topline.strokeColor = NSColor.redColor()
-        topline.fillColor = NSColor.redColor()
-        topline.yScale = 1/self.yScale
-        self.addChild(topline)
-        topline.position = CGPoint(x: 50.0, y: 50.0)
-        
+        //autolocate to bottom left axis in superviews coords, taking account of yscale. We always start with x = 0 so no effect of xScale
+        self.position = CGPoint(x: self.border, y: (self.border)-(self.parameters.minParam*Double(self.yScale)))
+
         for var row:Int = 0; row<self.parameters.values.count; ++row
         {
             let value = self.parameters.values[row]
             let node = SKSpriteNode(imageNamed: "ball")
             node.name = "dot"
-            node.userInteractionEnabled = true
+            node.userInteractionEnabled = false
             node.color = self.colour
             node.colorBlendFactor = 1.0
             //correct for the top nodes yScale to avoid stretch of images
             node.yScale = 1/self.yScale
+            node.xScale = 1/self.xScale
             node.zPosition = CGFloat(row)
             node.physicsBody?.dynamic = false
             self.addChild(node)
-            node.position = CGPoint(x: xVal, y: value)
-            xVal += self.xSpacing
+            node.position = CGPoint(x: Double(row), y: value)
         }
 
     }
