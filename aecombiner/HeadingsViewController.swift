@@ -19,11 +19,10 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBOutlet weak var chartView: ChartView!
 
     @IBOutlet weak var buttonModel: NSButton!
+    @IBOutlet weak var buttonSortParameters: NSButton!
+    @IBOutlet weak var buttonTrash: NSButton!
     
     // MARK: - @IBAction
-    @IBAction func sortChartParameters(sender: AnyObject) {
-        self.chartView?.reSortYourParameters()
-    }
 
     @IBAction func renameColumn(sender: AnyObject) {
         guard !self.textFieldColumnRecodedName.stringValue.isEmpty else
@@ -46,15 +45,21 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     
     // MARK: - Charts
+    @IBAction func sortChartParameters(sender: AnyObject) {
+        guard
+            let chartview = self.chartView,
+            let columnIndex = self.selectedColumnFromHeadersTableView()
+            else {return}
+        chartview.reSortTheseParameters(dataSetName: self.stringForColumnIndex(columnIndex))
+    }
 
     @IBAction func modelParameter(sender: NSButton) {
-    
         guard
                 let chartview = self.chartView,
                 let columnIndex = self.selectedColumnFromHeadersTableView(),
                 let parameters = self.myCSVdataViewController()?.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
-        else {return}
-        chartview.chartTheseParameters(parameters: parameters, nameOfParameters: "Untitled")
+            else {return}
+        chartview.chartTheseParameters(parameters: parameters, nameOfParameters: self.stringForColumnIndex(columnIndex))
     }
     
     
@@ -161,17 +166,26 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     
     func tableViewSelectionDidChange(notification: NSNotification) {
-        guard let tableViewID = (notification.object as? NSTableView)?.identifier
+        guard let tableViewID = (notification.object as? NSTableView)?.identifier,
+                let selected = (notification.object as? NSTableView)?.selectedRowIndexes
             else {return}
 
         switch tableViewID
         {
+            case "tableViewHeaders":
+            self.enableButtons(enabled: selected.count>0)
             default:
                 break
         }
         
     }
     
+    func enableButtons(enabled enabled:Bool)
+    {
+        self.buttonModel?.enabled = enabled
+        self.buttonSortParameters?.enabled = enabled
+        self.buttonTrash?.enabled = enabled
 
+    }
     
 }

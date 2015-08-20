@@ -86,7 +86,7 @@ class DataPointNode: SKSpriteNode {
 class DataSetNode: SKNode {
     var axesExtent = ChartDataPoint(xvalue: 1.0, yvalue: 1.0)
     var parameters = ChartDataSet()
-    var border:Double = 10.0
+    var border:Double = kBorderDefaultSize
     var colour = kColour_Unselected
     var sortDirection = kAscending
     var dataSetName:String? = "Untitled"
@@ -164,7 +164,42 @@ class ChartScene: SKScene {
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
             node.removeFromParent()
+       }
+    }
+    
+    func autoLocateAndChartAllParameters()
+    {
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
+            (node as! DataSetNode).autolocateAndChartParameters()
         }
+
+    }
+    
+    func resortAllDataSets()
+    {
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
+            (node as! DataSetNode).reSortYourParameters()
+        }
+    }
+    
+    func reSortTheseParameters(dataSetName dataSetName:String)
+    {
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
+            guard let dsNode = (node as? DataSetNode) else {return}
+            if dsNode.dataSetName == dataSetName
+            {
+                dsNode.reSortYourParameters()
+            }
+        }
+
+    }
+
+    func chartTheseParameters(parameters parameters:ChartDataSet, nameOfParameters:String?)
+    {
+        self.removeDataSetNodes()
+        let topNode = DataSetNode(sceneSize: ChartDataPoint(xvalue:Double(self.size.width),yvalue:Double(self.size.height)), parameters: parameters, nameOfParameters: nameOfParameters, colour:kColour_Unselected)
+        self.addChild(topNode)
+        topNode.autolocateAndChartParameters()
     }
     
     func rebuildSelectedPointsArray(rectNode:SKNode)

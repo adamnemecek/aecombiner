@@ -11,7 +11,7 @@ import SpriteKit
 
 class ChartView: SKView {
     
-    var topNode:DataSetNode?
+    //var topNode:DataSetNode?
     
     override func viewWillStartLiveResize() {
         super.viewWillStartLiveResize()
@@ -20,9 +20,9 @@ class ChartView: SKView {
     
     override func viewDidEndLiveResize() {
         super.viewDidEndLiveResize()
-        guard let topnode = self.topNode else {self.scene?.hidden = false;return}
-        self.chartTheseParameters(parameters: topnode.parameters, nameOfParameters: topnode.name)
-        self.scene?.hidden = false
+        guard let scene = self.scene as? ChartScene else {self.scene?.hidden = false;return}
+        scene.autoLocateAndChartAllParameters()
+        scene.hidden = false
     }
 
     
@@ -55,20 +55,24 @@ class ChartView: SKView {
     }
     
     
-    func reSortYourParameters()
+    func reSortAllParameters()
     {
-        self.topNode?.reSortYourParameters()
+        guard let scene = self.scene as? ChartScene else {return}
+        scene.resortAllDataSets()
     }
-
+    
+    
+    func reSortTheseParameters(dataSetName dataSetName:String)
+    {
+        guard let scene = self.scene as? ChartScene else {return}
+        scene.reSortTheseParameters(dataSetName: dataSetName)
+    }
+    
     
     func chartTheseParameters(parameters parameters:ChartDataSet, nameOfParameters:String?)
     {
         guard let chartscene = self.scene as? ChartScene else {return}
-        chartscene.removeDataSetNodes()
-        let topNode = DataSetNode(sceneSize: ChartDataPoint(xvalue:Double(chartscene.size.width),yvalue:Double(chartscene.size.height)), parameters: parameters, nameOfParameters: nameOfParameters, colour:kColour_Unselected)
-        chartscene.addChild(topNode)
-        topNode.autolocateAndChartParameters()
-        self.topNode = topNode
+        chartscene.chartTheseParameters(parameters: parameters, nameOfParameters: nameOfParameters)
     }
     
     
