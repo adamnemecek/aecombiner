@@ -9,6 +9,20 @@
 import SpriteKit
 
 let kBorderDefaultSize = 20.0  // single border
+let kNodeName_DataPoint = "p"
+let kNodeName_DataSet = "s"
+let kNodeName_SelectionRect = "r"
+let kNodeName_ZoomButton = "z"
+
+let kButtonName_ZoomIn = "+"
+let kButtonName_ZoomOut = "-"
+let kButtonName_ZoomZero = "z0"
+
+
+let kColour_Selected = NSColor.redColor()
+let kColour_Unselected = NSColor.greenColor()
+
+
 
 struct ChartDataPoint {
     var xValue:Double
@@ -28,17 +42,61 @@ struct ChartDataSet {
     var nameOfDataSet:String = ""
 }
 
-class ChartTopNode: SKNode {
+class ButtonNode: SKSpriteNode {
+    convenience init (position:CGPoint, imageName:String)
+    {
+        self.init(imageNamed: imageName)
+        self.userInteractionEnabled = true
+        self.name = kNodeName_ZoomButton
+        self.position = position
+        self.anchorPoint = CGPoint(x: 0.0, y: 0.0)
+    }
+    
+    override func mouseDown(theEvent: NSEvent) {
+        guard let name = self.name, let scene = self.parent as? ChartScene else {return}
+            switch name {
+                case kButtonName_ZoomIn, kButtonName_ZoomOut, kButtonName_ZoomZero:
+                    scene.zoomScale(name)
+                default:
+                break
+        }
+        
+    }
+}
+
+class DataPointNode: SKSpriteNode {
+    var dataPoint:ChartDataPoint = ChartDataPoint(xvalue: 0.0, yvalue: 0.0)
+    
+    func initialiseParameters(dataPoint:ChartDataPoint, colour:NSColor, yScale:CGFloat, xScale:CGFloat, zPos:Int)
+    {
+        self.dataPoint = dataPoint
+        self.name = kNodeName_DataPoint
+        self.userInteractionEnabled = false
+        self.color = colour
+        self.colorBlendFactor = 1.0
+        self.blendMode = .Alpha
+        //correct for the top nodes yScale to avoid stretch of images
+        self.yScale = 1/yScale
+        self.xScale = 1/xScale
+        self.zPosition = CGFloat(zPos)
+        self.physicsBody?.dynamic = false
+    }
+}
+    
+class DataSetNode: SKNode {
     var axesExtent = ChartDataPoint(xvalue: 1.0, yvalue: 1.0)
     var parameters = ChartDataSet()
     var border:Double = 10.0
-    var colour = NSColor.blackColor()
+    var colour = kColour_Unselected
     var sortDirection = kAscending
+    var dataSetName:String? = "Untitled"
+    var selectedDataPoints = [ChartDataPoint]()
     
     convenience init (sceneSize:ChartDataPoint, parameters:ChartDataSet, nameOfParameters:String?, colour:NSColor)
     {
         self.init()
-        self.name = nameOfParameters
+        self.name = kNodeName_DataSet
+        self.dataSetName = nameOfParameters
         self.axesExtent = sceneSize
         self.parameters = parameters
         self.border = kBorderDefaultSize // single border
@@ -61,6 +119,7 @@ class ChartTopNode: SKNode {
         self.autolocateAndChartParameters()
     }
     
+    
     func autolocateAndChartParameters()
     {
         // yScale is the range between min and max parameter divided into the Y axis length
@@ -76,19 +135,10 @@ class ChartTopNode: SKNode {
 
         for var row:Int = 0; row<self.parameters.dataPoints.count; ++row
         {
-            let value = self.parameters.dataPoints[row].yValue
-            let node = SKSpriteNode(imageNamed: "ball")
-            node.name = "dot"
-            node.userInteractionEnabled = false
-            node.color = self.colour
-            node.colorBlendFactor = 1.0
-            //correct for the top nodes yScale to avoid stretch of images
-            node.yScale = 1/self.yScale
-            node.xScale = 1/self.xScale
-            node.zPosition = CGFloat(row)
-            node.physicsBody?.dynamic = false
+            let node = DataPointNode(imageNamed: "ball")
+            node.initialiseParameters(self.parameters.dataPoints[row], colour: self.colour, yScale: self.yScale, xScale: self.xScale, zPos: row)
             self.addChild(node)
-            node.position = CGPoint(x: Double(row), y: value)
+            node.position = CGPoint(x: Double(row), y: node.dataPoint.yValue)
         }
 
     }
@@ -97,28 +147,81 @@ class ChartTopNode: SKNode {
 
 class ChartScene: SKScene {
     
+    func zoomScale(zoomDirection:String)
+    {
+        
+    }
+
+    
+    func removeRectNodes()
+    {
+        self.enumerateChildNodesWithName(kNodeName_SelectionRect) { (node, found) -> Void in
+            node.removeFromParent()
+        }
+    }
+    
+    func removeDataSetNodes()
+    {
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
+            node.removeFromParent()
+        }
+    }
+    
+    func rebuildSelectedPointsArray(rectNode:SKNode)
+    {
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
+            let dsNode = (topnode as! DataSetNode)
+            dsNode.selectedDataPoints = [ChartDataPoint]()
+            topnode.enumerateChildNodesWithName(kNodeName_DataPoint) { (pointnode, foundpoint) -> Void in
+                let ptNode = (pointnode as! DataPointNode)
+                if rectNode.containsPoint(topnode.convertPoint(ptNode.position, toNode: self))
+                {
+                    (topnode as! DataSetNode).selectedDataPoints.append(ptNode.dataPoint)
+                    ptNode.color = kColour_Selected
+                }
+                else
+                {
+                    ptNode.color = kColour_Unselected
+                }
+            }
+        }
+    }
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here*/
+        self.addChild(ButtonNode(position: CGPoint(x: 5, y: 5), imageName: "zoomIn"))
+        self.addChild(ButtonNode(position: CGPoint(x: 25, y: 5), imageName: "zoomOut"))
+        self.addChild(ButtonNode(position: CGPoint(x: 45, y: 5), imageName: "zoomZero"))
     }
     
     override func mouseDown(theEvent: NSEvent) {
         /* Called when a mouse click occurs */
-        
-        
-        let rectNode = SKShapeNode(rectOfSize: CGSize(width: 10.0, height: 10.0))
-        rectNode.name = "rectNode"
-        rectNode.strokeColor = NSColor.redColor()
-        rectNode.position = theEvent.locationInNode(self)
+        self.removeRectNodes()
+        let rectNode = SKShapeNode(rect: CGRectZero)
+        rectNode.name = kNodeName_SelectionRect
+        rectNode.strokeColor = kColour_Selected
         self.addChild(rectNode)
-    }
+        rectNode.position = theEvent.locationInNode(self)
+   }
     
     override func mouseDragged(theEvent: NSEvent) {
-        
-        guard let rectNode = self.childNodeWithName("rectNode") else {return}
-        rectNode.position = theEvent.locationInNode(self)
-        
+        guard let oldNode = self.childNodeWithName(kNodeName_SelectionRect)  else {return}
+        let startPos = oldNode.position
+        let newPos = theEvent.locationInNode(self)
+        self.removeRectNodes()
+        let rectNode = SKShapeNode(rect: CGRect(x: 0.0, y: 0.0, width: newPos.x-startPos.x, height: newPos.y-startPos.y))
+        rectNode.name = kNodeName_SelectionRect
+        rectNode.strokeColor = kColour_Selected
+        self.addChild(rectNode)
+        rectNode.position = startPos
     }
+    
+    override func mouseUp(theEvent: NSEvent) {
+        guard let rectNode = self.childNodeWithName(kNodeName_SelectionRect)  else {return}
+        self.rebuildSelectedPointsArray(rectNode)
+        self.removeRectNodes()
+    }
+    
     
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */

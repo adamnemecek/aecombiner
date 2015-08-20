@@ -394,17 +394,13 @@ class CSVdataDocument: NSDocument {
 
     func createSetOfParameters(fromColumn columnIndex:Int)->Set<String>?
     {
-        var set: Set<String>? = Set<String>()
+        var set = Set<String>()
         for parameter in self.csvDataModel.csvData
         {
             // parameter is a [string] array of row columns
-            set!.insert(parameter[columnIndex])
+            set.insert(parameter[columnIndex])
         }
-        if set!.count == 0
-        {
-            set = nil
-        }
-        return set
+        return set.count == 0 ? nil : set
     }
 
     func stringForColumnIndex(columnIndex:Int?) -> String
