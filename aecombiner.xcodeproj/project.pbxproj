@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8E0E0E6B1B872EB400BD1C06 /* ChartNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0E0E6A1B872EB400BD1C06 /* ChartNodes.swift */; };
 		8E10726E1B40768D00E4E409 /* CSVdata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E10726D1B40768D00E4E409 /* CSVdata.swift */; };
 		8E69F3101B67DA4100BDB720 /* CSVdataViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */; };
 		8E69F3111B67DA4100BDB720 /* CSVdataWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8E0E0E6A1B872EB400BD1C06 /* ChartNodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartNodes.swift; sourceTree = "<group>"; };
 		8E10726D1B40768D00E4E409 /* CSVdata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdata.swift; sourceTree = "<group>"; };
 		8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdataViewController.swift; sourceTree = "<group>"; };
 		8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdataWindowController.swift; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 			children = (
 				C5CBBC411B3C0BFA008FB844 /* Main.storyboard */,
 				C587D34E1B7B5E9400FA3854 /* ChartScene.swift */,
+				8E0E0E6A1B872EB400BD1C06 /* ChartNodes.swift */,
 				C5AC44E81B7E3B3400A6B06D /* ChartView.swift */,
 				8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */,
 				C52666271B664EC6006C251E /* HeadingsViewController.swift */,
@@ -234,6 +237,7 @@
 				C5AC44E91B7E3B3400A6B06D /* ChartView.swift in Sources */,
 				C5CBBC3E1B3C0BFA008FB844 /* CSVdataDocument.swift in Sources */,
 				C5772F651B7A09DC00C80DF7 /* GroupParametersViewController.swift in Sources */,
+				8E0E0E6B1B872EB400BD1C06 /* ChartNodes.swift in Sources */,
 				C52666291B664EC6006C251E /* HeadingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

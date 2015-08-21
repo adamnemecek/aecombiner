@@ -16,6 +16,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBOutlet weak var tableViewHeaders: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
+    //@IBOutlet weak var chartView: ChartView!
     @IBOutlet weak var chartView: ChartView!
 
     @IBOutlet weak var buttonModel: NSButton!
@@ -54,6 +55,15 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     }
     
     
+    @IBAction func segmentZoomTapped(sender: NSSegmentedControl) {
+        
+        guard
+            let image = sender.imageForSegment(sender.selectedSegment),
+            let name = image.name()
+            else {return}
+        
+        self.chartView.zoom(segmentImageName: name)
+    }
     
     
     // MARK: - Charts

@@ -151,7 +151,8 @@ class CSVdataDocument: NSDocument {
     func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
     {
         var params = ChartDataSet()
-        
+        params.minXvalue = 0
+        params.maxXvalue = Double(self.csvDataModel.csvData.count-1)
         for var r:Int = 0; r<self.csvDataModel.csvData.count; ++r
         {
             let row = self.csvDataModel.csvData[r]

@@ -58,7 +58,7 @@ class ChartView: SKView {
     func reSortAllParameters()
     {
         guard let scene = self.scene as? ChartScene else {return}
-        scene.resortAllDataSets()
+        scene.reSortAllDataSets()
     }
     
     
@@ -75,5 +75,9 @@ class ChartView: SKView {
         chartscene.chartTheseParameters(parameters: parameters, nameOfParameters: nameOfParameters)
     }
     
-    
+    func zoom(segmentImageName segmentImageName:String)
+    {
+        guard let scene = self.scene as? ChartScene else {return}
+        scene.zoomScale(segmentImageName)
+    }
 }
