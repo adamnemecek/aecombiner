@@ -37,8 +37,20 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     }
     
     @IBAction func deleteHeading(sender: AnyObject) {
-        self.myCSVdataViewController()?.deleteColumnAtIndex(self.tableViewHeaders.selectedRow)
-        self.tableViewHeaders.reloadData()
+        
+        let alert = NSAlert()
+        alert.alertStyle = .CriticalAlertStyle
+        alert.messageText = "Are you sure you want to delete '"+self.titleForSelectedColumnInHeaders()+"'?\nIt cannot be undone."
+        alert.addButtonWithTitle("Delete")
+        alert.addButtonWithTitle("Cancel")
+        
+        alert.beginSheetModalForWindow(self.view.window!) { (response) -> Void in
+            if response == NSAlertFirstButtonReturn
+            {
+                self.myCSVdataViewController()?.deleteColumnAtIndex(self.tableViewHeaders.selectedRow)
+                self.tableViewHeaders.reloadData()
+            }
+        }
     }
     
     
@@ -81,6 +93,11 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         guard self.requestedColumnIndexIsOK(self.tableViewHeaders.selectedRow)
             else {return nil}
         return self.tableViewHeaders.selectedRow
+    }
+    
+    func titleForSelectedColumnInHeaders()->String
+    {
+        return self.stringForColumnIndex(self.selectedColumnFromHeadersTableView())
     }
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
