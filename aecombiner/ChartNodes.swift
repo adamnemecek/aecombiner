@@ -42,25 +42,6 @@ struct ChartDataSet {
     var nameOfDataSet:String = ""
 }
 
-class ButtonNode: SKSpriteNode {
-    
-    var direction:String = kButtonName_ZoomIn
-    
-    convenience init (position:CGPoint, imageName:String)
-    {
-        self.init(imageNamed: imageName)
-        self.direction = imageName
-        self.userInteractionEnabled = true
-        self.name = kNodeName_ZoomButton
-        self.position = position
-        self.anchorPoint = CGPoint(x: 0.0, y: 0.0)
-    }
-    
-    override func mouseDown(theEvent: NSEvent) {
-        (self.parent as? ChartScene)?.zoomScale(self.direction)
-        
-    }
-}
 
 class DataPointNode: SKSpriteNode {
     var dataPoint:ChartDataPoint = ChartDataPoint(xvalue: 0.0, yvalue: 0.0)
@@ -100,6 +81,13 @@ class DataSetNode: SKNode {
         self.colour = colour
     }
     
+    
+    func zoomToThisPoint(zoomFactor zoomFactor:CGFloat, point:CGPoint)
+    {
+        self.zoom(zoomFactor)
+        self.autolocate(centrePoint: point)
+    }
+    
     func zoom(zoomFactor:CGFloat)
     {
         self.yScale *= zoomFactor
@@ -110,7 +98,6 @@ class DataSetNode: SKNode {
             dpNode.yScale = 1/self.yScale
             dpNode.xScale = 1/self.xScale
         }
-        self.autolocate()
     }
     
     func reSortYourParameters()
@@ -144,13 +131,13 @@ class DataSetNode: SKNode {
         self.xScale = (sceneSize.xExent-self.border*2.0)/CGFloat(parameters.dataPoints.count-1)
     }
 
-    func locateToThisClickPointInScene(clickPoint clickPoint:CGPoint)
+    func midPointOfDataDistribution()->CGPoint
     {
-        let convertedClickPoint = self.convertPoint(clickPoint, fromNode: self.scene!)
-        
+        return CGPoint(x: ((self.parameters.minXvalue+self.parameters.maxXvalue)/2.0), y: ((self.parameters.minYvalue+self.parameters.maxYvalue)/2.0))
     }
     
-    func autolocate()
+    
+    func autolocate(centrePoint centrePoint:CGPoint)
     {
         //autolocate to  centre axes
         
@@ -159,7 +146,7 @@ class DataSetNode: SKNode {
         //translate the screen mid into our coords taking into account hte scale etc
         let screenMidInSelf = self.convertPoint(screenMid, fromNode: self.scene!)
         //calculate how far the 0,0 must move to align the screen centre in our coords with the mid point of the data distribution
-        let newZero = CGPoint(x: Double(screenMidInSelf.x)-((self.parameters.minXvalue+self.parameters.maxXvalue)/2.0), y: Double(screenMidInSelf.y)-((self.parameters.minYvalue+self.parameters.maxYvalue)/2.0))
+        let newZero = CGPoint(x: screenMidInSelf.x-centrePoint.x, y: screenMidInSelf.y-centrePoint.y)
         //move the 0,0 to the new position translated back into scene coords
         self.position = self.convertPoint(newZero, toNode: self.scene!)
 
@@ -171,7 +158,7 @@ class DataSetNode: SKNode {
         //process the parameters
         self.removeAllChildren()
         self.calculateScalesForXandY()
-        self.autolocate()
+        self.autolocate(centrePoint: self.midPointOfDataDistribution())
         
         for var row:Int = 0; row<self.parameters.dataPoints.count; ++row
         {

@@ -11,6 +11,12 @@ let kButtonName_ZoomIn = "inZoom"
 let kButtonName_ZoomOut = "outZoom"
 let kButtonName_ZoomZero = "zeroZoom"
 
+
+let kMinifyDefault:CGFloat = 0.5
+let kMagnifyDefault:CGFloat = 2.0
+
+
+
 enum ChartCursorStates:Int {
     case Hand
     case Crosshair
@@ -25,29 +31,8 @@ class ChartScene: SKScene {
     // MARK: - Var
     var chartCursorState:ChartCursorStates = .Hand
     var mouseClickDownPoint = CGPoint(x: 0.0, y: 0.0)
-    
-    func zoomScale(zoomDirection:String)
-    {
-        switch zoomDirection
-        {
-        case kButtonName_ZoomIn, kButtonName_ZoomOut:
-            let zoomfactor:CGFloat = zoomDirection == kButtonName_ZoomIn ? 2.0 : 0.5
-            self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-                guard let dsNode = (node as? DataSetNode) else {return}
-                dsNode.zoom(zoomfactor)
-            }
-        case kButtonName_ZoomZero:
-            self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-                guard let dsNode = (node as? DataSetNode) else {return}
-                dsNode.autolocateAndChartParameters()
-            }
-            break
-        default:
-            break
-        }
-        
-        
-    }
+    var minifyValue = kMinifyDefault
+    var magnifyValue = kMagnifyDefault
     
     func removeRectNodes()
     {
@@ -130,6 +115,29 @@ class ChartScene: SKScene {
         }
     }
     
+    /*
+    func zoomScale(zoomDirection:String)
+    {
+        switch zoomDirection
+        {
+        case kButtonName_ZoomIn, kButtonName_ZoomOut:
+            let zoomfactor:CGFloat = zoomDirection == kButtonName_ZoomIn ? 2.0 : 0.5
+            self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
+                guard let dsNode = (node as? DataSetNode) else {return}
+                dsNode.zoom(zoomfactor)
+            }
+        case kButtonName_ZoomZero:
+            self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
+                guard let dsNode = (node as? DataSetNode) else {return}
+                dsNode.autolocateAndChartParameters()
+            }
+            break
+        default:
+            break
+        }
+    }
+    */
+    
     override func didMoveToView(view: SKView) {
         /* Setup your scene here*/
 
@@ -149,10 +157,20 @@ class ChartScene: SKScene {
             rectNode.strokeColor = kColour_Selected
             self.addChild(rectNode)
             rectNode.position = theEvent.locationInNode(self)
+
         case .ZoomIn:
-            break
+            self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
+                let dsNode = (topnode as! DataSetNode)
+                let newMousePoint = theEvent.locationInNode(dsNode)
+                dsNode.zoomToThisPoint(zoomFactor: self.magnifyValue, point: newMousePoint)
+            }
         case .ZoomOut:
-                break
+            self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
+                let dsNode = (topnode as! DataSetNode)
+                let newMousePoint = theEvent.locationInNode(dsNode)
+                dsNode.zoomToThisPoint(zoomFactor: self.minifyValue, point: newMousePoint)
+            }
+
             /*default:
             return NSCursor.arrowCursor()*/
         }

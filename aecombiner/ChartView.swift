@@ -99,7 +99,7 @@ class ChartView: SKView {
         case .ZoomIn:
             return NSCursor(image: NSImage(named: kButtonName_ZoomIn)!, hotSpot: CGPoint(x: 8.0, y: 8.0))
         case .ZoomOut:
-            return NSCursor(image: NSImage(named: kButtonName_ZoomIn)!, hotSpot: CGPoint(x: 8.0, y: 8.0))
+            return NSCursor(image: NSImage(named: kButtonName_ZoomOut)!, hotSpot: CGPoint(x: 8.0, y: 8.0))
             /*default:
             return NSCursor.arrowCursor()*/
         }
@@ -146,7 +146,7 @@ class ChartView: SKView {
     
     func zoom(segmentImageName segmentImageName:String)
     {
-        guard let scene = self.scene as? ChartScene else {return}
-        scene.zoomScale(segmentImageName)
+        guard let _ = self.scene as? ChartScene else {return}
+
     }
 }

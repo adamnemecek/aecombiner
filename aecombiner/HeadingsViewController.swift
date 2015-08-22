@@ -31,6 +31,11 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         self.chartView.updateCursorState(newState: sender.selectedSegment)
     }
     
+    @IBAction func refreshSegmentTapped(sender: NSSegmentedControl) {
+        guard let scene = self.chartView.scene as? ChartScene else {return}
+        scene.autoLocateAndChartAllParameters()
+    }
+    
     @IBAction func renameColumn(sender: AnyObject) {
         guard !self.textFieldColumnRecodedName.stringValue.isEmpty else
         {
@@ -60,16 +65,6 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         }
     }
     
-    
-    @IBAction func segmentZoomTapped(sender: NSSegmentedControl) {
-        
-        guard
-            let image = sender.imageForSegment(sender.selectedSegment),
-            let name = image.name()
-            else {return}
-        
-        self.chartView.zoom(segmentImageName: name)
-    }
     
     
     // MARK: - Charts
