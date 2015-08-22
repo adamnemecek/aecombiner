@@ -9,7 +9,7 @@
 import Foundation
 import SpriteKit
 
-let kBorderDefaultSize = 20.0  // single border
+let kBorderDefaultSize:CGFloat = 20.0  // single border
 let kNodeName_DataPoint = "p"
 let kNodeName_DataSet = "s"
 let kNodeName_SelectionRect = "r"
@@ -83,13 +83,13 @@ class DataPointNode: SKSpriteNode {
 
 class DataSetNode: SKNode {
     var parameters = ChartDataSet()
-    var border:Double = kBorderDefaultSize
+    var border:CGFloat = kBorderDefaultSize
     var colour = kColour_Unselected
     var sortDirection = kAscending
-    var dataSetName:String? = "Untitled"
+    var dataSetName:String = "Untitled"
     var selectedDataPoints = [ChartDataPoint]()
     
-    convenience init (parameters:ChartDataSet, nameOfParameters:String?, colour:NSColor)
+    convenience init (parameters:ChartDataSet, nameOfParameters:String, colour:NSColor)
     {
         self.init()
         self.userInteractionEnabled = false
@@ -110,7 +110,7 @@ class DataSetNode: SKNode {
             dpNode.yScale = 1/self.yScale
             dpNode.xScale = 1/self.xScale
         }
-        self.autoCentre()
+        self.autolocate()
     }
     
     func reSortYourParameters()
@@ -129,44 +129,48 @@ class DataSetNode: SKNode {
         self.autolocateAndChartParameters()
     }
     
-    func mySceneSize()->(yExtent:Double,xExent:Double)
+    func sceneSize()->(yExtent:CGFloat, xExent:CGFloat)
     {
-        return (Double(self.scene!.size.height),Double(self.scene!.size.width))
+        return (self.scene!.size.height, self.scene!.size.width)
     }
     
-    func midPointOfDataPoints()->CGPoint
+    func calculateScalesForXandY()
     {
-        let midX:CGFloat = CGFloat((self.parameters.maxXvalue-self.parameters.minXvalue)/2.0)*self.xScale
-        let midY:CGFloat = CGFloat((self.parameters.maxYvalue-self.parameters.minYvalue)/2.0)*self.yScale
-        return CGPoint(x: midX, y: midY)
+        let sceneSize = self.sceneSize()
+        // yScale is the range between min and max parameter divided into the Y axis length
+        self.yScale = (sceneSize.yExtent-self.border*2.0)/CGFloat(parameters.maxYvalue-parameters.minYvalue)
+        
+        //xScale is the length of x axis / number of parameters to plot -1, minus 1 because we need the number of gaps between poins which = num points -1
+        self.xScale = (sceneSize.xExent-self.border*2.0)/CGFloat(parameters.dataPoints.count-1)
+    }
+
+    func locateToThisClickPointInScene(clickPoint clickPoint:CGPoint)
+    {
+        let convertedClickPoint = self.convertPoint(clickPoint, fromNode: self.scene!)
+        
     }
     
     func autolocate()
     {
-        //autolocate to bottom left axis in superviews coords, taking account of yscale xScale
-        self.position = CGPoint(x: (self.border)-(self.parameters.minXvalue*Double(self.xScale)), y: (self.border)-(self.parameters.minYvalue*Double(self.yScale)))
+        //autolocate to  centre axes
+        
+        //find the mid point of scene in scene coords
+        let screenMid = CGPoint(x: self.sceneSize().xExent/2.0, y: self.sceneSize().yExtent/2.0)
+        //translate the screen mid into our coords taking into account hte scale etc
+        let screenMidInSelf = self.convertPoint(screenMid, fromNode: self.scene!)
+        //calculate how far the 0,0 must move to align the screen centre in our coords with the mid point of the data distribution
+        let newZero = CGPoint(x: Double(screenMidInSelf.x)-((self.parameters.minXvalue+self.parameters.maxXvalue)/2.0), y: Double(screenMidInSelf.y)-((self.parameters.minYvalue+self.parameters.maxYvalue)/2.0))
+        //move the 0,0 to the new position translated back into scene coords
+        self.position = self.convertPoint(newZero, toNode: self.scene!)
 
     }
     
-    func autoCentre()
-    {
-        //autolocate to centreaxis in superviews coords, taking account of yscale xScale
-        let midPointCorrection = self.midPointOfDataPoints()
-        self.position = CGPoint(x: (self.scene!.size.width/2.0)-midPointCorrection.x, y: (self.scene!.size.height/2.0)-midPointCorrection.y)
-
-    }
     
     func autolocateAndChartParameters()
     {
-        let sceneSize = self.mySceneSize()
-        // yScale is the range between min and max parameter divided into the Y axis length
-        self.yScale = CGFloat((sceneSize.yExtent-self.border*2.0)/(parameters.maxYvalue-parameters.minYvalue))
-        
-        //xScale is the length of x axis / number of parameters to plot -1, minus 1 because we need the number of gaps between poins which = num points -1
-        self.xScale = CGFloat((sceneSize.xExent-self.border*2.0)/Double(parameters.dataPoints.count-1))
         //process the parameters
         self.removeAllChildren()
-        
+        self.calculateScalesForXandY()
         self.autolocate()
         
         for var row:Int = 0; row<self.parameters.dataPoints.count; ++row

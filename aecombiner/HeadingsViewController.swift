@@ -23,8 +23,14 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBOutlet weak var buttonSortParameters: NSButton!
     @IBOutlet weak var buttonTrash: NSButton!
     
+    @IBOutlet weak var segmentCursorState: NSSegmentedControl!
+    
     // MARK: - @IBAction
 
+    @IBAction func segmentCursorStateTapped(sender: NSSegmentedControl) {
+        self.chartView.updateCursorState(newState: sender.selectedSegment)
+    }
+    
     @IBAction func renameColumn(sender: AnyObject) {
         guard !self.textFieldColumnRecodedName.stringValue.isEmpty else
         {
@@ -81,7 +87,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
                 let columnIndex = self.selectedColumnFromHeadersTableView(),
                 let parameters = self.myCSVdataViewController()?.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
             else {return}
-        chartview.chartTheseParameters(parameters: parameters, nameOfParameters: self.stringForColumnIndex(columnIndex))
+        chartview.chartNewParameters(parameters: parameters, nameOfParameters: self.stringForColumnIndex(columnIndex))
     }
     
     

@@ -847,7 +847,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView identifier="tableViewHeaders" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="nxT-l4-6wV" userLabel="Table View Headers">
-                                            <rect key="frame" x="0.0" y="0.0" width="221" height="244"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="221" height="0.0"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1004,6 +1004,25 @@
                                     <action selector="segmentZoomTapped:" target="EBc-G2-mhh" id="1PI-7o-Iit"/>
                                 </connections>
                             </segmentedControl>
+                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jJk-7b-m9U">
+                                <rect key="frame" x="359" y="18" width="137" height="25"/>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="separated" trackingMode="selectOne" id="PDG-J6-gAz">
+                                    <font key="font" metaFont="system"/>
+                                    <segments>
+                                        <segment image="hand" selected="YES"/>
+                                        <segment image="crosshair" tag="1"/>
+                                        <segment image="inZoom">
+                                            <nil key="label"/>
+                                        </segment>
+                                        <segment image="outZoom">
+                                            <nil key="label"/>
+                                        </segment>
+                                    </segments>
+                                </segmentedCell>
+                                <connections>
+                                    <action selector="segmentCursorStateTapped:" target="EBc-G2-mhh" id="5uP-VB-kWu"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <constraints>
                             <constraint firstItem="chJ-Oy-uie" firstAttribute="leading" secondItem="M3C-eb-Xai" secondAttribute="leading" constant="20" symbolic="YES" id="2Yq-15-1si"/>
@@ -1040,6 +1059,7 @@
                         <outlet property="buttonSortParameters" destination="baL-qW-eM4" id="pkz-ES-KHJ"/>
                         <outlet property="buttonTrash" destination="6xe-DW-eHE" id="NQE-pn-cGY"/>
                         <outlet property="chartView" destination="xtf-v2-FH2" id="V9p-S7-4q1"/>
+                        <outlet property="segmentCursorState" destination="jJk-7b-m9U" id="xAa-1e-ks5"/>
                         <outlet property="tableViewHeaders" destination="nxT-l4-6wV" id="Udk-Tj-CVC"/>
                         <outlet property="textFieldColumnRecodedName" destination="GMl-hh-Rdw" id="W94-eJ-mM6"/>
                     </connections>
@@ -2216,8 +2236,10 @@
     <resources>
         <image name="chart32" width="32" height="32"/>
         <image name="column32" width="32" height="32"/>
+        <image name="crosshair" width="16" height="16"/>
         <image name="extract32" width="32" height="32"/>
         <image name="group32" width="32" height="32"/>
+        <image name="hand" width="16" height="16"/>
         <image name="inZoom" width="16" height="16"/>
         <image name="outZoom" width="16" height="16"/>
         <image name="recode32" width="32" height="32"/>

@@ -9,10 +9,16 @@
 import Foundation
 import SpriteKit
 
+
+
 class ChartView: SKView {
     
-    //var topNode:DataSetNode?
+    // MARK: - VAR
+    var chartCursorState:ChartCursorStates = .Hand
+
     
+    // MARK: - override
+
     override func viewWillStartLiveResize() {
         super.viewWillStartLiveResize()
         self.scene?.hidden = true
@@ -39,6 +45,69 @@ class ChartView: SKView {
         
     }
     
+    
+    // MARK: - Cursors
+    override func updateTrackingAreas()
+    {
+        super.updateTrackingAreas()
+        
+        for TA in self.trackingAreas
+        {
+            self.removeTrackingArea(TA)
+        }
+        
+        let opts:NSTrackingAreaOptions = [.MouseEnteredAndExited, .ActiveInKeyWindow]
+        let trackingArea = NSTrackingArea(rect: self.bounds, options: opts, owner: self, userInfo: nil)
+        self.addTrackingArea(trackingArea)
+
+    }
+
+    
+    override func mouseEntered(theEvent: NSEvent) {
+        super.mouseEntered(theEvent)
+        self.cursorForChartCursorState(state: self.chartCursorState).set()
+    }
+    
+    override func mouseExited(theEvent: NSEvent) {
+        super.mouseExited(theEvent)
+        NSCursor.arrowCursor().set()
+
+    }
+    
+    func updateCursorState(newState newState:Int)
+    {
+        if let validState = ChartCursorStates(rawValue: newState)
+        {
+            self.chartCursorState = validState
+            (self.scene as? ChartScene)?.chartCursorState = validState
+        }
+        else
+        {
+            self.chartCursorState = .Hand
+            (self.scene as? ChartScene)?.chartCursorState = .Hand
+        }
+    }
+
+    func cursorForChartCursorState(state state:ChartCursorStates)->NSCursor
+    {
+        switch state
+        {
+        case .Hand:
+            return NSCursor.openHandCursor()
+        case .Crosshair:
+            return NSCursor.crosshairCursor()
+        case .ZoomIn:
+            return NSCursor(image: NSImage(named: kButtonName_ZoomIn)!, hotSpot: CGPoint(x: 8.0, y: 8.0))
+        case .ZoomOut:
+            return NSCursor(image: NSImage(named: kButtonName_ZoomIn)!, hotSpot: CGPoint(x: 8.0, y: 8.0))
+            /*default:
+            return NSCursor.arrowCursor()*/
+        }
+    }
+    
+    
+    // MARK: - Charts
+
     func showChartSceneInView() {
         self.layer?.backgroundColor = NSColor.clearColor().CGColor
         let scene = ChartScene(size: self.frame.size)//fileNamed:"ChartScene"),
@@ -69,10 +138,10 @@ class ChartView: SKView {
     }
     
     
-    func chartTheseParameters(parameters parameters:ChartDataSet, nameOfParameters:String?)
+    func chartNewParameters(parameters parameters:ChartDataSet, nameOfParameters:String)
     {
         guard let chartscene = self.scene as? ChartScene else {return}
-        chartscene.chartTheseParameters(parameters: parameters, nameOfParameters: nameOfParameters)
+        chartscene.chartNewParameters(parameters: parameters, nameOfParameters: nameOfParameters)
     }
     
     func zoom(segmentImageName segmentImageName:String)
