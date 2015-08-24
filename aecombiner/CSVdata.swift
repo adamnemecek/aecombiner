@@ -15,6 +15,8 @@ let commaDelimiter = ","
 let carriageReturn = "\n"
 let tabDelimiter = "\t"
 
+
+
 class CSVdata {
 
     var headers = [String]()

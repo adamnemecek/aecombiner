@@ -31,18 +31,6 @@ class ChartView: SKView {
         scene.autoLocateAndChartAllDataSets()
         scene.hidden = false
     }
-
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        self.showChartSceneInView()
-        
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        self.showChartSceneInView()
-        
-    }
     
     
     // MARK: - Cursors
@@ -61,7 +49,6 @@ class ChartView: SKView {
 
     }
 
-    
     override func mouseEntered(theEvent: NSEvent) {
         super.mouseEntered(theEvent)
         self.cursorForChartCursorState(state: self.chartCursorState).set()
@@ -109,7 +96,7 @@ class ChartView: SKView {
 
     func showChartSceneInView() {
         self.layer?.backgroundColor = NSColor.clearColor().CGColor
-        let scene = ChartScene(size: self.frame.size)//fileNamed:"ChartScene"),
+        let scene = ChartScene(size: self.frame.size)
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .ResizeFill
         scene.backgroundColor = NSColor.whiteColor()
@@ -122,30 +109,4 @@ class ChartView: SKView {
         
     }
     
-    
-    func reSortAllDataSet()
-    {
-        guard let scene = self.scene as? ChartScene else {return}
-        scene.reSortAllDataSets()
-    }
-    
-    
-    func reSortThisChartDataSet(dataSetName dataSetName:String)
-    {
-        guard let scene = self.scene as? ChartScene else {return}
-        scene.reSortThisChartDataSet(dataSetName: dataSetName)
-    }
-    
-    
-    func displayNewChartDataSet(dataSet dataSet:ChartDataSet, nameOfChartDataSet:String)
-    {
-        guard let chartscene = self.scene as? ChartScene else {return}
-        chartscene.displayNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: nameOfChartDataSet)
-    }
-    
-    func zoom(segmentImageName segmentImageName:String)
-    {
-        guard let _ = self.scene as? ChartScene else {return}
-
-    }
 }

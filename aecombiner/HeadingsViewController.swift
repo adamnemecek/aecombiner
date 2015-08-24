@@ -58,7 +58,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     
     // MARK: - Charts
-    @IBAction func sortChartParameters(sender: AnyObject) {
+    @IBAction func sortSelectedDataSet(sender: AnyObject) {
         guard
             let chartviewC = self.chartViewController,
             let columnIndex = self.selectedColumnFromHeadersTableView()
@@ -66,13 +66,13 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         chartviewC.reSortThisChartDataSet(dataSetName: self.stringForColumnIndex(columnIndex))
     }
 
-    @IBAction func modelParameter(sender: NSButton) {
+    @IBAction func chartSelectedDataSet(sender: NSButton) {
         guard
                 let chartviewC = self.chartViewController,
                 let columnIndex = self.selectedColumnFromHeadersTableView(),
                 let dataSet = self.myCSVdataViewController()?.chartDataSetFromColumnIndex(columnIndex: columnIndex)
             else {return}
-        chartviewC.displayNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: self.stringForColumnIndex(columnIndex))
+        chartviewC.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: self.stringForColumnIndex(columnIndex))
     }
     
     

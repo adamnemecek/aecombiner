@@ -31,32 +31,69 @@ class GroupParametersViewController: RecodeColumnViewController {
     
     // MARK: - @IBOutlet
 
-    @IBAction func combineColumns(sender: NSButton) {
+    @IBAction func combineAndExtractColumnsTapped(sender: NSButton) {
         self.combineCoumnsAndExtract()
         
     }
     
-    // MARK: - Columns
-    func combineCoumnsAndExtract()
-    {
-        guard let csvdo = self.myCSVdataViewController() else {return}
-        let columnIndexForGrouping = self.tableViewHeaders.selectedRow
-        let columnIndexesToGroup = self.tableViewGroupHeadersSecondary.selectedRowIndexes
-        guard
-            columnIndexForGrouping >= 0 &&
-            columnIndexForGrouping < csvdo.numberOfColumnsInData() &&
-            columnIndexesToGroup.count > 0 &&
-            self.arrayExtractedParameters.count > 0
-            else {return}
+    @IBAction func combineAndChartColumnsTapped(sender: NSButton) {
+        self.combineColumnsAndChartData()
         
+    }
+    
+    // MARK: - Columns
+    
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:[[String]], nameOfColumn:String)
+    {
+        guard let csvdo = self.myCSVdataViewController() else {return ([[String]](), "")}
+        return csvdo.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
+    }
+    
+    func arrayOfExtractedParametersInGroup()->[String]
+    {
         //create an array with the keys the params we extracted for grouping
         var arrayOfExtractedParametersInGroup = [String]()
         for parameter in self.arrayExtractedParameters
         {
             arrayOfExtractedParametersInGroup.append(parameter[kParametersArrayParametersIndex])
         }
+        return arrayOfExtractedParametersInGroup
+    }
+    
+    
+    func okToCombine()->Bool
+    {
+        guard
+            let csvdo = self.myCSVdataViewController()
+            else {return false}
+        guard
+            self.tableViewHeaders.selectedRow >= 0 &&
+            self.tableViewHeaders.selectedRow < csvdo.numberOfColumnsInData() &&
+            self.tableViewGroupHeadersSecondary.selectedRowIndexes.count > 0 &&
+            self.arrayExtractedParameters.count > 0
+            else {return false}
         
-        csvdo.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: self.popupAddOrMultiply.indexOfSelectedItem)
+        return true
+    }
+    
+    func combineColumnsAndChartData()
+    {
+        guard self.okToCombine() else {return}
+        
+        let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
+        let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: self.tableViewHeaders.selectedRow, columnIndexesToGroup: self.tableViewGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: self.popupAddOrMultiply.indexOfSelectedItem)
+        let dataset = ChartDataSet(data: dataAndName.cvsDataData, forColumnIndex: kCsvDataData_column_value)
+        self.chartViewController?.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfColumn)
+    }
+
+    
+    func combineCoumnsAndExtract()
+    {
+        guard self.okToCombine() else {return}
+        
+        let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
+        
+        self.myCSVdataViewController()!.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: self.tableViewHeaders.selectedRow, columnIndexesToGroup: self.tableViewGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: self.popupAddOrMultiply.indexOfSelectedItem)
         
     }
     
@@ -95,10 +132,10 @@ class GroupParametersViewController: RecodeColumnViewController {
             case "parameter":
                 cellView = tableView.makeViewWithIdentifier("dataSetCell", owner: self) as! NSTableCellView
                 cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArrayParametersIndex]
-            case "value"://dataSet
+        /*  case "value"://dataSet
                 cellView = tableView.makeViewWithIdentifier("dataSetValueCell", owner: self) as! NSTableCellView
                 cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArrayParametersValueIndex]
-                cellView.textField!.tag = row
+                cellView.textField!.tag = row */
             default:
                 break
             }

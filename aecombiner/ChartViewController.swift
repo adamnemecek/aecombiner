@@ -23,17 +23,34 @@ class ChartViewController: NSViewController {
         self.chartView.updateCursorState(newState: sender.selectedSegment)
     }
     
-    @IBAction func refreshSegmentTapped(sender: NSSegmentedControl) {
+    @IBAction func segmentChartTypeTapped(sender: NSSegmentedControl) {
+        guard
+                let scene = self.chartView.scene as? ChartScene,
+                let imagename = sender.imageForSegment((sender.selectedSegment))?.name()
+                else {return}
+        
+        switch imagename
+        {
+        case "scatterChart":
+            scene.unSortAllDataSets()
+        case "lineChart":
+            scene.reSortAllDataSets()
+
+            default: break
+        }
+        
+        
+    }
+    
+    func reSortThisChartDataSet(dataSetName dataSetName:String?) {
         guard let scene = self.chartView.scene as? ChartScene else {return}
-        scene.autoLocateAndChartAllDataSets()
+        scene.reSortThisChartDataSet(dataSetName: dataSetName)
+
     }
     
-    func reSortThisChartDataSet(dataSetName dataSetName:String) {
-        self.chartView?.reSortThisChartDataSet(dataSetName: dataSetName)
-    }
-    
-    func displayNewChartDataSet(dataSet dataSet: ChartDataSet, nameOfChartDataSet: String ) {
-        self.chartView?.displayNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: nameOfChartDataSet)
+    func plotNewChartDataSet(dataSet dataSet: ChartDataSet, nameOfChartDataSet: String) {
+        guard let scene = self.chartView.scene as? ChartScene else {return}
+        scene.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: nameOfChartDataSet)
     }
     
 
@@ -42,6 +59,12 @@ class ChartViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        self.chartView?.showChartSceneInView()
+        
     }
     
 }

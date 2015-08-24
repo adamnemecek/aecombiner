@@ -15,6 +15,7 @@ let kNodeName_DataSet = "s"
 let kNodeName_SelectionRect = "r"
 let kNodeName_ZoomButton = "z"
 
+let kDataSetDefaultName = "Untitled"
 
 
 let kColour_Selected = NSColor.redColor()
@@ -38,13 +39,35 @@ struct ChartDataPoint {
     }
 }
 
-struct ChartDataSet {
+class ChartDataSet {
     var maxYvalue:Double = 0.0
     var minYvalue:Double = Double(Int.max)
     var maxXvalue:Double = 0.0
     var minXvalue:Double = Double(Int.max)
     var dataPoints = [ChartDataPoint]()
-    var nameOfDataSet:String = ""
+    var nameOfDataSet:String = kDataSetDefaultName
+    
+    convenience init(data: [[String]], forColumnIndex columnIndex:Int)
+    {
+        self.init()
+        guard columnIndex>0 && columnIndex<data.count else {return}
+        
+        for var r:Int = 0; r<data.count; r++
+        {
+            let row = data[r]
+            guard
+                row[columnIndex].characters.count>0,
+                let Yvalue = Double(row[columnIndex])
+                else {continue}
+            let Xvalue = Double(r)
+            self.minYvalue = fmin(self.minYvalue,Yvalue)
+            self.maxYvalue = fmax(self.maxYvalue,Yvalue)
+            self.minXvalue = fmin(self.minXvalue,Xvalue)
+            self.maxXvalue = fmax(self.maxXvalue,Xvalue)
+            // we store the row number as the X value and when we sort on the Y value we can always map back to the row in the data for extracting other values. !! If we sort the CSVdata we are lost
+            self.dataPoints.append(ChartDataPoint(xvalue: Xvalue, yvalue: Yvalue))
+        }
+    }
 }
 
 
@@ -72,15 +95,15 @@ class DataSetNode: SKNode {
     var border:ChartBorders = ChartBorders()
     var colour = kColour_Unselected
     var sortDirection = kAscending
-    var dataSetName:String = "Untitled"
+    var dataSetName:String = kDataSetDefaultName
     var selectedDataPoints = [ChartDataPoint]()
     
-    convenience init (dataSet:ChartDataSet, nameOfChartDataSet:String, colour:NSColor)
+    convenience init (dataSet:ChartDataSet, nameOfChartDataSet:String?, colour:NSColor)
     {
         self.init()
         self.userInteractionEnabled = false
         self.name = kNodeName_DataSet
-        self.dataSetName = nameOfChartDataSet
+        self.dataSetName = nameOfChartDataSet == nil ? kDataSetDefaultName : nameOfChartDataSet!
         self.dataSet = dataSet
         self.colour = colour
     }
@@ -102,6 +125,22 @@ class DataSetNode: SKNode {
             dpNode.yScale = 1/self.yScale
             dpNode.xScale = 1/self.xScale
         }
+    }
+    
+    func unSortYourDataSet()
+    {
+        switch self.sortDirection
+        {
+        case kAscending:
+            self.dataSet.dataPoints.sortInPlace(){$0.xValue > $1.xValue}
+            self.sortDirection = kDescending
+        case kDescending:
+            self.dataSet.dataPoints.sortInPlace(){$0.xValue < $1.xValue}
+            self.sortDirection = kAscending
+        default:
+            break
+        }
+        self.autolocateAndChartDataSet()
     }
     
     func reSortYourDataSet()

@@ -16,6 +16,9 @@ let kSortAsValue = 1
 let kGroupAddition = 0
 let kGroupMultiplication = 1
 
+let kCsvDataData_column_groupingIDs = 0// in a [[String]] of combined CVSdata 0 is the ids and 1 is the data
+let kCsvDataData_column_value = 1
+
 
 func generic_SortArrayOfColumnsAsTextOrValues(inout arrayToSort arrayToSort:[[String]], columnIndexToSort:Int, textOrvalue:Int, direction: Int)
 {
@@ -150,27 +153,11 @@ class CSVdataDocument: NSDocument {
     // MARK: - Data
     func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
     {
-        var params = ChartDataSet()
-        for var r:Int = 0; r<self.csvDataModel.csvData.count; r++
-        {
-            let row = self.csvDataModel.csvData[r]
-            guard
-                row[columnIndex].characters.count>0,
-                let Yvalue = Double(row[columnIndex])
-                else {continue}
-            let Xvalue = Double(r)
-            params.minYvalue = fmin(params.minYvalue,Yvalue)
-            params.maxYvalue = fmax(params.maxYvalue,Yvalue)
-            params.minXvalue = fmin(params.minXvalue,Xvalue)
-            params.maxXvalue = fmax(params.maxXvalue,Xvalue)
-            // we store the row number as the X value and when we sort on the Y value we can always map back to the row in the data for extracting other values. !! If we sort the CSVdata we are lost
-            params.dataPoints.append(ChartDataPoint(xvalue: Xvalue, yvalue: Yvalue))
-        }
-        return params
+        return ChartDataSet(data: self.csvDataModel.csvData, forColumnIndex: columnIndex)
     }
 
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:[[String]], nameOfColumn:String)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:[[String]], nameOfColumn:String)// cvsDataData[0] is the grouping ID, cvsDataData[1] is the value
     {
         var groupStartValue:Double
         switch groupMethod
