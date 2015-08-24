@@ -166,7 +166,7 @@ class RecodeColumnViewController: HeadingsViewController {
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        guard let csvdo = self.myCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView(), let set = csvdo.createSetOfParameters(fromColumn: columnIndex) else { return }
+        guard let csvdo = self.myCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView(), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
         
         var subArray = Array(set)
         // replace blanks with string

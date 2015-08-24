@@ -54,9 +54,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.view.window?.windowController?.document as? CSVdataDocument
     }
     */
-    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
+    func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
     {
-        return self.myCSVdataDocument.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
+        return self.myCSVdataDocument.chartDataSetFromColumnIndex(columnIndex: columnIndex)
     }
     
     func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int)
@@ -80,9 +80,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.tableViewCSVdata.reloadData()
     }
     
-    func createSetOfParameters(fromColumn columnIndex:Int)->Set<String>?
+    func setOfParametersFromColumn(fromColumn columnIndex:Int)->Set<String>?
     {
-        return self.myCSVdataDocument.createSetOfParameters(fromColumn: columnIndex)
+        return self.myCSVdataDocument.setOfParametersFromColumn(fromColumn: columnIndex)
     }
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool

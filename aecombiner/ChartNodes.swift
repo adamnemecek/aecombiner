@@ -9,7 +9,7 @@
 import Foundation
 import SpriteKit
 
-let kBorderDefaultSize:CGFloat = 20.0  // single border
+let kBorderDefaultSize:CGFloat = 10.0  // single border
 let kNodeName_DataPoint = "p"
 let kNodeName_DataSet = "s"
 let kNodeName_SelectionRect = "r"
@@ -20,7 +20,12 @@ let kNodeName_ZoomButton = "z"
 let kColour_Selected = NSColor.redColor()
 let kColour_Unselected = NSColor.greenColor()
 
-
+struct ChartBorders {
+    var top = kBorderDefaultSize
+    var bottom = kBorderDefaultSize
+    var left = kBorderDefaultSize
+    var right = kBorderDefaultSize
+}
 
 struct ChartDataPoint {
     var xValue:Double
@@ -64,7 +69,7 @@ class DataPointNode: SKSpriteNode {
 
 class DataSetNode: SKNode {
     var parameters = ChartDataSet()
-    var border:CGFloat = kBorderDefaultSize
+    var border:ChartBorders = ChartBorders()
     var colour = kColour_Unselected
     var sortDirection = kAscending
     var dataSetName:String = "Untitled"
@@ -77,7 +82,6 @@ class DataSetNode: SKNode {
         self.name = kNodeName_DataSet
         self.dataSetName = nameOfParameters
         self.parameters = parameters
-        self.border = kBorderDefaultSize // single border
         self.colour = colour
     }
     
@@ -124,11 +128,9 @@ class DataSetNode: SKNode {
     func calculateScalesForXandY()
     {
         let sceneSize = self.sceneSize()
-        // yScale is the range between min and max parameter divided into the Y axis length
-        self.yScale = (sceneSize.yExtent-self.border*2.0)/CGFloat(parameters.maxYvalue-parameters.minYvalue)
-        
-        //xScale is the length of x axis / number of parameters to plot -1, minus 1 because we need the number of gaps between poins which = num points -1
-        self.xScale = (sceneSize.xExent-self.border*2.0)/CGFloat(parameters.dataPoints.count-1)
+        // yxScale is the range between min and max parameter divided into the Y axis length
+        self.yScale = (sceneSize.yExtent-self.border.top-self.border.bottom)/CGFloat(parameters.maxYvalue-parameters.minYvalue)
+        self.xScale = (sceneSize.xExent-self.border.left-self.border.right)/CGFloat(parameters.maxXvalue-parameters.minXvalue)
     }
 
     func midPointOfDataDistribution()->CGPoint

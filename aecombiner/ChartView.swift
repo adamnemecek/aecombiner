@@ -19,6 +19,7 @@ class ChartView: SKView {
     
     // MARK: - override
 
+    
     override func viewWillStartLiveResize() {
         super.viewWillStartLiveResize()
         self.scene?.hidden = true
@@ -26,12 +27,10 @@ class ChartView: SKView {
     
     override func viewDidEndLiveResize() {
         super.viewDidEndLiveResize()
-        guard let scene = self.scene as? ChartScene else {self.scene?.hidden = false;return}
+        guard let scene = self.scene as? ChartScene else {self.scene?.hidden = false; return}
         scene.autoLocateAndChartAllParameters()
         scene.hidden = false
     }
-
-    
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -97,9 +96,9 @@ class ChartView: SKView {
         case .Crosshair:
             return NSCursor.crosshairCursor()
         case .ZoomIn:
-            return NSCursor(image: NSImage(named: kButtonName_ZoomIn)!, hotSpot: CGPoint(x: 8.0, y: 8.0))
+            return NSCursor(image: NSImage(named: kButtonName_ZoomIn)!, hotSpot: CGPoint(x: 6.0, y: 6.0))
         case .ZoomOut:
-            return NSCursor(image: NSImage(named: kButtonName_ZoomOut)!, hotSpot: CGPoint(x: 8.0, y: 8.0))
+            return NSCursor(image: NSImage(named: kButtonName_ZoomOut)!, hotSpot: CGPoint(x: 6.0, y: 6.0))
             /*default:
             return NSCursor.arrowCursor()*/
         }

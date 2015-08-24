@@ -16,13 +16,11 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBOutlet weak var tableViewHeaders: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
-    //@IBOutlet weak var chartView: ChartView!
     @IBOutlet weak var chartView: ChartView!
 
     @IBOutlet weak var buttonModel: NSButton!
     @IBOutlet weak var buttonSortParameters: NSButton!
     @IBOutlet weak var buttonTrash: NSButton!
-    
     @IBOutlet weak var segmentCursorState: NSSegmentedControl!
     
     // MARK: - @IBAction
@@ -80,7 +78,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         guard
                 let chartview = self.chartView,
                 let columnIndex = self.selectedColumnFromHeadersTableView(),
-                let parameters = self.myCSVdataViewController()?.parametersAsDoublesFromColumnIndex(columnIndex: columnIndex)
+                let parameters = self.myCSVdataViewController()?.chartDataSetFromColumnIndex(columnIndex: columnIndex)
             else {return}
         chartview.chartNewParameters(parameters: parameters, nameOfParameters: self.stringForColumnIndex(columnIndex))
     }

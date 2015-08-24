@@ -148,22 +148,23 @@ class CSVdataDocument: NSDocument {
     }
     
     // MARK: - Data
-    func parametersAsDoublesFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
+    func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
     {
         var params = ChartDataSet()
-        params.minXvalue = 0
-        params.maxXvalue = Double(self.csvDataModel.csvData.count-1)
-        for var r:Int = 0; r<self.csvDataModel.csvData.count; ++r
+        for var r:Int = 0; r<self.csvDataModel.csvData.count; r++
         {
             let row = self.csvDataModel.csvData[r]
             guard
                 row[columnIndex].characters.count>0,
-                let value = Double(row[columnIndex])
+                let Yvalue = Double(row[columnIndex])
                 else {continue}
-            params.minYvalue = fmin(params.minYvalue,value)
-            params.maxYvalue = fmax(params.maxYvalue,value)
+            let Xvalue = Double(r)
+            params.minYvalue = fmin(params.minYvalue,Yvalue)
+            params.maxYvalue = fmax(params.maxYvalue,Yvalue)
+            params.minXvalue = fmin(params.minXvalue,Xvalue)
+            params.maxXvalue = fmax(params.maxXvalue,Xvalue)
             // we store the row number as the X value and when we sort on the Y value we can always map back to the row in the data for extracting other values. !! If we sort the CSVdata we are lost
-            params.dataPoints.append(ChartDataPoint(xvalue: Double(r), yvalue: value))
+            params.dataPoints.append(ChartDataPoint(xvalue: Xvalue, yvalue: Yvalue))
         }
         return params
     }
@@ -393,7 +394,7 @@ class CSVdataDocument: NSDocument {
         }
     }
 
-    func createSetOfParameters(fromColumn columnIndex:Int)->Set<String>?
+    func setOfParametersFromColumn(fromColumn columnIndex:Int)->Set<String>?
     {
         var set = Set<String>()
         for parameter in self.csvDataModel.csvData

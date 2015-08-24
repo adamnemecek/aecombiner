@@ -98,7 +98,7 @@ class ChartScene: SKScene {
     func rebuildSelectedPointsArray(rectNode:SKNode)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
-            let dsNode = (topnode as! DataSetNode)
+            guard let dsNode = (topnode as? DataSetNode) else {return}
             dsNode.selectedDataPoints = [ChartDataPoint]()
             topnode.enumerateChildNodesWithName(kNodeName_DataPoint) { (pointnode, foundpoint) -> Void in
                 let ptNode = (pointnode as! DataPointNode)
@@ -116,24 +116,20 @@ class ChartScene: SKScene {
     }
     
     /*
-    func zoomScale(zoomDirection:String)
-    {
-        switch zoomDirection
-        {
-        case kButtonName_ZoomIn, kButtonName_ZoomOut:
-            let zoomfactor:CGFloat = zoomDirection == kButtonName_ZoomIn ? 2.0 : 0.5
-            self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-                guard let dsNode = (node as? DataSetNode) else {return}
-                dsNode.zoom(zoomfactor)
-            }
-        case kButtonName_ZoomZero:
-            self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-                guard let dsNode = (node as? DataSetNode) else {return}
-                dsNode.autolocateAndChartParameters()
-            }
-            break
-        default:
-            break
+    override func didChangeSize(oldSize: CGSize) {
+        let deltaX = self.size.width/oldSize.width
+        let deltaY = self.size.height/oldSize.height
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
+            guard let dsNode = (node as? DataSetNode) else {return}
+            dsNode.yScale *= deltaY
+            dsNode.xScale *= deltaX
+            dsNode.position.x *= deltaX
+            dsNode.position.y *= deltaY
+            dsNode.enumerateChildNodesWithName(kNodeName_DataPoint, usingBlock: { (pointnode, found) -> Void in
+                guard let pNode = (pointnode as? DataPointNode) else {return}
+                pNode.yScale = 1/dsNode.yScale
+                pNode.xScale = 1/dsNode.xScale
+            })
         }
     }
     */

@@ -11,6 +11,8 @@
 		8E10726E1B40768D00E4E409 /* CSVdata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E10726D1B40768D00E4E409 /* CSVdata.swift */; };
 		8E69F3101B67DA4100BDB720 /* CSVdataViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */; };
 		8E69F3111B67DA4100BDB720 /* CSVdataWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */; };
+		8E77E8EC1B8B2DB800A0D46F /* ChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */; };
+		8E77E8ED1B8B2DB800A0D46F /* ChartViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8E77E8EB1B8B2DB800A0D46F /* ChartViewController.xib */; };
 		C52666291B664EC6006C251E /* HeadingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52666271B664EC6006C251E /* HeadingsViewController.swift */; };
 		C5557D381B5948BC00C7E94D /* SelectParametersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5557D371B5948BC00C7E94D /* SelectParametersViewController.swift */; };
 		C5772F651B7A09DC00C80DF7 /* GroupParametersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */; };
@@ -40,6 +42,8 @@
 		8E10726D1B40768D00E4E409 /* CSVdata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdata.swift; sourceTree = "<group>"; };
 		8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdataViewController.swift; sourceTree = "<group>"; };
 		8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdataWindowController.swift; sourceTree = "<group>"; };
+		8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewController.swift; sourceTree = "<group>"; };
+		8E77E8EB1B8B2DB800A0D46F /* ChartViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChartViewController.xib; sourceTree = "<group>"; };
 		C52666271B664EC6006C251E /* HeadingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeadingsViewController.swift; sourceTree = "<group>"; };
 		C5557D371B5948BC00C7E94D /* SelectParametersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectParametersViewController.swift; sourceTree = "<group>"; };
 		C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupParametersViewController.swift; sourceTree = "<group>"; };
@@ -97,6 +101,8 @@
 		C5CBBC361B3C0BFA008FB844 /* aecombiner */ = {
 			isa = PBXGroup;
 			children = (
+				8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */,
+				8E77E8EB1B8B2DB800A0D46F /* ChartViewController.xib */,
 				C5CBBC411B3C0BFA008FB844 /* Main.storyboard */,
 				C587D34E1B7B5E9400FA3854 /* ChartScene.swift */,
 				8E0E0E6A1B872EB400BD1C06 /* ChartNodes.swift */,
@@ -208,6 +214,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5CBBC401B3C0BFA008FB844 /* Images.xcassets in Resources */,
+				8E77E8ED1B8B2DB800A0D46F /* ChartViewController.xib in Resources */,
 				C587D34D1B7B592B00FA3854 /* ChartScene.sks in Resources */,
 				C5CBBC431B3C0BFA008FB844 /* Main.storyboard in Resources */,
 			);
@@ -231,6 +238,7 @@
 				C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */,
 				8E69F3111B67DA4100BDB720 /* CSVdataWindowController.swift in Sources */,
 				C587D34F1B7B5E9400FA3854 /* ChartScene.swift in Sources */,
+				8E77E8EC1B8B2DB800A0D46F /* ChartViewController.swift in Sources */,
 				C5557D381B5948BC00C7E94D /* SelectParametersViewController.swift in Sources */,
 				8E10726E1B40768D00E4E409 /* CSVdata.swift in Sources */,
 				8E69F3101B67DA4100BDB720 /* CSVdataViewController.swift in Sources */,
