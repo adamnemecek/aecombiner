@@ -14,10 +14,9 @@ class ChartViewController: NSViewController {
     
     // MARK: - @IBOutlet
     @IBOutlet weak var chartView: ChartView!
-    @IBOutlet weak var buttonSortParameters: NSButton!
+    @IBOutlet weak var buttonSortDataSet: NSButton!
     @IBOutlet weak var buttonTrash: NSButton!
     @IBOutlet weak var segmentCursorState: NSSegmentedControl!
-    @IBOutlet weak var placeHolderView: NSView!
 
     // MARK: - @IBAction
     @IBAction func segmentCursorStateTapped(sender: NSSegmentedControl) {
@@ -26,21 +25,15 @@ class ChartViewController: NSViewController {
     
     @IBAction func refreshSegmentTapped(sender: NSSegmentedControl) {
         guard let scene = self.chartView.scene as? ChartScene else {return}
-        scene.autoLocateAndChartAllParameters()
+        scene.autoLocateAndChartAllDataSets()
     }
     
-    func reSortTheseParameters(dataSetName:String) {
-        guard
-            let chartview = self.chartView
-            else {return}
-        chartview.reSortTheseParameters(dataSetName: dataSetName)
+    func reSortThisChartDataSet(dataSetName dataSetName:String) {
+        self.chartView?.reSortThisChartDataSet(dataSetName: dataSetName)
     }
     
-    func chartNewParameters(parameters: ChartDataSet, nameOfParameters: String ) {
-        guard
-            let chartview = self.chartView
-            else {return}
-        chartview.chartNewParameters(parameters: parameters, nameOfParameters: nameOfParameters)
+    func displayNewChartDataSet(dataSet dataSet: ChartDataSet, nameOfChartDataSet: String ) {
+        self.chartView?.displayNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: nameOfChartDataSet)
     }
     
 
@@ -50,7 +43,5 @@ class ChartViewController: NSViewController {
         super.viewDidLoad()
         // Do view setup here.
     }
-    
-    
     
 }

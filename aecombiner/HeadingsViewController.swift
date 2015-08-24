@@ -16,7 +16,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBOutlet weak var tableViewHeaders: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
-    @IBOutlet weak var chartView: ChartView!
+    weak var chartViewController: ChartViewController!
 
     @IBOutlet weak var buttonModel: NSButton!
     @IBOutlet weak var buttonSortParameters: NSButton!
@@ -25,14 +25,6 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     // MARK: - @IBAction
 
-    @IBAction func segmentCursorStateTapped(sender: NSSegmentedControl) {
-        self.chartView.updateCursorState(newState: sender.selectedSegment)
-    }
-    
-    @IBAction func refreshSegmentTapped(sender: NSSegmentedControl) {
-        guard let scene = self.chartView.scene as? ChartScene else {return}
-        scene.autoLocateAndChartAllParameters()
-    }
     
     @IBAction func renameColumn(sender: AnyObject) {
         guard !self.textFieldColumnRecodedName.stringValue.isEmpty else
@@ -68,19 +60,19 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     // MARK: - Charts
     @IBAction func sortChartParameters(sender: AnyObject) {
         guard
-            let chartview = self.chartView,
+            let chartviewC = self.chartViewController,
             let columnIndex = self.selectedColumnFromHeadersTableView()
             else {return}
-        chartview.reSortTheseParameters(dataSetName: self.stringForColumnIndex(columnIndex))
+        chartviewC.reSortThisChartDataSet(dataSetName: self.stringForColumnIndex(columnIndex))
     }
 
     @IBAction func modelParameter(sender: NSButton) {
         guard
-                let chartview = self.chartView,
+                let chartviewC = self.chartViewController,
                 let columnIndex = self.selectedColumnFromHeadersTableView(),
-                let parameters = self.myCSVdataViewController()?.chartDataSetFromColumnIndex(columnIndex: columnIndex)
+                let dataSet = self.myCSVdataViewController()?.chartDataSetFromColumnIndex(columnIndex: columnIndex)
             else {return}
-        chartview.chartNewParameters(parameters: parameters, nameOfParameters: self.stringForColumnIndex(columnIndex))
+        chartviewC.displayNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: self.stringForColumnIndex(columnIndex))
     }
     
     
@@ -139,8 +131,20 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         return (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
     }
 
-    // MARK: - CSVdataDocument
     
+    // MARK: - Segue
+    override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
+        super.prepareForSegue(segue, sender: sender)
+        
+        if let cvc = (segue.destinationController as? ChartViewController)
+        {
+            self.chartViewController = cvc
+        }
+
+        
+    }
+    
+    // MARK: - CSVdataDocument
     
     func documentMakeDirty()
     {

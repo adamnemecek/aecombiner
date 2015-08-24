@@ -28,7 +28,7 @@ class ChartView: SKView {
     override func viewDidEndLiveResize() {
         super.viewDidEndLiveResize()
         guard let scene = self.scene as? ChartScene else {self.scene?.hidden = false; return}
-        scene.autoLocateAndChartAllParameters()
+        scene.autoLocateAndChartAllDataSets()
         scene.hidden = false
     }
 
@@ -123,24 +123,24 @@ class ChartView: SKView {
     }
     
     
-    func reSortAllParameters()
+    func reSortAllDataSet()
     {
         guard let scene = self.scene as? ChartScene else {return}
         scene.reSortAllDataSets()
     }
     
     
-    func reSortTheseParameters(dataSetName dataSetName:String)
+    func reSortThisChartDataSet(dataSetName dataSetName:String)
     {
         guard let scene = self.scene as? ChartScene else {return}
-        scene.reSortTheseParameters(dataSetName: dataSetName)
+        scene.reSortThisChartDataSet(dataSetName: dataSetName)
     }
     
     
-    func chartNewParameters(parameters parameters:ChartDataSet, nameOfParameters:String)
+    func displayNewChartDataSet(dataSet dataSet:ChartDataSet, nameOfChartDataSet:String)
     {
         guard let chartscene = self.scene as? ChartScene else {return}
-        chartscene.chartNewParameters(parameters: parameters, nameOfParameters: nameOfParameters)
+        chartscene.displayNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: nameOfChartDataSet)
     }
     
     func zoom(segmentImageName segmentImageName:String)

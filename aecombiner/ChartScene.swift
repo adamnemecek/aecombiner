@@ -48,10 +48,10 @@ class ChartScene: SKScene {
        }
     }
     
-    func autoLocateAndChartAllParameters()
+    func autoLocateAndChartAllDataSets()
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-            (node as! DataSetNode).autolocateAndChartParameters()
+            (node as! DataSetNode).autolocateAndChartDataSet()
         }
 
     }
@@ -59,40 +59,40 @@ class ChartScene: SKScene {
     func reSortAllDataSets()
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-            (node as! DataSetNode).reSortYourParameters()
+            (node as! DataSetNode).reSortYourDataSet()
         }
     }
     
-    func reSortTheseParameters(dataSetName dataSetName:String)
+    func reSortThisChartDataSet(dataSetName dataSetName:String)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
             guard let dsNode = (node as? DataSetNode) else {return}
             if dsNode.dataSetName == dataSetName
             {
-                dsNode.reSortYourParameters()
+                dsNode.reSortYourDataSet()
             }
         }
         
     }
     
-    func reChartTheseParameters(dataSetName dataSetName:String)
+    func reChartTheseDataSet(dataSetName dataSetName:String)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
             guard let dsNode = (node as? DataSetNode) else {return}
             if dsNode.dataSetName == dataSetName
             {
-                dsNode.autolocateAndChartParameters()
+                dsNode.autolocateAndChartDataSet()
             }
         }
         
     }
     
-    func chartNewParameters(parameters parameters:ChartDataSet, nameOfParameters:String)
+    func displayNewChartDataSet(dataSet dataSet:ChartDataSet, nameOfChartDataSet:String)
     {
         self.removeDataSetNodes()
-        let topNode = DataSetNode(parameters: parameters, nameOfParameters: nameOfParameters, colour:kColour_Unselected)
+        let topNode = DataSetNode(dataSet: dataSet, nameOfChartDataSet: nameOfChartDataSet, colour:kColour_Unselected)
         self.addChild(topNode)
-        self.reChartTheseParameters(dataSetName: nameOfParameters)
+        self.reChartTheseDataSet(dataSetName: nameOfChartDataSet)
     }
     
     func rebuildSelectedPointsArray(rectNode:SKNode)

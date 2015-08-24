@@ -93,10 +93,10 @@ class GroupParametersViewController: RecodeColumnViewController {
             switch tableColumn!.identifier
             {
             case "parameter":
-                cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
+                cellView = tableView.makeViewWithIdentifier("dataSetCell", owner: self) as! NSTableCellView
                 cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArrayParametersIndex]
-            case "value"://parameters
-                cellView = tableView.makeViewWithIdentifier("parametersValueCell", owner: self) as! NSTableCellView
+            case "value"://dataSet
+                cellView = tableView.makeViewWithIdentifier("dataSetValueCell", owner: self) as! NSTableCellView
                 cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArrayParametersValueIndex]
                 cellView.textField!.tag = row
             default:

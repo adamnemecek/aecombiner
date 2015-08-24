@@ -51,7 +51,7 @@ struct ChartDataSet {
 class DataPointNode: SKSpriteNode {
     var dataPoint:ChartDataPoint = ChartDataPoint(xvalue: 0.0, yvalue: 0.0)
     
-    func initialiseParameters(dataPoint:ChartDataPoint, colour:NSColor, yScale:CGFloat, xScale:CGFloat, zPos:Int)
+    func initialiseDataSet(dataPoint:ChartDataPoint, colour:NSColor, yScale:CGFloat, xScale:CGFloat, zPos:Int)
     {
         self.dataPoint = dataPoint
         self.name = kNodeName_DataPoint
@@ -68,20 +68,20 @@ class DataPointNode: SKSpriteNode {
 }
 
 class DataSetNode: SKNode {
-    var parameters = ChartDataSet()
+    var dataSet = ChartDataSet()
     var border:ChartBorders = ChartBorders()
     var colour = kColour_Unselected
     var sortDirection = kAscending
     var dataSetName:String = "Untitled"
     var selectedDataPoints = [ChartDataPoint]()
     
-    convenience init (parameters:ChartDataSet, nameOfParameters:String, colour:NSColor)
+    convenience init (dataSet:ChartDataSet, nameOfChartDataSet:String, colour:NSColor)
     {
         self.init()
         self.userInteractionEnabled = false
         self.name = kNodeName_DataSet
-        self.dataSetName = nameOfParameters
-        self.parameters = parameters
+        self.dataSetName = nameOfChartDataSet
+        self.dataSet = dataSet
         self.colour = colour
     }
     
@@ -104,20 +104,20 @@ class DataSetNode: SKNode {
         }
     }
     
-    func reSortYourParameters()
+    func reSortYourDataSet()
     {
         switch self.sortDirection
         {
         case kAscending:
-            self.parameters.dataPoints.sortInPlace(){$0.yValue > $1.yValue}
+            self.dataSet.dataPoints.sortInPlace(){$0.yValue > $1.yValue}
             self.sortDirection = kDescending
         case kDescending:
-            self.parameters.dataPoints.sortInPlace(){$0.yValue < $1.yValue}
+            self.dataSet.dataPoints.sortInPlace(){$0.yValue < $1.yValue}
             self.sortDirection = kAscending
         default:
             break
         }
-        self.autolocateAndChartParameters()
+        self.autolocateAndChartDataSet()
     }
     
     func sceneSize()->(yExtent:CGFloat, xExent:CGFloat)
@@ -129,13 +129,13 @@ class DataSetNode: SKNode {
     {
         let sceneSize = self.sceneSize()
         // yxScale is the range between min and max parameter divided into the Y axis length
-        self.yScale = (sceneSize.yExtent-self.border.top-self.border.bottom)/CGFloat(parameters.maxYvalue-parameters.minYvalue)
-        self.xScale = (sceneSize.xExent-self.border.left-self.border.right)/CGFloat(parameters.maxXvalue-parameters.minXvalue)
+        self.yScale = (sceneSize.yExtent-self.border.top-self.border.bottom)/CGFloat(dataSet.maxYvalue-dataSet.minYvalue)
+        self.xScale = (sceneSize.xExent-self.border.left-self.border.right)/CGFloat(dataSet.maxXvalue-dataSet.minXvalue)
     }
 
     func midPointOfDataDistribution()->CGPoint
     {
-        return CGPoint(x: ((self.parameters.minXvalue+self.parameters.maxXvalue)/2.0), y: ((self.parameters.minYvalue+self.parameters.maxYvalue)/2.0))
+        return CGPoint(x: ((self.dataSet.minXvalue+self.dataSet.maxXvalue)/2.0), y: ((self.dataSet.minYvalue+self.dataSet.maxYvalue)/2.0))
     }
     
     
@@ -155,17 +155,17 @@ class DataSetNode: SKNode {
     }
     
     
-    func autolocateAndChartParameters()
+    func autolocateAndChartDataSet()
     {
-        //process the parameters
+        //process the dataSet
         self.removeAllChildren()
         self.calculateScalesForXandY()
         self.autolocate(centrePoint: self.midPointOfDataDistribution())
         
-        for var row:Int = 0; row<self.parameters.dataPoints.count; ++row
+        for var row:Int = 0; row<self.dataSet.dataPoints.count; ++row
         {
             let node = DataPointNode(imageNamed: "ball")
-            node.initialiseParameters(self.parameters.dataPoints[row], colour: self.colour, yScale: self.yScale, xScale: self.xScale, zPos: row)
+            node.initialiseDataSet(self.dataSet.dataPoints[row], colour: self.colour, yScale: self.yScale, xScale: self.xScale, zPos: row)
             self.addChild(node)
             node.position = CGPoint(x: Double(row), y: node.dataPoint.yValue)
         }
