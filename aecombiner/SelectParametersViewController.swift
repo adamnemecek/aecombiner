@@ -8,12 +8,16 @@
 
 import Cocoa
 
+
+
+
 class SelectParametersViewController: RecodeColumnViewController {
     
     
     // MARK: - class vars
-    var arrayANDpredicates = [[String]]()
-    var arrayORpredicates = [[String]]()
+    var arrayANDpredicates = DataMatrix()
+    var arrayORpredicates = DataMatrix()
+    var dataModelExtracted = DataMatrix()
     
     
     // MARK: - class constants
@@ -26,6 +30,9 @@ class SelectParametersViewController: RecodeColumnViewController {
     @IBOutlet weak var buttonRemoveANDParameter: NSButton!
     @IBOutlet weak var tableViewORparameters: NSTableView!
     @IBOutlet weak var buttonRemoveORParameter: NSButton!
+    
+    @IBOutlet weak var buttonChartExtractedRows: NSButton!
+    @IBOutlet weak var tableViewHeadersForChart: NSTableView!
 
     /* MARK: - Represented Object
     override func updateRepresentedObjectToCSVData(csvdata:CSVdata)
@@ -35,11 +42,6 @@ class SelectParametersViewController: RecodeColumnViewController {
 */
     // MARK: - @IBAction
     
-    
-    @IBAction func extractParameters(sender: AnyObject) {
-        //called from Process menu
-        self.extractParametersIntoSetFromColumn()
-    }
     
     @IBAction func addSelectedParameter(sender: NSButton) {
         self.addColumnAndSelectedParameter(sender.identifier!)
@@ -54,9 +56,29 @@ class SelectParametersViewController: RecodeColumnViewController {
     }
     
     
-    @IBAction func extractRowsBasedOnPredicates(sender: NSButton) {
+    @IBAction func extractRowsBasedOnPredicatesIntoNewFile(sender: NSButton) {
+        guard let cdvc = self.myCSVdataViewController() else {return}
         
-        self.myCSVdataViewController()?.extractRowsBasedOnPredicates(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
+        cdvc.extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
+    }
+    
+    @IBAction func extractRowsBasedOnPredicatesIntoModelForChart(sender: AnyObject) {
+        guard let cdvc = self.myCSVdataViewController() else {return}
+        
+        self.dataModelExtracted = cdvc.dataModelExtractedWithPredicates(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
+        
+        self.buttonChartExtractedRows.enabled = self.dataModelExtracted.count>0
+    }
+    
+    
+    @IBAction func chartExtractedRows(sender: NSButton) {
+        guard
+            let chartviewC = self.chartViewController,
+            let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeadersForChart)
+            else {return}
+        let dataset = ChartDataSet(data: self.dataModelExtracted, forColumnIndex: columnIndex)
+        chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: self.headerStringForColumnIndex(columnIndex))
+
     }
     
     // MARK: - overrides
@@ -65,18 +87,14 @@ class SelectParametersViewController: RecodeColumnViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         //self.representedObject = CSVdata()
-        self.tableViewHeaders?.reloadData()
-        self.tableViewExtractedParameters?.reloadData()
     }
     
-    /* override var representedObject: AnyObject? {
-        didSet {
-            // Update the view, if already loaded.
-            self.tableViewHeaders?.reloadData()
-            self.tableViewExtractedParameters?.reloadData()
-            
-        }
-    }*/
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        self.tableViewHeaders?.reloadData()
+        self.tableViewExtractedParameters?.reloadData()
+        self.tableViewHeadersForChart?.reloadData()
+    }
     
     override func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
     {
@@ -102,13 +120,12 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier,let csvdo = self.myCSVdataViewController()  else
-        {
-            return 0
-        }
+        guard let tvidentifier = tableView.identifier,let csvdo = self.myCSVdataViewController()  else {return 0}
         switch tvidentifier
         {
         case "tableViewSelectedHeaders":
+            return csvdo.numberOfColumnsInData()
+        case "tableViewHeadersForChart":
             return csvdo.numberOfColumnsInData()
         case "tableViewSelectedExtractedParameters":
             return self.arrayExtractedParameters.count
@@ -131,6 +148,8 @@ class SelectParametersViewController: RecodeColumnViewController {
         }
         switch tvidentifier
         {
+        case "tableViewHeadersForChart":
+            cellView = self.cellForHeadersTable(tableView: tableView, row: row)
         case "tableViewSelectedHeaders":
             cellView = self.cellForHeadersTable(tableView: tableView, row: row)
         case "tableViewSelectedExtractedParameters":
@@ -154,7 +173,7 @@ class SelectParametersViewController: RecodeColumnViewController {
             {
             case "column":
                 cellView = tableView.makeViewWithIdentifier("selectedParameterCellC", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.stringForColumnIndex(columnNumber)
+                cellView.textField!.stringValue = self.headerStringForColumnIndex(columnNumber)
             case "parameter":
                 cellView = tableView.makeViewWithIdentifier("selectedParameterCellP", owner: self) as! NSTableCellView
                 cellView.textField!.stringValue = col_parameter[kSelectedParametersArrayParameterIndex]
@@ -183,6 +202,8 @@ class SelectParametersViewController: RecodeColumnViewController {
             self.buttonRemoveANDParameter.enabled = tableView.selectedRow != -1
         case "tableViewORparameters":
             self.buttonRemoveORParameter.enabled = tableView.selectedRow != -1
+        case "tableViewHeadersForChart":
+            break
         default:
             break;
         }

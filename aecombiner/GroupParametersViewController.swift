@@ -10,7 +10,7 @@ import Cocoa
 
 class GroupParametersViewController: RecodeColumnViewController {
     // MARK: - class vars
-    var arrayHeadersSecondarySelected = [[String]]()
+    var arrayHeadersSecondarySelected = DataMatrix()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,9 +43,9 @@ class GroupParametersViewController: RecodeColumnViewController {
     
     // MARK: - Columns
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:[[String]], nameOfColumn:String)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:DataMatrix, nameOfColumn:String)
     {
-        guard let csvdo = self.myCSVdataViewController() else {return ([[String]](), "")}
+        guard let csvdo = self.myCSVdataViewController() else {return (DataMatrix(), "")}
         return csvdo.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
     

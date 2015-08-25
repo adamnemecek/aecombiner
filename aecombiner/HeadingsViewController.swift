@@ -42,7 +42,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         
         let alert = NSAlert()
         alert.alertStyle = .CriticalAlertStyle
-        alert.messageText = "Are you sure you want to delete '"+self.titleForSelectedColumnInHeaders()+"'?\nIt cannot be undone."
+        alert.messageText = "Are you sure you want to delete '"+self.titleForSelectedColumnInHeaders(self.tableViewHeaders)+"'?\nIt cannot be undone."
         alert.addButtonWithTitle("Delete")
         alert.addButtonWithTitle("Cancel")
         
@@ -61,18 +61,18 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBAction func sortSelectedDataSet(sender: AnyObject) {
         guard
             let chartviewC = self.chartViewController,
-            let columnIndex = self.selectedColumnFromHeadersTableView()
+            let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders)
             else {return}
-        chartviewC.reSortThisChartDataSet(dataSetName: self.stringForColumnIndex(columnIndex))
+        chartviewC.reSortThisChartDataSet(dataSetName: self.headerStringForColumnIndex(columnIndex))
     }
 
     @IBAction func chartSelectedDataSet(sender: NSButton) {
         guard
                 let chartviewC = self.chartViewController,
-                let columnIndex = self.selectedColumnFromHeadersTableView(),
+                let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders),
                 let dataSet = self.myCSVdataViewController()?.chartDataSetFromColumnIndex(columnIndex: columnIndex)
             else {return}
-        chartviewC.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: self.stringForColumnIndex(columnIndex))
+        chartviewC.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: self.headerStringForColumnIndex(columnIndex))
     }
     
     
@@ -89,16 +89,16 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
 
     
     // MARK: - Columns
-    func selectedColumnFromHeadersTableView() -> Int?
+    func selectedColumnFromHeadersTableView(tableview: NSTableView) -> Int?
     {
-        guard self.requestedColumnIndexIsOK(self.tableViewHeaders.selectedRow)
+        guard self.requestedColumnIndexIsOK(tableview.selectedRow)
             else {return nil}
-        return self.tableViewHeaders.selectedRow
+        return tableview.selectedRow
     }
     
-    func titleForSelectedColumnInHeaders()->String
+    func titleForSelectedColumnInHeaders(tableview: NSTableView)->String
     {
-        return self.stringForColumnIndex(self.selectedColumnFromHeadersTableView())
+        return self.headerStringForColumnIndex(self.selectedColumnFromHeadersTableView(tableview))
     }
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
@@ -107,10 +107,10 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         return vc.requestedColumnIndexIsOK(columnIndex)
     }
     
-    func stringForColumnIndex(columnIndex:Int?) -> String
+    func headerStringForColumnIndex(columnIndex:Int?) -> String
     {
         guard let csvdo = self.myCSVdataViewController() else {return "???"}
-        return csvdo.stringForColumnIndex(columnIndex)
+        return csvdo.headerStringForColumnIndex(columnIndex)
     }
     
     //MARK: - Supers overrides
@@ -169,7 +169,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     func cellForHeadersTable(tableView tableView: NSTableView, row: Int) ->NSTableCellView
     {
         let cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
-        cellView.textField!.stringValue = self.stringForColumnIndex(row)
+        cellView.textField!.stringValue = self.headerStringForColumnIndex(row)
         return cellView
     }
     

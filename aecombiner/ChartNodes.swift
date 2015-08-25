@@ -47,7 +47,7 @@ class ChartDataSet {
     var dataPoints = [ChartDataPoint]()
     var nameOfDataSet:String = kDataSetDefaultName
     
-    convenience init(data: [[String]], forColumnIndex columnIndex:Int)
+    convenience init(data: DataMatrix, forColumnIndex columnIndex:Int)
     {
         self.init()
         guard columnIndex>0 && columnIndex<data.count else {return}

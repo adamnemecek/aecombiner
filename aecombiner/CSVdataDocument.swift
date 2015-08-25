@@ -20,7 +20,7 @@ let kCsvDataData_column_groupingIDs = 0// in a [[String]] of combined CVSdata 0 
 let kCsvDataData_column_value = 1
 
 
-func generic_SortArrayOfColumnsAsTextOrValues(inout arrayToSort arrayToSort:[[String]], columnIndexToSort:Int, textOrvalue:Int, direction: Int)
+func generic_SortArrayOfColumnsAsTextOrValues(inout arrayToSort arrayToSort:DataMatrix, columnIndexToSort:Int, textOrvalue:Int, direction: Int)
 {
     switch (direction, textOrvalue)
     {
@@ -157,7 +157,7 @@ class CSVdataDocument: NSDocument {
     }
 
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:[[String]], nameOfColumn:String)// cvsDataData[0] is the grouping ID, cvsDataData[1] is the value
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:DataMatrix, nameOfColumn:String)// cvsDataData[0] is the grouping ID, cvsDataData[1] is the value
     {
         var groupStartValue:Double
         switch groupMethod
@@ -199,7 +199,7 @@ class CSVdataDocument: NSDocument {
 
         //join col names to make a mega name for the combination
         //make an array first
-        var namesOfCombinedColumn = [String]()
+        var namesOfCombinedColumn = HeadersMatrix()
         for columnIndex in columnIndexesToGroup
         {
             namesOfCombinedColumn.append(self.csvDataModel.headers[columnIndex])
@@ -217,7 +217,7 @@ class CSVdataDocument: NSDocument {
         }
         
         //createTheCSVdata
-        var csvDataData = [[String]]()
+        var csvDataData = DataMatrix()
         for (parameter,value) in dictionaryOfParametersAndCombinedValues
         {
             csvDataData.append([parameter, String(value)])
@@ -259,7 +259,7 @@ class CSVdataDocument: NSDocument {
         return true
     }
 
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:[[String]])
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:DataMatrix)
     {
         //make a temporary dictionary
         var paramsDict = [String : String]()
@@ -315,9 +315,9 @@ class CSVdataDocument: NSDocument {
         generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.csvDataModel.csvData, columnIndexToSort: columnIndexToSort, textOrvalue: textOrvalue, direction: direction)
     }
 
-    func extractRowsBasedOnPredicates(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
+    func dataModelExtractedWithPredicates(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)->DataMatrix
     {
-        var extractedRows = [[String]]()
+        var extractedRows = DataMatrix()
         for rowOfColumns in self.csvDataModel.csvData
         {
             //assume row is matched
@@ -360,14 +360,20 @@ class CSVdataDocument: NSDocument {
                 extractedRows.append(rowOfColumns)
             }
         }
-        
-        if extractedRows.count > 0
-        {
-            self.createNewDocumentFromExtractedRows(cvsData: extractedRows, headers: self.csvDataModel.headers)
-        }        
+        return extractedRows
     }
     
-    func createNewDocumentFromExtractedRows(cvsData extractedRows:[[String]], headers:[String])
+    func extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)
+    {
+        let extractedData = self.dataModelExtractedWithPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+        if extractedData.count>0
+        {
+            self.createNewDocumentFromExtractedRows(cvsData: extractedData, headers: self.csvDataModel.headers)
+        }
+        
+    }
+    
+    func createNewDocumentFromExtractedRows(cvsData extractedRows:DataMatrix, headers:HeadersMatrix)
     {
         do {
             let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
@@ -392,7 +398,7 @@ class CSVdataDocument: NSDocument {
         return set.count == 0 ? nil : set
     }
 
-    func stringForColumnIndex(columnIndex:Int?) -> String
+    func headerStringForColumnIndex(columnIndex:Int?) -> String
     {
         guard let index = columnIndex where columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return "???"}
         return (self.csvDataModel.headers[index])

@@ -60,7 +60,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
     
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:[[String]], nameOfColumn:String)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:DataMatrix, nameOfColumn:String)
     {
         return self.myCSVdataDocument.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
@@ -71,18 +71,23 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         
     }
 
-    func stringForColumnIndex(columnIndex:Int?) -> String
+    func headerStringForColumnIndex(columnIndex:Int?) -> String
     {
-        return self.myCSVdataDocument.stringForColumnIndex(columnIndex)
+        return self.myCSVdataDocument.headerStringForColumnIndex(columnIndex)
     }
 
     func numberOfColumnsInData()->Int{
         return self.myCSVdataDocument.numberOfColumnsInData()
     }
 
-    func extractRowsBasedOnPredicates(ANDpredicates ANDpredicates:[[String]], ORpredicates:[[String]])
+    func dataModelExtractedWithPredicates(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)->DataMatrix
     {
-        self.myCSVdataDocument.extractRowsBasedOnPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+        return self.myCSVdataDocument.dataModelExtractedWithPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+    }
+    
+    func extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)
+    {
+        self.myCSVdataDocument.extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
         self.tableViewCSVdata.reloadData()
     }
     
@@ -111,7 +116,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
 
     
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:[[String]])
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:DataMatrix)
     {
         self.myCSVdataDocument.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray)
         

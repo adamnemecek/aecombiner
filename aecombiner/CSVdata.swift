@@ -15,22 +15,24 @@ let commaDelimiter = ","
 let carriageReturn = "\n"
 let tabDelimiter = "\t"
 
+typealias DataMatrix = [[String]]
+typealias HeadersMatrix = [String]
 
 
 class CSVdata {
 
-    var headers = [String]()
-    var csvData = [[String]]()
+    var headers = HeadersMatrix()
+    var csvData = DataMatrix()
     var processedDataOK = false
     
     init()
     {
-        self.headers = [String]()
-        self.csvData = [[String]]()
+        self.headers = HeadersMatrix()
+        self.csvData = DataMatrix()
         self.processedDataOK = false
     }
     
-    convenience init (headers:[String], csvdata:[[String]])
+    convenience init (headers:HeadersMatrix, csvdata:DataMatrix)
     {
         self.init()
         self.headers = headers
@@ -60,7 +62,7 @@ class CSVdata {
     
     func importCSVstring(dataAsString dataAsString:NSString)
     {
-        var arrayOfRowArrays = [[String]]()
+        var arrayOfRowArrays = DataMatrix()
         dataAsString.enumerateLinesUsingBlock({ (line, okay) -> Void in
             //check for "" and replace , inside them
             if line.rangeOfString(quotationMarks) != nil
@@ -93,7 +95,7 @@ class CSVdata {
     
     func importTABstring(dataAsString dataAsString:NSString)
     {
-        var arrayOfRowArrays = [[String]]()
+        var arrayOfRowArrays = DataMatrix()
         dataAsString.enumerateLinesUsingBlock({ (line, okay) -> Void in
             // we dont check for tabs inside quotes
             arrayOfRowArrays.append(line.componentsSeparatedByString(tabDelimiter))
@@ -109,7 +111,7 @@ class CSVdata {
 
     func processCSVtoData(delimiter delimiter:String) -> NSData?
     {
-        var tempArray = [String]()
+        var tempArray = HeadersMatrix()
         for var row = 0; row<self.csvData.count; row++
         {
             let rowString = delimiter.join(self.csvData[row])

@@ -12,7 +12,7 @@ class RecodeColumnViewController: HeadingsViewController {
     
 
     // MARK: - class vars
-    var arrayExtractedParameters = [[String]]()
+    var arrayExtractedParameters = DataMatrix()
     
 
     // MARK: - class constants
@@ -130,7 +130,7 @@ class RecodeColumnViewController: HeadingsViewController {
         case "tableViewRecodeHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-            self.textFieldColumnRecodedName?.stringValue = self.stringForColumnIndex(self.tableViewHeaders.selectedRow)
+            self.textFieldColumnRecodedName?.stringValue = self.headerStringForColumnIndex(self.tableViewHeaders.selectedRow)
       default:
             break;
         }
@@ -140,7 +140,7 @@ class RecodeColumnViewController: HeadingsViewController {
     // MARK: - Column parameters
     func stringForRecodedColumn(columnIndex:Int) -> String
     {
-        return self.stringForColumnIndex(columnIndex)+kStringRecodedColumnNameSuffix
+        return self.headerStringForColumnIndex(columnIndex)+kStringRecodedColumnNameSuffix
     }
     
     override func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
@@ -158,7 +158,7 @@ class RecodeColumnViewController: HeadingsViewController {
     
     func resetExtractedParameters()
     {
-        self.arrayExtractedParameters = [[String]]()
+        self.arrayExtractedParameters = DataMatrix()
         self.tableViewExtractedParameters?.reloadData()
         self.textFieldColumnRecodedName?.stringValue = ""
     }
@@ -166,7 +166,7 @@ class RecodeColumnViewController: HeadingsViewController {
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        guard let csvdo = self.myCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView(), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
+        guard let csvdo = self.myCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
         
         var subArray = Array(set)
         // replace blanks with string
@@ -178,7 +178,7 @@ class RecodeColumnViewController: HeadingsViewController {
             }
         }
         //clear the parameters array
-        self.arrayExtractedParameters = [[String]]()
+        self.arrayExtractedParameters = DataMatrix()
         for var row = 0; row<subArray.count; ++row
         {
             self.arrayExtractedParameters.append([subArray[row],""])
@@ -192,7 +192,7 @@ class RecodeColumnViewController: HeadingsViewController {
     {
         guard self.arrayExtractedParameters.count > 0  else {return}
         guard   let csvVC = self.myCSVdataViewController(),
-                let columnIndex = self.selectedColumnFromHeadersTableView()
+                let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders)
                 else {return}
         //give a name if none
         let colTitle = self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(columnIndex) : self.textFieldColumnRecodedName!.stringValue
