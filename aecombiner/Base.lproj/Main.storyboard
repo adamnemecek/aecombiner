@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="8173.3" systemVersion="14E46" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="8164.2" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8173.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8164.2"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -801,24 +801,48 @@
                                     </segments>
                                 </segmentedCell>
                             </segmentedControl>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZrY-GH-bo7">
+                                <rect key="frame" x="18" y="269" width="43" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Rows:" id="fNZ-uZ-wK2">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Am-OO-13q">
+                                <rect key="frame" x="65" y="269" width="65" height="17"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="61" id="qP5-RO-gYN"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title=" " id="2Iv-Tp-kZ6">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="igw-A2-c2M" secondAttribute="trailing" constant="20" symbolic="YES" id="2rH-qt-Sdt"/>
-                            <constraint firstAttribute="bottom" secondItem="igw-A2-c2M" secondAttribute="bottom" constant="20" symbolic="YES" id="9d1-Zh-niY"/>
-                            <constraint firstItem="HdC-7Z-LlT" firstAttribute="centerX" secondItem="igw-A2-c2M" secondAttribute="centerX" id="AaM-4E-BFA"/>
-                            <constraint firstItem="igw-A2-c2M" firstAttribute="leading" secondItem="YE6-aK-qPu" secondAttribute="leading" constant="20" symbolic="YES" id="Eyo-ff-Rae"/>
-                            <constraint firstItem="igw-A2-c2M" firstAttribute="top" secondItem="YE6-aK-qPu" secondAttribute="top" constant="20" symbolic="YES" id="Lac-im-1Fy"/>
-                            <constraint firstItem="HdC-7Z-LlT" firstAttribute="top" secondItem="YE6-aK-qPu" secondAttribute="top" id="bQ2-wW-xbK"/>
+                            <constraint firstAttribute="bottom" secondItem="igw-A2-c2M" secondAttribute="bottom" constant="20" symbolic="YES" id="4yS-BT-90z"/>
+                            <constraint firstItem="HdC-7Z-LlT" firstAttribute="top" secondItem="YE6-aK-qPu" secondAttribute="top" id="94G-ei-ZGQ"/>
+                            <constraint firstItem="ZrY-GH-bo7" firstAttribute="leading" secondItem="YE6-aK-qPu" secondAttribute="leading" constant="20" symbolic="YES" id="JXO-5K-mhD"/>
+                            <constraint firstAttribute="trailing" secondItem="igw-A2-c2M" secondAttribute="trailing" constant="20" symbolic="YES" id="JgZ-Rq-EFT"/>
+                            <constraint firstItem="HdC-7Z-LlT" firstAttribute="centerX" secondItem="igw-A2-c2M" secondAttribute="centerX" id="LDV-X1-eyX"/>
+                            <constraint firstItem="0Am-OO-13q" firstAttribute="leading" secondItem="ZrY-GH-bo7" secondAttribute="trailing" constant="8" symbolic="YES" id="YUL-p3-uVf"/>
+                            <constraint firstItem="igw-A2-c2M" firstAttribute="leading" secondItem="ZrY-GH-bo7" secondAttribute="leading" id="fZ8-eo-cVM"/>
+                            <constraint firstItem="igw-A2-c2M" firstAttribute="top" secondItem="YE6-aK-qPu" secondAttribute="top" constant="20" symbolic="YES" id="jpI-3I-3i0"/>
+                            <constraint firstItem="HdC-7Z-LlT" firstAttribute="centerY" secondItem="0Am-OO-13q" secondAttribute="centerY" id="r8d-zC-Q2r"/>
+                            <constraint firstItem="ZrY-GH-bo7" firstAttribute="baseline" secondItem="0Am-OO-13q" secondAttribute="baseline" id="xhd-T5-zTJ"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="labelNumRows" destination="0Am-OO-13q" id="5aa-d4-6CX"/>
                         <outlet property="segmentSortTextOrValue" destination="HdC-7Z-LlT" id="QS0-6q-y1z"/>
                         <outlet property="tableViewCSVdata" destination="EI9-el-G9V" id="OyV-vR-9rS"/>
                     </connections>
                 </viewController>
                 <customObject id="6J4-3I-SRC" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="211.5" y="155"/>
+            <point key="canvasLocation" x="356.5" y="113"/>
         </scene>
         <!--Headings View Controller-->
         <scene sceneID="6L5-16-sX7">
@@ -2215,13 +2239,22 @@
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9fb-s2-Z8x">
                                 <rect key="frame" x="345" y="324" width="165" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="+ Add" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="NDs-1y-WOP" id="Z73-aC-RBk">
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="Z73-aC-RBk">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" id="5Jg-bQ-T9K">
                                         <items>
-                                            <menuItem title="+ Add" state="on" id="NDs-1y-WOP"/>
-                                            <menuItem title="× Multiply " id="qLK-Mj-4gI">
+                                            <menuItem title="Sum" id="NDs-1y-WOP" userLabel="Sum"/>
+                                            <menuItem title="Factorial" id="qLK-Mj-4gI" userLabel="Factorial">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Count" id="H2m-l9-a8n" userLabel="Count">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Mean" id="eU4-ym-qEX" userLabel="Mean">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Geometric Mean" id="4EA-ln-fQ5" userLabel="Geometric Mean">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>
@@ -2318,6 +2351,6 @@
         <image name="trash32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="MuR-6W-Djl"/>
+        <segue reference="hQc-2D-YN3"/>
     </inferredMetricsTieBreakers>
 </document>

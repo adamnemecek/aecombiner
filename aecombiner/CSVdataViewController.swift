@@ -14,6 +14,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     // MARK: - @IBOutlet
     @IBOutlet weak var tableViewCSVdata: NSTableView!
     @IBOutlet weak var segmentSortTextOrValue: NSSegmentedControl!
+    @IBOutlet weak var labelNumRows: NSTextField!
 
     // MARK: - @IBActions
     
@@ -60,12 +61,12 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
     
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int) -> (cvsDataData:DataMatrix, nameOfColumn:String)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (cvsDataData:DataMatrix, nameOfColumn:String)
     {
         return self.myCSVdataDocument.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
     
-    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:Int)
+    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String)
     {
         self.myCSVdataDocument.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
         
@@ -105,6 +106,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
    func columnsClearAndRebuild(){
         
         self.myCSVdataDocument.columnsClearAndRebuild(self.tableViewCSVdata)
+        self.labelNumRows.stringValue = String(self.myCSVdataDocument.numberOfRowsOfData())
     }
     
     func renameColumnAtIndex(columnIndex: Int, newName:String)
