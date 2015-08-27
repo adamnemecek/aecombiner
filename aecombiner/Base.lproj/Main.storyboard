@@ -2245,7 +2245,7 @@
                                     <menu key="menu" id="5Jg-bQ-T9K">
                                         <items>
                                             <menuItem title="Sum" id="NDs-1y-WOP" userLabel="Sum"/>
-                                            <menuItem title="Factorial" id="qLK-Mj-4gI" userLabel="Factorial">
+                                            <menuItem title="Product" id="qLK-Mj-4gI" userLabel="Product">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="Count" id="H2m-l9-a8n" userLabel="Count">
