@@ -15,7 +15,7 @@ let kSortAsText = 0
 let kSortAsValue = 1
 
 let kGroupAddition = "Sum"
-let kGroupMultiplication = "Factorial"
+let kGroupMultiplication = "Product"
 let kGroupCount = "Count"
 let kGroupMean = "Mean"
 let kGroupGeoMean = "Geometric Mean"
@@ -187,19 +187,19 @@ class CSVdataDocument: NSDocument {
         let groupStartValue = self.groupStartValueForString(groupMethod)
         //create a dict with the keys the params we extracted for grouping
         //make a blank array to hold the values associated with the grouping for each member of the group
-        var dictionaryOfParametersAndCombinedValues = [String : (total:Double, count:Double)]()
-        var dictionaryOfParametersAndCombinedRanges = [String : (minm:Double, maxm:Double)]()
+        var valuesForGroup = [String : (total:Double, count:Double)]()
+        var rangesForGroup = [String : (minm:Double, maxm:Double)]()
         switch groupMethod
         {
         case kGroupMean, kGroupGeoMean:
             for parameter in arrayOfParamatersInGroup
             {
-                dictionaryOfParametersAndCombinedValues[parameter] = (groupStartValue,0.0)
+                valuesForGroup[parameter] = (groupStartValue,0.0)
             }
         case kGroupRange:
             for parameter in arrayOfParamatersInGroup
             {
-                dictionaryOfParametersAndCombinedRanges[parameter] = (self.groupStartValueForString(kGroupMin),self.groupStartValueForString(kGroupMax))
+                rangesForGroup[parameter] = (self.groupStartValueForString(kGroupMin),self.groupStartValueForString(kGroupMax))
             }
         default:
             break
@@ -213,19 +213,17 @@ class CSVdataDocument: NSDocument {
                 switch groupMethod
                 {
                 case kGroupRange:
-                    guard let running = dictionaryOfParametersAndCombinedRanges[paramID],
+                    guard let running = rangesForGroup[paramID],
                         let value = Double(row[columnIndexInGroup]) else {continue}
-                    print((dictionaryOfParametersAndCombinedValues[paramID],(fmin(running.minm, value), fmax(running.maxm,value))))
-                    dictionaryOfParametersAndCombinedValues[paramID] = (fmin(running.minm, value), fmax(running.maxm,value))
+                    rangesForGroup[paramID] = (fmin(running.minm, value), fmax(running.maxm,value))
                 case kGroupMean:
-                    guard let running = dictionaryOfParametersAndCombinedValues[paramID],
+                    guard let running = valuesForGroup[paramID],
                         let value = Double(row[columnIndexInGroup]) else {continue}
-                    dictionaryOfParametersAndCombinedValues[paramID] = (running.total + value, running.count + 1.0)
+                    valuesForGroup[paramID] = (running.total + value, running.count + 1.0)
                 case kGroupGeoMean:
-                    guard let running = dictionaryOfParametersAndCombinedValues[paramID],
-                    let  value = Double(row[columnIndexInGroup]) where value >= 0 else {continue} //geo mean cannot handle negative numbers
-                    dictionaryOfParametersAndCombinedValues[paramID] = (running.total +  log(value), running.count + 1.0)
-                    print(dictionaryOfParametersAndCombinedValues[paramID])
+                    guard let running = valuesForGroup[paramID],
+                    let  value = Double(row[columnIndexInGroup]) where value > 0 else {continue} //geo mean cannot handle negative numbers
+                    valuesForGroup[paramID] = (running.total +  log(value), running.count + 1.0)
                default:
                     break
                 }
@@ -238,12 +236,12 @@ class CSVdataDocument: NSDocument {
         switch groupMethod
         {
         case kGroupRange:
-            for (key,value) in dictionaryOfParametersAndCombinedRanges
+            for (key,value) in rangesForGroup
             {
                 processedDict[key] = value.maxm-value.minm
             }
         case kGroupMean, kGroupGeoMean:
-            for (key,value) in dictionaryOfParametersAndCombinedValues
+            for (key,value) in valuesForGroup
             {
                 switch groupMethod
                 {
@@ -289,7 +287,7 @@ class CSVdataDocument: NSDocument {
         case kGroupAddition:
             nameOfNewColumn = "Sum("+"+".join(namesOfCombinedColumn)+")"
         case kGroupMultiplication:
-            nameOfNewColumn = "Factorial("+"*".join(namesOfCombinedColumn)+")"
+            nameOfNewColumn = "Product("+"*".join(namesOfCombinedColumn)+")"
         case kGroupCount:
             nameOfNewColumn = "Count("+"_".join(namesOfCombinedColumn)+")"
         case kGroupMean:
@@ -325,19 +323,19 @@ class CSVdataDocument: NSDocument {
         //create a dict with the keys the params we extracted for grouping
         //make a blank array to hold the values associated with the grouping for each member of the group
         //Doubles for adding and multiplying, Ints for counting - to avoud decimal places in counts string
-        var dictionaryOfParametersAndCombinedValues = [String : Double]()
-        var dictionaryOfParametersAndCounts = [String : Int]()
+        var valuesForGroup = [String : Double]()
+        var countsForGroup = [String : Int]()
         switch groupMethod
         {
         case kGroupAddition, kGroupMultiplication, kGroupMax, kGroupMin:
             for parameter in arrayOfParamatersInGroup
             {
-                dictionaryOfParametersAndCombinedValues[parameter] = groupStartValue
+                valuesForGroup[parameter] = groupStartValue
             }
         case kGroupCount:
             for parameter in arrayOfParamatersInGroup
             {
-                dictionaryOfParametersAndCounts[parameter] = Int(groupStartValue)
+                countsForGroup[parameter] = Int(groupStartValue)
             }
         default:
             break
@@ -351,24 +349,25 @@ class CSVdataDocument: NSDocument {
                 switch groupMethod
                 {
                 case kGroupMin:
-                    guard let running = dictionaryOfParametersAndCombinedValues[paramID],
+                    guard let running = valuesForGroup[paramID],
                         let value = Double(row[columnIndexInGroup]) else {continue}
-                    dictionaryOfParametersAndCombinedValues[paramID] = fmin(running, value)
+                    valuesForGroup[paramID] = fmin(running, value)
                 case kGroupMax:
-                    guard let running = dictionaryOfParametersAndCombinedValues[paramID],
+                    guard let running = valuesForGroup[paramID],
                         let value = Double(row[columnIndexInGroup]) else {continue}
-                    dictionaryOfParametersAndCombinedValues[paramID] = fmax(running, value)
+                    valuesForGroup[paramID] = fmax(running, value)
                 case kGroupAddition:
-                    guard let running = dictionaryOfParametersAndCombinedValues[paramID],
+                    guard let running = valuesForGroup[paramID],
                         let value = Double(row[columnIndexInGroup]) else {continue}
-                    dictionaryOfParametersAndCombinedValues[paramID] = running + value
+                    valuesForGroup[paramID] = running + value
                 case kGroupMultiplication:
-                    guard let running = dictionaryOfParametersAndCombinedValues[paramID],
+                    guard let running = valuesForGroup[paramID],
                     let value = Double(row[columnIndexInGroup]) else {continue}
-                    dictionaryOfParametersAndCombinedValues[paramID] = running * value
+                    valuesForGroup[paramID] = running * value
                 case kGroupCount:
-                    guard let running = dictionaryOfParametersAndCounts[paramID] else {continue}
-                    dictionaryOfParametersAndCounts[paramID] = running + 1
+                    guard let running = countsForGroup[paramID],
+                    let _ = Double(row[columnIndexInGroup]) else {continue}
+                    countsForGroup[paramID] = running + 1
                 default:
                     break
                 }
@@ -382,12 +381,12 @@ class CSVdataDocument: NSDocument {
         switch groupMethod
         {
         case kGroupAddition, kGroupMultiplication, kGroupMin, kGroupMax:
-            for (parameter,value) in dictionaryOfParametersAndCombinedValues
+            for (parameter,value) in valuesForGroup
             {
                 csvDataData.append([parameter, String(value)])
             }
         case kGroupCount:
-            for (parameter,value) in dictionaryOfParametersAndCounts
+            for (parameter,value) in countsForGroup
             {
                 csvDataData.append([parameter, String(value)])
             }
@@ -398,6 +397,87 @@ class CSVdataDocument: NSDocument {
         
         return (csvDataData, nameOfNewColumn)
     }
+    
+    
+    func allStatsForCombinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], nameOfColumn:String)
+    {
+        
+        typealias AggregatedStats = (minm:Double, maxm:Double,sum:Double, product:Double, logSum:Double, count:Int)
+        
+        //create a dict with the keys the params we extracted for grouping
+        //make a blank array to hold the values associated with the grouping for each member of the group
+        //Doubles for adding and multiplying, Ints for counting - to avoud decimal places in counts string
+        var statsForGroup = [String : AggregatedStats]()
+        let stats = AggregatedStats(Double(Int.max),0,0,1,0,0)
+        for parameter in arrayOfParamatersInGroup
+        {
+            statsForGroup[parameter] = stats
+        }
+      
+        for row in self.csvDataModel.csvData
+        {
+            let paramID = row[columnIndexForGrouping]
+            for columnIndexInGroup in columnIndexesToGroup
+            {
+                guard let running = statsForGroup[paramID],
+                let value = Double(row[columnIndexInGroup]) else {continue}
+
+                
+                
+                switch groupMethod
+                {
+                case kGroupMin:
+                    guard let running = valuesForGroup[paramID],
+                        let value = Double(row[columnIndexInGroup]) else {continue}
+                    valuesForGroup[paramID] = fmin(running, value)
+                case kGroupMax:
+                    guard let running = valuesForGroup[paramID],
+                        let value = Double(row[columnIndexInGroup]) else {continue}
+                    valuesForGroup[paramID] = fmax(running, value)
+                case kGroupAddition:
+                    guard let running = valuesForGroup[paramID],
+                        let value = Double(row[columnIndexInGroup]) else {continue}
+                    valuesForGroup[paramID] = running + value
+                case kGroupMultiplication:
+                    guard let running = valuesForGroup[paramID],
+                        let value = Double(row[columnIndexInGroup]) else {continue}
+                    valuesForGroup[paramID] = running * value
+                case kGroupCount:
+                    guard let running = countsForGroup[paramID],
+                    let value = Double(row[columnIndexInGroup]) else {continue}
+                    countsForGroup[paramID] = running + 1
+                default:
+                    break
+                }
+            }
+        }
+        
+        let nameOfNewColumn = self.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: groupMethod)
+        
+        //createTheCSVdata
+        var csvDataData = DataMatrix()
+        switch groupMethod
+        {
+        case kGroupAddition, kGroupMultiplication, kGroupMin, kGroupMax:
+            for (parameter,value) in valuesForGroup
+            {
+                csvDataData.append([parameter, String(value)])
+            }
+        case kGroupCount:
+            for (parameter,value) in countsForGroup
+            {
+                csvDataData.append([parameter, String(value)])
+            }
+        default:
+            break
+        }
+        
+        
+        return (csvDataData, nameOfNewColumn)
+    }
+    
+
+    
     
     func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String)
     {

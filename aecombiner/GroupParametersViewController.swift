@@ -11,7 +11,8 @@ import Cocoa
 class GroupParametersViewController: RecodeColumnViewController {
     // MARK: - class vars
     var arrayHeadersSecondarySelected = DataMatrix()
-
+    var arrayButtonsForExtracting = [NSButton]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -21,12 +22,17 @@ class GroupParametersViewController: RecodeColumnViewController {
         super.viewDidAppear()
         // Do view setup here.
         self.tableViewGroupHeadersSecondary?.reloadData()
+        self.arrayButtonsForExtracting.append(self.buttonCombineColumns)
+        self.arrayButtonsForExtracting.append(self.buttonExtractAllStatistics)
+        self.arrayButtonsForExtracting.append(self.buttonModel)
+        self.arrayButtonsForExtracting.append(self.popupAddOrMultiply)
     }
 
     // MARK: - @IBOutlet
     @IBOutlet weak var tableViewGroupHeadersSecondary: NSTableView!
     
     @IBOutlet weak var buttonCombineColumns: NSButton!
+    @IBOutlet weak var buttonExtractAllStatistics: NSButton!
     @IBOutlet weak var popupAddOrMultiply: NSPopUpButton!
     
     // MARK: - @IBOutlet
@@ -40,6 +46,18 @@ class GroupParametersViewController: RecodeColumnViewController {
         self.combineColumnsAndChartData()
         
     }
+    
+    // MARK: - Buttons
+    func updateButtonsForExtracting()
+    {
+        let enabled = self.tableViewGroupHeadersSecondary.selectedRowIndexes.count>0
+        for button in self.arrayButtonsForExtracting
+        {
+            button.enabled = enabled
+        }
+    }
+    
+    
     
     // MARK: - Columns
     
@@ -118,6 +136,7 @@ class GroupParametersViewController: RecodeColumnViewController {
         case "tableViewGroupHeaders", "tableViewGroupHeadersSecondary":
             return csvdo.numberOfColumnsInData()
         case "tableViewGroupParameters":
+            self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) in group"
             return self.arrayExtractedParameters.count
         default:
             return 0
@@ -166,10 +185,12 @@ class GroupParametersViewController: RecodeColumnViewController {
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
             self.tableViewGroupHeadersSecondary.reloadData()
+        case "tableViewGroupHeadersSecondary":
+            break
         default:
             break;
         }
-        
+        self.updateButtonsForExtracting()
     }
     
 
