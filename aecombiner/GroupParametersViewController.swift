@@ -47,6 +47,9 @@ class GroupParametersViewController: RecodeColumnViewController {
         
     }
     
+    @IBAction func combineAndExtractAllStatsToFile(sender: AnyObject) {
+        self.combineColumnsAndExtractAllStatsToFile()
+    }
     // MARK: - Buttons
     func updateButtonsForExtracting()
     {
@@ -94,6 +97,8 @@ class GroupParametersViewController: RecodeColumnViewController {
         return true
     }
     
+    
+    
     func combineColumnsAndChartData()
     {
         guard self.okToCombine() else {return}
@@ -108,7 +113,19 @@ class GroupParametersViewController: RecodeColumnViewController {
         cvc.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfColumn)
     }
 
-    
+    func combineColumnsAndExtractAllStatsToFile()
+    {
+        guard self.okToCombine() else {return}
+        guard
+            let dvc = self.myCSVdataViewController() else {return}
+        
+        let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
+        
+        
+        dvc.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.tableViewHeaders.selectedRow, columnIndexesToGroup: self.tableViewGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup)
+        
+    }
+
     func combineCoumnsAndExtract()
     {
         guard self.okToCombine() else {return}
