@@ -27,7 +27,8 @@ class RecodeColumnViewController: HeadingsViewController {
     // MARK: - @IBOutlet
 
     @IBOutlet weak var tableViewExtractedParameters: NSTableView!
-    
+    @IBOutlet weak var labelNumberOfParameterOrGroupingItems: NSTextField!
+
     @IBOutlet weak var segmentedSortAsTextOrNumbers: NSSegmentedControl!
     //@IBOutlet weak var segmentedSortParameterOrValue: NSSegmentedControl!
     
@@ -82,6 +83,7 @@ class RecodeColumnViewController: HeadingsViewController {
         case "tableViewRecodeHeaders":
             return csvdo.numberOfColumnsInData()
         case "tableViewExtractedParameters":
+            self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) parameters"
             return self.arrayExtractedParameters.count
         default:
             return 0
@@ -161,6 +163,7 @@ class RecodeColumnViewController: HeadingsViewController {
         self.arrayExtractedParameters = DataMatrix()
         self.tableViewExtractedParameters?.reloadData()
         self.textFieldColumnRecodedName?.stringValue = ""
+        self.labelNumberOfParameterOrGroupingItems?.stringValue = ""
     }
     
     func extractParametersIntoSetFromColumn()
