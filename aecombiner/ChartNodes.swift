@@ -28,6 +28,18 @@ struct ChartBorders {
     var right = kBorderDefaultSize
 }
 
+struct ChartDataPointsFromNode {
+    var chartDataPoints: ChartDataPointsArray
+    var nodeName:String
+    init(dataPoints: ChartDataPointsArray, name:String)
+    {
+        chartDataPoints = dataPoints
+        nodeName = name
+    }
+}
+
+typealias ChartDataPointsArray = [ChartDataPoint]
+
 struct ChartDataPoint {
     var xValue:Double
     var yValue:Double
@@ -44,7 +56,7 @@ class ChartDataSet {
     var minYvalue:Double = Double(Int.max)
     var maxXvalue:Double = 0.0
     var minXvalue:Double = Double(Int.max)
-    var dataPoints = [ChartDataPoint]()
+    var dataPoints = ChartDataPointsArray()
     var nameOfDataSet:String = kDataSetDefaultName
     
     convenience init(data: DataMatrix, forColumnIndex columnIndex:Int)
@@ -96,7 +108,7 @@ class DataSetNode: SKNode {
     var colour = kColour_Unselected
     var sortDirection = kAscending
     var dataSetName:String = kDataSetDefaultName
-    var selectedDataPoints = [ChartDataPoint]()
+    var selectedDataPoints = ChartDataPointsArray()
     
     convenience init (dataSet:ChartDataSet, nameOfChartDataSet:String?, colour:NSColor)
     {
@@ -108,6 +120,10 @@ class DataSetNode: SKNode {
         self.colour = colour
     }
     
+    func selectedDataPointsWithName()->ChartDataPointsFromNode
+    {
+        return ChartDataPointsFromNode(dataPoints: self.selectedDataPoints, name: self.dataSetName)
+    }
     
     func zoomToThisPoint(zoomFactor zoomFactor:CGFloat, point:CGPoint)
     {

@@ -60,7 +60,19 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.myCSVdataDocument.chartDataSetFromColumnIndex(columnIndex: columnIndex)
     }
     
-    
+    func extractRowsAndMakeNewDocumentsForChartPointsFromNodes(arrayOfChartPoints:[ChartDataPointsFromNode])
+    {
+        for selectedPointsFromNode in arrayOfChartPoints
+        {
+            let indexset = NSMutableIndexSet()
+            for chartdatapoint in selectedPointsFromNode.chartDataPoints
+            {
+                indexset.addIndex(Int(chartdatapoint.xValue))//this is the row
+            }
+            self.myCSVdataDocument.createNewDocumentFromRowsInIndexSet(rows: indexset, docName: selectedPointsFromNode.nodeName)
+        }
+    }
+
     func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (cvsDataData:DataMatrix, nameOfColumn:String)
     {
         return self.myCSVdataDocument.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)

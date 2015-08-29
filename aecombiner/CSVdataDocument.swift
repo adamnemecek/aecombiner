@@ -624,6 +624,24 @@ class CSVdataDocument: NSDocument {
         
     }
     
+    func extractTheseRows(rows rows:NSIndexSet)->CSVdata
+    {
+        var extractedRows = DataMatrix()
+        let numRows = self.csvDataModel.csvData.count
+        for rowIndex in rows
+        {
+            guard rowIndex<numRows else {continue}
+            extractedRows.append(self.csvDataModel.csvData[rowIndex])
+        }
+        return CSVdata(headers: self.csvDataModel.headers, csvdata: extractedRows)
+    }
+    
+    
+    func createNewDocumentFromRowsInIndexSet(rows rows:NSIndexSet, docName:String)
+    {
+        self.createNewDocumentFromCVSDataAndColumnName(cvsData: self.extractTheseRows(rows: rows), name: docName)
+    }
+    
     func createNewDocumentFromExtractedRows(cvsData extractedRows:DataMatrix, headers:HeadersMatrix, name: String?)
     {
         do {

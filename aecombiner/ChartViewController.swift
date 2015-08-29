@@ -42,13 +42,18 @@ class ChartViewController: NSViewController {
     }
     
     @IBAction func exportSelectedTapped(sender: AnyObject) {
-        guard let scene = self.chartView.scene as? ChartScene else {return}
-
-        
-        
+        guard
+                let scene = self.chartView.scene as? ChartScene,
+                let cdvc = self.myCSVdataViewController()
+        else {return}
+        cdvc.extractRowsAndMakeNewDocumentsForChartPointsFromNodes(scene.selectedDataPointsArrayFromNodes())
     }
     
-    
+    func myCSVdataViewController() -> CSVdataViewController?
+    {
+        return (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
+    }
+
     // MARK: - Func
 
     func reSortThisChartDataSet(dataSetName dataSetName:String?) {

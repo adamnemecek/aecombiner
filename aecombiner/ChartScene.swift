@@ -48,6 +48,20 @@ class ChartScene: SKScene {
        }
     }
     
+    func selectedDataPointsArrayFromNodes()->[ChartDataPointsFromNode]
+    {
+        var arrayOfPoints = [ChartDataPointsFromNode]()
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
+            let points = (node as! DataSetNode).selectedDataPointsWithName()
+            if points.chartDataPoints.count > 0
+            {
+                arrayOfPoints.append(points)
+            }
+        }
+        return arrayOfPoints
+    }
+
+    
     func autoLocateAndChartAllDataSets()
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
@@ -115,11 +129,20 @@ class ChartScene: SKScene {
         self.reChartTheseDataSets(dataSetNameOrNil: nameOfChartDataSet)
     }
     
+    
+    func clearSelectedPointsArray()
+    {
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
+            guard let dsNode = (topnode as? DataSetNode) else {return}
+            dsNode.selectedDataPoints = ChartDataPointsArray()
+        }
+    }
+    
     func rebuildSelectedPointsArray(rectNode:SKNode)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
             guard let dsNode = (topnode as? DataSetNode) else {return}
-            dsNode.selectedDataPoints = [ChartDataPoint]()
+            dsNode.selectedDataPoints = ChartDataPointsArray()
             topnode.enumerateChildNodesWithName(kNodeName_DataPoint) { (pointnode, foundpoint) -> Void in
                 let ptNode = (pointnode as! DataPointNode)
                 if rectNode.containsPoint(topnode.convertPoint(ptNode.position, toNode: self))
@@ -168,6 +191,7 @@ class ChartScene: SKScene {
             self.mouseClickDownPoint = theEvent.locationInNode(self)
         case .Crosshair:
             self.removeRectNodes()
+            self.clearSelectedPointsArray()
             let rectNode = SKShapeNode(rect: CGRectZero)
             rectNode.name = kNodeName_SelectionRect
             rectNode.strokeColor = kColour_Selected
