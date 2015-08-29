@@ -14,9 +14,8 @@ class ChartViewController: NSViewController {
     
     // MARK: - @IBOutlet
     @IBOutlet weak var chartView: ChartView!
-    @IBOutlet weak var buttonSortDataSet: NSButton!
-    @IBOutlet weak var buttonTrash: NSButton!
     @IBOutlet weak var segmentCursorState: NSSegmentedControl!
+    @IBOutlet weak var buttonExportSelected: NSButton!
 
     // MARK: - @IBAction
     @IBAction func segmentCursorStateTapped(sender: NSSegmentedControl) {
@@ -42,6 +41,16 @@ class ChartViewController: NSViewController {
         
     }
     
+    @IBAction func exportSelectedTapped(sender: AnyObject) {
+        guard let scene = self.chartView.scene as? ChartScene else {return}
+
+        
+        
+    }
+    
+    
+    // MARK: - Func
+
     func reSortThisChartDataSet(dataSetName dataSetName:String?) {
         guard let scene = self.chartView.scene as? ChartScene else {return}
         scene.reSortThisChartDataSet(dataSetName: dataSetName)

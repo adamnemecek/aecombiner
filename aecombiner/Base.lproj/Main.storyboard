@@ -1027,10 +1027,10 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="yb5-4j-7Lz" customClass="ChartView" customModule="aecombiner" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="30" width="270" height="282"/>
+                                <rect key="frame" x="0.0" y="35" width="270" height="277"/>
                             </customView>
                             <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tro-bF-AhT">
-                                <rect key="frame" x="3" y="-2" width="59" height="25"/>
+                                <rect key="frame" x="3" y="3" width="59" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="3tc-Kf-SoR"/>
                                     <constraint firstAttribute="width" constant="59" id="ibc-9l-GwU"/>
@@ -1048,11 +1048,25 @@
                                     <action selector="segmentChartTypeTapped:" target="3ve-cH-Ehb" id="zMw-YV-9PF"/>
                                 </connections>
                             </segmentedControl>
-                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gyU-vu-SOY">
-                                <rect key="frame" x="130" y="-2" width="137" height="25"/>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="so9-t9-kgX">
+                                <rect key="frame" x="235" y="0.0" width="32" height="32"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="137" id="dca-Ja-GVV"/>
-                                    <constraint firstAttribute="height" constant="22" id="iOT-oj-o1V"/>
+                                    <constraint firstAttribute="width" constant="32" id="VDv-Yy-hvd"/>
+                                    <constraint firstAttribute="height" constant="32" id="zjO-1s-6Ic"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="csv32" imagePosition="only" alignment="center" enabled="NO" imageScaling="proportionallyUpOrDown" inset="2" id="lw7-Re-j9e">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="exportSelectedTapped:" target="3ve-cH-Ehb" id="j8C-Yp-bvj"/>
+                                </connections>
+                            </button>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gyU-vu-SOY">
+                                <rect key="frame" x="92" y="3" width="137" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="0oL-PM-KsA"/>
+                                    <constraint firstAttribute="width" constant="137" id="ZdY-SA-I80"/>
                                 </constraints>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="separated" trackingMode="selectOne" id="A27-V9-4sU">
                                     <font key="font" metaFont="system"/>
@@ -1073,17 +1087,20 @@
                             </segmentedControl>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="yb5-4j-7Lz" firstAttribute="leading" secondItem="XFc-iw-pug" secondAttribute="leading" id="CYJ-uY-WMo"/>
+                            <constraint firstItem="yb5-4j-7Lz" firstAttribute="top" secondItem="XFc-iw-pug" secondAttribute="top" id="GI2-7U-PTS"/>
+                            <constraint firstItem="so9-t9-kgX" firstAttribute="leading" secondItem="gyU-vu-SOY" secondAttribute="trailing" constant="6" id="LEI-lh-h0A"/>
+                            <constraint firstAttribute="bottom" secondItem="so9-t9-kgX" secondAttribute="bottom" id="Yn0-I0-AbW"/>
                             <constraint firstItem="tro-bF-AhT" firstAttribute="leading" secondItem="XFc-iw-pug" secondAttribute="leading" constant="3" id="a7q-BL-Y8F"/>
-                            <constraint firstItem="yb5-4j-7Lz" firstAttribute="top" secondItem="XFc-iw-pug" secondAttribute="top" id="b1d-oN-TGe"/>
-                            <constraint firstAttribute="bottom" secondItem="tro-bF-AhT" secondAttribute="bottom" id="bb5-5v-uvJ"/>
-                            <constraint firstItem="tro-bF-AhT" firstAttribute="top" secondItem="yb5-4j-7Lz" secondAttribute="bottom" constant="8" id="eEA-mr-93l"/>
-                            <constraint firstItem="yb5-4j-7Lz" firstAttribute="leading" secondItem="XFc-iw-pug" secondAttribute="leading" id="gFz-l5-JlJ"/>
-                            <constraint firstAttribute="bottom" secondItem="gyU-vu-SOY" secondAttribute="bottom" id="gon-YY-fov"/>
-                            <constraint firstAttribute="trailing" secondItem="yb5-4j-7Lz" secondAttribute="trailing" id="qvx-0I-KTb"/>
-                            <constraint firstAttribute="trailing" secondItem="gyU-vu-SOY" secondAttribute="trailing" constant="3" id="t4f-Jr-prT"/>
+                            <constraint firstAttribute="bottom" secondItem="tro-bF-AhT" secondAttribute="bottom" constant="5" id="bb5-5v-uvJ"/>
+                            <constraint firstAttribute="trailing" secondItem="yb5-4j-7Lz" secondAttribute="trailing" id="nDV-sx-HUT"/>
+                            <constraint firstAttribute="bottom" secondItem="gyU-vu-SOY" secondAttribute="bottom" constant="5" id="qFy-6f-fP9"/>
+                            <constraint firstItem="so9-t9-kgX" firstAttribute="top" secondItem="yb5-4j-7Lz" secondAttribute="bottom" constant="3" id="uWY-I1-ODX"/>
+                            <constraint firstAttribute="trailing" secondItem="so9-t9-kgX" secondAttribute="trailing" constant="3" id="vhD-Kv-Iuv"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="buttonExportSelected" destination="so9-t9-kgX" id="SXh-En-bXo"/>
                         <outlet property="chartView" destination="yb5-4j-7Lz" id="rT1-Q9-PrX"/>
                         <outlet property="segmentCursorState" destination="gyU-vu-SOY" id="8Ae-lB-9Ug"/>
                     </connections>
@@ -2396,6 +2413,7 @@
         <image name="chart32" width="32" height="32"/>
         <image name="column32" width="32" height="32"/>
         <image name="crosshair" width="16" height="16"/>
+        <image name="csv32" width="32" height="32"/>
         <image name="extract32" width="32" height="32"/>
         <image name="group32" width="32" height="32"/>
         <image name="hand" width="16" height="16"/>
