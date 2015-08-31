@@ -97,7 +97,7 @@ class CSVdataDocument: NSDocument {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
         let csvDataWindowController = storyboard.instantiateControllerWithIdentifier("CSVdataWindowController") as! CSVdataWindowController
         self.addWindowController(csvDataWindowController)
-        (csvDataWindowController.window?.contentViewController as? CSVdataViewController)?.CSVdataDocumentAssociated = self
+        (csvDataWindowController.window?.contentViewController as? CSVdataViewController)?.associatedCSVdataDocument = self
 
     }
     
@@ -192,7 +192,7 @@ class CSVdataDocument: NSDocument {
     }
     
     
-    func combinedColumnForMeansAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (cvsDataData:DataMatrix, nameOfColumn:String)
+    func combinedColumnForMeansAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (csvDataMatrix:DataMatrix, nameOfColumn:String)
     {
         let groupStartValue = self.groupStartValueForString(groupMethod)
         //create a dict with the keys the params we extracted for grouping
@@ -319,7 +319,7 @@ class CSVdataDocument: NSDocument {
     }
     
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (cvsDataData:DataMatrix, nameOfColumn:String)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (csvDataMatrix:DataMatrix, nameOfColumn:String)
     {
         
         //trap others
@@ -477,7 +477,7 @@ class CSVdataDocument: NSDocument {
     {
         //extract the rows and present
         let combinedDataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-        self.createNewDocumentFromExtractedRows(cvsData: combinedDataAndName.cvsDataData, headers: [self.csvDataModel.headers[columnIndexForGrouping]], name: combinedDataAndName.nameOfColumn+" by "+self.headerStringForColumnIndex(columnIndexForGrouping))
+        self.createNewDocumentFromExtractedRows(cvsData: combinedDataAndName.csvDataMatrix, headers: [self.headerStringForColumnIndex(columnIndexForGrouping),combinedDataAndName.nameOfColumn], name: combinedDataAndName.nameOfColumn+" by "+self.headerStringForColumnIndex(columnIndexForGrouping))
     }
     
     
@@ -566,7 +566,7 @@ class CSVdataDocument: NSDocument {
         generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.csvDataModel.csvData, columnIndexToSort: columnIndexToSort, textOrvalue: textOrvalue, direction: direction)
     }
 
-    func dataModelExtractedWithPredicates(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)->DataMatrix
+    func extractedDataMatrixForChartWithPredicates(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)->DataMatrix
     {
         var extractedRows = DataMatrix()
         for rowOfColumns in self.csvDataModel.csvData
@@ -616,7 +616,7 @@ class CSVdataDocument: NSDocument {
     
     func extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)
     {
-        let extractedData = self.dataModelExtractedWithPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+        let extractedData = self.extractedDataMatrixForChartWithPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
         if extractedData.count>0
         {
             self.createNewDocumentFromExtractedRows(cvsData: extractedData, headers: nil, name:nil)

@@ -9,7 +9,13 @@
 import Foundation
 import SpriteKit
 
-
+enum ChartCursorStates:Int {
+    case Hand
+    case Crosshair
+    case ZoomIn
+    case ZoomOut
+    
+}
 
 class ChartView: SKView {
     

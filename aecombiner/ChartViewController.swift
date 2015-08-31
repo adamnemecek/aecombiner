@@ -9,6 +9,13 @@
 import Cocoa
 import SpriteKit
 
+@objc protocol ChartViewControllerDelegate
+{
+    func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes:NSMutableIndexSet, nameOfDataSet:String)
+    
+}
+
+
 class ChartViewController: NSViewController {
 
     
@@ -45,10 +52,10 @@ class ChartViewController: NSViewController {
         self.extractRowsAndMakeNewDocumentsForChartPointsFromNodes()
     }
     
-    
-    func myCSVdataViewController() -> CSVdataViewController?
+
+    func associatedChartViewControllerDelegate() -> ChartViewControllerDelegate?
     {
-        return (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
+        return self.parentViewController as? ChartViewControllerDelegate
     }
 
     // MARK: - Func
@@ -56,7 +63,7 @@ class ChartViewController: NSViewController {
     {
         guard
             let scene = self.chartView.scene as? ChartScene,
-            let parent = self.parentViewController as? ExtractSelectedChartPointsProtocol
+            let assocCVCD = self.associatedChartViewControllerDelegate()
             else {return}
         
         for selectedPointsFromNode in scene.selectedDataPointsArrayFromNodes()
@@ -67,7 +74,7 @@ class ChartViewController: NSViewController {
                 indexset.addIndex(Int(chartdatapoint.xValue))//this is the row
             }
             
-            parent.extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexset, nameOfDataSet: selectedPointsFromNode.nodeName)
+            assocCVCD.extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexset, nameOfDataSet: selectedPointsFromNode.nodeName)
         }
     }
     

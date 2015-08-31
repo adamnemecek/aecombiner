@@ -73,7 +73,7 @@ class RecodeColumnViewController: HeadingsViewController {
     
 
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier, let csvdo = self.myCSVdataViewController() else
+        guard let tvidentifier = tableView.identifier, let csvdo = self.associatedCSVdataViewController() else
         {
             return 0
         }
@@ -168,7 +168,7 @@ class RecodeColumnViewController: HeadingsViewController {
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        guard let csvdo = self.myCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
+        guard let csvdo = self.associatedCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
         
         var subArray = Array(set)
         // replace blanks with string
@@ -193,7 +193,7 @@ class RecodeColumnViewController: HeadingsViewController {
     func doTheRecodeParametersAndAddNewColumn()
     {
         guard self.arrayExtractedParameters.count > 0  else {return}
-        guard   let csvVC = self.myCSVdataViewController(),
+        guard   let csvVC = self.associatedCSVdataViewController(),
                 let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders)
                 else {return}
         //give a name if none

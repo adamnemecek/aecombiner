@@ -12,6 +12,7 @@
 		8E69F3101B67DA4100BDB720 /* CSVdataViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */; };
 		8E69F3111B67DA4100BDB720 /* CSVdataWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */; };
 		8E77E8EC1B8B2DB800A0D46F /* ChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */; };
+		8E911A711B94B2D2004D717A /* ChartDataPointsSets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E911A701B94B2D2004D717A /* ChartDataPointsSets.swift */; settings = {ASSET_TAGS = (); }; };
 		C52666291B664EC6006C251E /* HeadingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52666271B664EC6006C251E /* HeadingsViewController.swift */; };
 		C5557D381B5948BC00C7E94D /* SelectParametersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5557D371B5948BC00C7E94D /* SelectParametersViewController.swift */; };
 		C5772F651B7A09DC00C80DF7 /* GroupParametersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */; };
@@ -42,6 +43,7 @@
 		8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdataViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdataWindowController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewController.swift; sourceTree = "<group>"; };
+		8E911A701B94B2D2004D717A /* ChartDataPointsSets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartDataPointsSets.swift; sourceTree = "<group>"; };
 		C52666271B664EC6006C251E /* HeadingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeadingsViewController.swift; sourceTree = "<group>"; };
 		C5557D371B5948BC00C7E94D /* SelectParametersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectParametersViewController.swift; sourceTree = "<group>"; };
 		C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GroupParametersViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -100,10 +102,11 @@
 			isa = PBXGroup;
 			children = (
 				C5CBBC411B3C0BFA008FB844 /* Main.storyboard */,
-				C587D34E1B7B5E9400FA3854 /* ChartScene.swift */,
+				8E911A701B94B2D2004D717A /* ChartDataPointsSets.swift */,
 				8E0E0E6A1B872EB400BD1C06 /* ChartNodes.swift */,
-				8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */,
+				C587D34E1B7B5E9400FA3854 /* ChartScene.swift */,
 				C5AC44E81B7E3B3400A6B06D /* ChartView.swift */,
+				8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */,
 				C52666271B664EC6006C251E /* HeadingsViewController.swift */,
 				C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */,
 				C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */,
@@ -230,6 +233,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E911A711B94B2D2004D717A /* ChartDataPointsSets.swift in Sources */,
 				C5CBBC3C1B3C0BFA008FB844 /* RecodeColumnViewController.swift in Sources */,
 				C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */,
 				8E69F3111B67DA4100BDB720 /* CSVdataWindowController.swift in Sources */,

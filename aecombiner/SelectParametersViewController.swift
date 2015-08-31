@@ -57,27 +57,27 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     @IBAction func extractRowsBasedOnPredicatesIntoNewFile(sender: NSButton) {
-        guard let cdvc = self.myCSVdataViewController() else {return}
+        guard let cdvc = self.associatedCSVdataViewController() else {return}
         
         cdvc.extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
     }
     
     @IBAction func extractRowsBasedOnPredicatesIntoModelForChart(sender: NSButton) {
-        guard let cdvc = self.myCSVdataViewController() else {return}
+        guard let cdvc = self.associatedCSVdataViewController() else {return}
         
-        self.dataModelExtracted = cdvc.dataModelExtractedWithPredicates(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
+        self.extractedDataMatrixForChart = cdvc.extractedDataMatrixForChartWithPredicates(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
         
-        self.buttonChartExtractedRows.enabled = self.dataModelExtracted.count>0
+        self.buttonChartExtractedRows.enabled = self.extractedDataMatrixForChart.count>0
         self.chartExtractedRows(sender)
     }
     
-    // MARK: - ExtractSelectedChartPointsProtocol
+    // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
-        guard let csvdatadoc = self.myCSVdataViewController()?.CSVdataDocumentAssociated else {return}
-        // we use self.dataModelExtracted
-        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.dataModelExtracted)
-        csvdatadoc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
+        guard let csvdatavc = self.associatedCSVdataViewController() else {return}
+        // we use self.extractedDataMatrixForChart
+        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixForChart)
+        csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
     }
 
     func chartExtractedRows(sender: NSButton) {
@@ -85,7 +85,7 @@ class SelectParametersViewController: RecodeColumnViewController {
             let chartviewC = self.chartViewController,
             let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeadersForChart)
             else {return}
-        let dataset = ChartDataSet(data: self.dataModelExtracted, forColumnIndex: columnIndex)
+        let dataset = ChartDataSet(data: self.extractedDataMatrixForChart, forColumnIndex: columnIndex)
         chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: self.headerStringForColumnIndex(columnIndex))
 
     }
@@ -129,7 +129,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier,let csvdo = self.myCSVdataViewController()  else {return 0}
+        guard let tvidentifier = tableView.identifier,let csvdo = self.associatedCSVdataViewController()  else {return 0}
         switch tvidentifier
         {
         case "tableViewSelectedHeaders":
@@ -240,7 +240,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     func addColumnAndSelectedParameter(arrayIdentifier: String)
     {
-        guard let csvdo = self.myCSVdataViewController() else {return}
+        guard let csvdo = self.associatedCSVdataViewController() else {return}
         let columnIndex = self.tableViewHeaders.selectedRow
         let parameterRows = self.tableViewExtractedParameters.selectedRowIndexes
 

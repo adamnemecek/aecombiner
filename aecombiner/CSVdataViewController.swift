@@ -9,6 +9,13 @@
 import Cocoa
 
 class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+    // MARK: - Var
+    var associatedCSVdataDocument: CSVdataDocument = CSVdataDocument() {
+        didSet {
+            // Update the view, if already loaded.
+            self.columnsClearAndRebuild()
+        }
+    }
 
     
     // MARK: - @IBOutlet
@@ -25,100 +32,102 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
 
     // MARK: - overrides
-    var CSVdataDocumentAssociated: CSVdataDocument = CSVdataDocument() {
-        didSet {
-            // Update the view, if already loaded.
-            self.columnsClearAndRebuild()
-        }
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        //self.CSVdataDocumentAssociated.csvDataModel = CSVdata()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "addColumnWithIdentifier:", name: "addColumnWithIdentifier", object: nil)
+        //NSNotificationCenter.defaultCenter().addObserver(self, selector: "addColumnWithIdentifier:", name: "addColumnWithIdentifier", object: nil)
 
     }
     
     // MARK: - document
     func documentMakeDirty()
     {
-        CSVdataDocument.makeDocumentDirtyForView(self.view)
-
+        //CSVdataDocument.makeDocumentDirtyForView(self.view)
+        self.associatedCSVdataDocument.updateChangeCount(.ChangeDone)
     }
 
     
-    // MARK: - CSV data table
-    /*
-    func CSVdataDocumentAssociated()->CSVdataDocument?
-    {
-        return self.view.window?.windowController?.document as? CSVdataDocument
-    }
-    */
-    func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
-    {
-        return self.CSVdataDocumentAssociated.chartDataSetFromColumnIndex(columnIndex: columnIndex)
-    }
-    
+    // MARK: - extracting CSV data table
 
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (cvsDataData:DataMatrix, nameOfColumn:String)
-    {
-        return self.CSVdataDocumentAssociated.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-    }
-    
-    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String)
-    {
-        self.CSVdataDocumentAssociated.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-        
-    }
-    
-    
-    func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String])
-    {
-        self.CSVdataDocumentAssociated.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup)
-    }
-
-    func headerStringForColumnIndex(columnIndex:Int?) -> String
-    {
-        return self.CSVdataDocumentAssociated.headerStringForColumnIndex(columnIndex)
-    }
-
-    func numberOfColumnsInData()->Int{
-        return self.CSVdataDocumentAssociated.numberOfColumnsInData()
-    }
-
-    func dataModelExtractedWithPredicates(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)->DataMatrix
-    {
-        return self.CSVdataDocumentAssociated.dataModelExtractedWithPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
-    }
-    
     func extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)
     {
-        self.CSVdataDocumentAssociated.extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+        self.associatedCSVdataDocument.extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
         self.tableViewCSVdata.reloadData()
+    }
+    
+    func extractedDataMatrixForChartWithPredicates(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)->DataMatrix
+    {
+        return self.associatedCSVdataDocument.extractedDataMatrixForChartWithPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+    }
+    
+    func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
+    {
+        return self.associatedCSVdataDocument.chartDataSetFromColumnIndex(columnIndex: columnIndex)
+    }
+    
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (csvDataMatrix:DataMatrix, nameOfColumn:String)
+    {
+        return self.associatedCSVdataDocument.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
     
     func setOfParametersFromColumn(fromColumn columnIndex:Int)->Set<String>?
     {
-        return self.CSVdataDocumentAssociated.setOfParametersFromColumn(fromColumn: columnIndex)
+        return self.associatedCSVdataDocument.setOfParametersFromColumn(fromColumn: columnIndex)
+    }
+    
+    func dataMatrixFromAssociatedCSVdataDocument()->DataMatrix?
+    {
+        return self.associatedCSVdataDocument.csvDataModel.csvData
+    }
+    
+    // MARK: -  creating docs
+   func createNewDocumentFromExtractedRows(cvsData extractedRows:DataMatrix, headers:HeadersMatrix?, name: String?)
+    {
+        self.associatedCSVdataDocument.createNewDocumentFromExtractedRows(cvsData: extractedRows, headers: headers, name: name)
+    }
+    
+    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String)
+    {
+        self.associatedCSVdataDocument.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
+        
+    }
+    
+   func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String])
+    {
+        self.associatedCSVdataDocument.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup)
+    }
+    
+
+    // MARK: - Columns
+    
+    func numberOfColumnsInData()->Int{
+        return self.associatedCSVdataDocument.numberOfColumnsInData()
+    }
+    
+    func headerStringForColumnIndex(columnIndex:Int?) -> String
+    {
+        return self.associatedCSVdataDocument.headerStringForColumnIndex(columnIndex)
     }
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
     {
-        return self.CSVdataDocumentAssociated.requestedColumnIndexIsOK(columnIndex)
+        return self.associatedCSVdataDocument.requestedColumnIndexIsOK(columnIndex)
     }
+    
+
 
     
    func columnsClearAndRebuild(){
         
-        self.CSVdataDocumentAssociated.columnsClearAndRebuild(self.tableViewCSVdata)
-        self.labelNumRows.stringValue = String(self.CSVdataDocumentAssociated.numberOfRowsOfData())
+        self.associatedCSVdataDocument.columnsClearAndRebuild(self.tableViewCSVdata)
+        self.labelNumRows.stringValue = String(self.associatedCSVdataDocument.numberOfRowsOfData())
     }
     
     func renameColumnAtIndex(columnIndex: Int, newName:String)
     {
         guard columnIndex >= 0 && !newName.isEmpty else {return}
-        self.CSVdataDocumentAssociated.csvDataModel.headers[columnIndex] = newName
+        self.associatedCSVdataDocument.csvDataModel.headers[columnIndex] = newName
         self.tableViewCSVdata.tableColumns[columnIndex].title = newName
         self.tableViewCSVdata.reloadData()
     }
@@ -126,10 +135,10 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:DataMatrix)
     {
-        self.CSVdataDocumentAssociated.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray)
+        self.associatedCSVdataDocument.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray)
         
         //Safe to add column to table now
-        self.tableViewCSVdata.addTableColumn(self.CSVdataDocumentAssociated.columnWithUniqueIdentifierAndTitle(title))
+        self.tableViewCSVdata.addTableColumn(self.associatedCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
         self.tableViewCSVdata.reloadData()
         self.tableViewCSVdata.scrollColumnToVisible(self.tableViewCSVdata.numberOfColumns-1)
         self.documentMakeDirty()
@@ -137,7 +146,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     func deleteColumnAtIndex(columnIndex: Int)
     {
-        guard self.CSVdataDocumentAssociated.deletedColumnAtIndex(columnIndex) else {return}
+        guard self.associatedCSVdataDocument.deletedColumnAtIndex(columnIndex) else {return}
         
         //Safe to delete column to table now
         self.tableViewCSVdata.removeTableColumn(self.tableViewCSVdata.tableColumns[columnIndex])
@@ -150,7 +159,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     func addColumnWithIdentifier(notification: NSNotification)
     {
         guard let title = notification.object as? String else {return}
-        self.tableViewCSVdata.addTableColumn(self.CSVdataDocumentAssociated.columnWithUniqueIdentifierAndTitle(title))
+        self.tableViewCSVdata.addTableColumn(self.associatedCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
         self.tableViewCSVdata.reloadData()
         self.tableViewCSVdata.scrollColumnToVisible(self.tableViewCSVdata.numberOfColumns-1)
     }
@@ -162,7 +171,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         guard columnIndex >= 0 else {return}
         guard let ascending = tableColumn.sortDescriptorPrototype?.ascending else {return}
         let sortdirection = ascending ? kAscending : kDescending
-        self.CSVdataDocumentAssociated.sortCSVrowsInColumnAsTextOrValues(columnIndexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, direction:sortdirection)
+        self.associatedCSVdataDocument.sortCSVrowsInColumnAsTextOrValues(columnIndexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, direction:sortdirection)
         tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !ascending)
         self.tableViewCSVdata.reloadData()
 
@@ -176,7 +185,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         switch tvidentifier
         {
         case "tableViewCSVdata":
-            return self.CSVdataDocumentAssociated.numberOfRowsOfData()
+            return self.associatedCSVdataDocument.numberOfRowsOfData()
         default:
             return 0
         }
@@ -195,7 +204,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
             // Set the stringValue of the cell's text field to the nameArray value at row
             let colIndex = tableView.columnWithIdentifier((tableColumn?.identifier)!)
-            cellView.textField!.stringValue = self.CSVdataDocumentAssociated.csvDataModel.csvData[row][colIndex]
+            cellView.textField!.stringValue = self.associatedCSVdataDocument.csvDataModel.csvData[row][colIndex]
             
         default:
             break;

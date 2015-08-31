@@ -12,6 +12,8 @@ class GroupParametersViewController: RecodeColumnViewController {
     // MARK: - class vars
     var arrayHeadersSecondarySelected = DataMatrix()
     var arrayButtonsForExtracting = [NSButton]()
+    var headersExtractedDataModelForChart = HeadersMatrix()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,12 +63,39 @@ class GroupParametersViewController: RecodeColumnViewController {
     }
     
     
+    // MARK: - ChartViewControllerDelegate
     
+    override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
+        guard let csvdatavc = self.associatedCSVdataViewController() else {return}
+        // we use self.extractedDataMatrixForChart which is a list of USERIDs usually (paramater to group) and values
+        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixForChart)
+        csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: self.headersExtractedDataModelForChart, name: nameOfDataSet)
+    }
+    
+    
+    func combineColumnsAndChartData()
+    {
+        guard self.okToCombine() else {return}
+        guard
+            let groupMethod = self.popupAddOrMultiply.titleOfSelectedItem,
+            let cvc = self.chartViewController,
+            let dvc = self.associatedCSVdataViewController()
+            else {return}
+        
+        let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
+        let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: self.tableViewHeaders.selectedRow, columnIndexesToGroup: self.tableViewGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
+        self.extractedDataMatrixForChart = dataAndName.csvDataMatrix
+        self.headersExtractedDataModelForChart = [dvc.headerStringForColumnIndex(self.tableViewHeaders.selectedRow),dataAndName.nameOfColumn]
+        let dataset = ChartDataSet(data: dataAndName.csvDataMatrix, forColumnIndex: kCsvDataData_column_value)
+        cvc.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfColumn)
+    }
+    
+
     // MARK: - Columns
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (cvsDataData:DataMatrix, nameOfColumn:String)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (csvDataMatrix:DataMatrix, nameOfColumn:String)
     {
-        guard let csvdo = self.myCSVdataViewController() else {return (DataMatrix(), "")}
+        guard let csvdo = self.associatedCSVdataViewController() else {return (DataMatrix(), "")}
         return csvdo.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
     
@@ -85,7 +114,7 @@ class GroupParametersViewController: RecodeColumnViewController {
     func okToCombine()->Bool
     {
         guard
-            let csvdo = self.myCSVdataViewController()
+            let csvdo = self.associatedCSVdataViewController()
             else {return false}
         guard
             self.tableViewHeaders.selectedRow >= 0 &&
@@ -98,26 +127,11 @@ class GroupParametersViewController: RecodeColumnViewController {
     }
     
     
-    
-    func combineColumnsAndChartData()
-    {
-        guard self.okToCombine() else {return}
-        guard
-            let groupMethod = self.popupAddOrMultiply.titleOfSelectedItem,
-            let cvc = self.chartViewController
-            else {return}
-
-        let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
-        let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: self.tableViewHeaders.selectedRow, columnIndexesToGroup: self.tableViewGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
-        let dataset = ChartDataSet(data: dataAndName.cvsDataData, forColumnIndex: kCsvDataData_column_value)
-        cvc.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfColumn)
-    }
-
     func combineColumnsAndExtractAllStatsToFile()
     {
         guard self.okToCombine() else {return}
         guard
-            let dvc = self.myCSVdataViewController() else {return}
+            let dvc = self.associatedCSVdataViewController() else {return}
         
         let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
         
@@ -130,7 +144,7 @@ class GroupParametersViewController: RecodeColumnViewController {
     {
         guard self.okToCombine() else {return}
         guard
-            let dvc = self.myCSVdataViewController(),
+            let dvc = self.associatedCSVdataViewController(),
             let groupMethod = self.popupAddOrMultiply.titleOfSelectedItem
             else {return}
         
@@ -144,7 +158,7 @@ class GroupParametersViewController: RecodeColumnViewController {
     // MARK: - TableView overrides
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier, let csvdo = self.myCSVdataViewController() else
+        guard let tvidentifier = tableView.identifier, let csvdo = self.associatedCSVdataViewController() else
         {
             return 0
         }

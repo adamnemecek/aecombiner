@@ -9,17 +9,15 @@
 import Foundation
 import SpriteKit
 
-let kBorderDefaultSize:CGFloat = 10.0  // single border
 let kNodeName_DataPoint = "p"
 let kNodeName_DataSet = "s"
 let kNodeName_SelectionRect = "r"
 let kNodeName_ZoomButton = "z"
 
-let kDataSetDefaultName = "Untitled"
-
-
 let kColour_Selected = NSColor.redColor()
 let kColour_Unselected = NSColor.greenColor()
+
+let kBorderDefaultSize:CGFloat = 10.0  // single border
 
 struct ChartBorders {
     var top = kBorderDefaultSize
@@ -27,68 +25,6 @@ struct ChartBorders {
     var left = kBorderDefaultSize
     var right = kBorderDefaultSize
 }
-
-struct ChartDataPointsFromNode {
-    var chartDataPoints: ChartDataPointsArray
-    var nodeName:String
-    init(dataPoints: ChartDataPointsArray, name:String)
-    {
-        chartDataPoints = dataPoints
-        nodeName = name
-    }
-}
-
-typealias ChartDataPointsArray = [ChartDataPoint]
-
-
-@objc protocol ExtractSelectedChartPointsProtocol
-{
-    func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes:NSMutableIndexSet, nameOfDataSet:String)
-    
-}
-
-struct ChartDataPoint {
-    var xValue:Double
-    var yValue:Double
-    
-    init (xvalue:Double, yvalue:Double)
-    {
-        xValue = xvalue // usually the row in the data model
-        yValue = yvalue
-    }
-}
-
-class ChartDataSet {
-    var maxYvalue:Double = 0.0
-    var minYvalue:Double = Double(Int.max)
-    var maxXvalue:Double = 0.0
-    var minXvalue:Double = Double(Int.max)
-    var dataPoints = ChartDataPointsArray()
-    var nameOfDataSet:String = kDataSetDefaultName
-    
-    convenience init(data: DataMatrix, forColumnIndex columnIndex:Int)
-    {
-        self.init()
-        guard columnIndex>0 && columnIndex<data.count else {return}
-        
-        for var r:Int = 0; r<data.count; r++
-        {
-            let row = data[r]
-            guard
-                row[columnIndex].characters.count>0,
-                let Yvalue = Double(row[columnIndex])
-                else {continue}
-            let Xvalue = Double(r)
-            self.minYvalue = fmin(self.minYvalue,Yvalue)
-            self.maxYvalue = fmax(self.maxYvalue,Yvalue)
-            self.minXvalue = fmin(self.minXvalue,Xvalue)
-            self.maxXvalue = fmax(self.maxXvalue,Xvalue)
-            // we store the row number as the X value and when we sort on the Y value we can always map back to the row in the data for extracting other values. !! If we sort the CSVdata we are lost
-            self.dataPoints.append(ChartDataPoint(xvalue: Xvalue, yvalue: Yvalue))
-        }
-    }
-}
-
 
 class DataPointNode: SKSpriteNode {
     var dataPoint:ChartDataPoint = ChartDataPoint(xvalue: 0.0, yvalue: 0.0)

@@ -17,15 +17,6 @@ let kMagnifyDefault:CGFloat = 2.0
 
 
 
-enum ChartCursorStates:Int {
-    case Hand
-    case Crosshair
-    case ZoomIn
-    case ZoomOut
-    
-}
-
-
 class ChartScene: SKScene {
     
     // MARK: - Var
@@ -158,24 +149,6 @@ class ChartScene: SKScene {
         }
     }
     
-    /*
-    override func didChangeSize(oldSize: CGSize) {
-        let deltaX = self.size.width/oldSize.width
-        let deltaY = self.size.height/oldSize.height
-        self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-            guard let dsNode = (node as? DataSetNode) else {return}
-            dsNode.yScale *= deltaY
-            dsNode.xScale *= deltaX
-            dsNode.position.x *= deltaX
-            dsNode.position.y *= deltaY
-            dsNode.enumerateChildNodesWithName(kNodeName_DataPoint, usingBlock: { (pointnode, found) -> Void in
-                guard let pNode = (pointnode as? DataPointNode) else {return}
-                pNode.yScale = 1/dsNode.yScale
-                pNode.xScale = 1/dsNode.xScale
-            })
-        }
-    }
-    */
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here*/
