@@ -125,10 +125,13 @@ class DataSetNode: SKNode {
     
     func calculateScalesForXandY()
     {
-        let sceneSize = self.sceneSize()
-        // yxScale is the range between min and max parameter divided into the Y axis length
-        self.yScale = (sceneSize.yExtent-self.border.top-self.border.bottom)/CGFloat(dataSet.maxYvalue-dataSet.minYvalue)
-        self.xScale = (sceneSize.xExent-self.border.left-self.border.right)/CGFloat(dataSet.maxXvalue-dataSet.minXvalue)
+        // yxScale is the range between min and max parameter divided into the XY axis length
+        // if the range is 0 we get divide by zero and so we make a range of 1 point
+        let yrange:CGFloat = dataSet.maxYvalue == dataSet.minYvalue ? 1.0 : CGFloat(dataSet.maxYvalue-dataSet.minYvalue)
+        let xrange:CGFloat = dataSet.maxXvalue == dataSet.minXvalue ? 1.0 : CGFloat(dataSet.maxXvalue-dataSet.minXvalue)
+        
+        self.yScale = (self.sceneSize().yExtent-self.border.top-self.border.bottom)/yrange
+        self.xScale = (self.sceneSize().xExent-self.border.left-self.border.right)/xrange
     }
 
     func midPointOfDataDistribution()->CGPoint
