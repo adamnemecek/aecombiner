@@ -77,7 +77,7 @@ class CSVdata {
                 {
                     subStrings[substringIndex] = subStrings[substringIndex].stringByReplacingOccurrencesOfString(commaDelimiter, withString: commaReplacement)
                 }
-                arrayOfRowArrays.append(quotationMarksReplacement.join(subStrings).componentsSeparatedByString(commaDelimiter))
+                arrayOfRowArrays.append(subStrings.joinWithSeparator(quotationMarksReplacement).componentsSeparatedByString(commaDelimiter))
             }
             else
             {
@@ -114,12 +114,37 @@ class CSVdata {
         var tempArray = HeadersMatrix()
         for var row = 0; row<self.csvData.count; row++
         {
-            let rowString = delimiter.join(self.csvData[row])
+            let rowString = self.csvData[row].joinWithSeparator(delimiter)
             tempArray.append(rowString)
         }
-        tempArray.insert(delimiter.join(self.headers), atIndex: 0)
-        let fileString = carriageReturn.join(tempArray)
+        tempArray.insert(self.headers.joinWithSeparator(delimiter), atIndex: 0)
+        let fileString = tempArray.joinWithSeparator(carriageReturn)
         return fileString.dataUsingEncoding(NSUTF8StringEncoding)
     }
+
+    func extractTheseRowsFromSelfAsCSVdata(rows rows:NSIndexSet)->CSVdata
+    {
+        var extractedRows = DataMatrix()
+        let numRows = self.csvData.count
+        for rowIndex in rows
+        {
+            guard rowIndex<numRows else {continue}
+            extractedRows.append(self.csvData[rowIndex])
+        }
+        return CSVdata(headers: self.headers, csvdata: extractedRows)
+    }
+        
+    class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:DataMatrix)->DataMatrix
+    {
+        var extractedRows = DataMatrix()
+        let numRows = datamatrix.count
+        for rowIndex in rows
+        {
+            guard rowIndex<numRows else {continue}
+            extractedRows.append(datamatrix[rowIndex])
+        }
+        return extractedRows
+    }
+
 
 }

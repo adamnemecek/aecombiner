@@ -40,6 +40,13 @@ struct ChartDataPointsFromNode {
 
 typealias ChartDataPointsArray = [ChartDataPoint]
 
+
+@objc protocol ExtractSelectedChartPointsProtocol
+{
+    func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes:NSMutableIndexSet, nameOfDataSet:String)
+    
+}
+
 struct ChartDataPoint {
     var xValue:Double
     var yValue:Double

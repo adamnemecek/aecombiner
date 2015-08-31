@@ -97,7 +97,7 @@ class CSVdataDocument: NSDocument {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
         let csvDataWindowController = storyboard.instantiateControllerWithIdentifier("CSVdataWindowController") as! CSVdataWindowController
         self.addWindowController(csvDataWindowController)
-        (csvDataWindowController.window?.contentViewController as? CSVdataViewController)?.myCSVdataDocument = self
+        (csvDataWindowController.window?.contentViewController as? CSVdataViewController)?.CSVdataDocumentAssociated = self
 
     }
     
@@ -295,25 +295,25 @@ class CSVdataDocument: NSDocument {
         switch groupMethod
         {
         case kGroupAddition:
-            nameOfNewColumn = "Sum("+"+".join(namesOfCombinedColumn)+")"
+            nameOfNewColumn = "Sum("+namesOfCombinedColumn.joinWithSeparator("+")+")"
         case kGroupMultiplication:
-            nameOfNewColumn = "Product("+"*".join(namesOfCombinedColumn)+")"
+            nameOfNewColumn = "Product("+namesOfCombinedColumn.joinWithSeparator("*")+")"
         case kGroupCount:
-            nameOfNewColumn = "Count("+"_".join(namesOfCombinedColumn)+")"
+            nameOfNewColumn = "Count("+namesOfCombinedColumn.joinWithSeparator("_")+")"
         case kGroupMean:
-            nameOfNewColumn = "Mean("+"+".join(namesOfCombinedColumn)+")"
+            nameOfNewColumn = "Mean("+namesOfCombinedColumn.joinWithSeparator("+")+")"
         case kGroupGeoMean:
-            nameOfNewColumn = "GeoMean("+"*".join(namesOfCombinedColumn)+")"
+            nameOfNewColumn = "GeoMean("+namesOfCombinedColumn.joinWithSeparator("_")+")"
         case kGroupMin:
-            nameOfNewColumn = "Min("+"_".join(namesOfCombinedColumn)+")"
+            nameOfNewColumn = "Min("+namesOfCombinedColumn.joinWithSeparator("_")+")"
         case kGroupMax:
-            nameOfNewColumn = "Max("+"_".join(namesOfCombinedColumn)+")"
+            nameOfNewColumn = "Max("+namesOfCombinedColumn.joinWithSeparator("_")+")"
         case kGroupRange:
-            nameOfNewColumn = "Range("+"_".join(namesOfCombinedColumn)+")"
+            nameOfNewColumn = "Range("+namesOfCombinedColumn.joinWithSeparator("_")+")"
         case kGroupAllStats:
-            nameOfNewColumn = "_".join(namesOfCombinedColumn)
+            nameOfNewColumn = namesOfCombinedColumn.joinWithSeparator("_")
         default:
-            nameOfNewColumn = "?".join(namesOfCombinedColumn)
+            nameOfNewColumn = namesOfCombinedColumn.joinWithSeparator("?")
         }
         return nameOfNewColumn
     }
@@ -619,36 +619,24 @@ class CSVdataDocument: NSDocument {
         let extractedData = self.dataModelExtractedWithPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
         if extractedData.count>0
         {
-            self.createNewDocumentFromExtractedRows(cvsData: extractedData, headers: self.csvDataModel.headers, name:nil)
+            self.createNewDocumentFromExtractedRows(cvsData: extractedData, headers: nil, name:nil)
         }
         
     }
     
-    func extractTheseRows(rows rows:NSIndexSet)->CSVdata
-    {
-        var extractedRows = DataMatrix()
-        let numRows = self.csvDataModel.csvData.count
-        for rowIndex in rows
-        {
-            guard rowIndex<numRows else {continue}
-            extractedRows.append(self.csvDataModel.csvData[rowIndex])
-        }
-        return CSVdata(headers: self.csvDataModel.headers, csvdata: extractedRows)
-    }
-    
-    
     func createNewDocumentFromRowsInIndexSet(rows rows:NSIndexSet, docName:String)
     {
-        self.createNewDocumentFromCVSDataAndColumnName(cvsData: self.extractTheseRows(rows: rows), name: docName)
+        self.createNewDocumentFromCVSDataAndColumnName(cvsData: self.csvDataModel.extractTheseRowsFromSelfAsCSVdata(rows: rows), name: docName)
     }
     
-    func createNewDocumentFromExtractedRows(cvsData extractedRows:DataMatrix, headers:HeadersMatrix, name: String?)
+    func createNewDocumentFromExtractedRows(cvsData extractedRows:DataMatrix, headers:HeadersMatrix?, name: String?)
     {
         do {
             let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
             if doc is CSVdataDocument
             {
-                (doc as! CSVdataDocument).csvDataModel = CSVdata(headers: headers, csvdata: extractedRows)
+                let headersOrMyHeaders = headers == nil ? self.csvDataModel.headers : headers! // use my headers if none
+                (doc as! CSVdataDocument).csvDataModel = CSVdata(headers: headersOrMyHeaders, csvdata: extractedRows)
                 (doc as! CSVdataDocument).updateChangeCount(.ChangeDone)
             }
             guard let docname = name else {return}

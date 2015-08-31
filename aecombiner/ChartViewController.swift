@@ -42,12 +42,9 @@ class ChartViewController: NSViewController {
     }
     
     @IBAction func exportSelectedTapped(sender: AnyObject) {
-        guard
-                let scene = self.chartView.scene as? ChartScene,
-                let cdvc = self.myCSVdataViewController()
-        else {return}
-        cdvc.extractRowsAndMakeNewDocumentsForChartPointsFromNodes(scene.selectedDataPointsArrayFromNodes())
+        self.extractRowsAndMakeNewDocumentsForChartPointsFromNodes()
     }
+    
     
     func myCSVdataViewController() -> CSVdataViewController?
     {
@@ -55,6 +52,26 @@ class ChartViewController: NSViewController {
     }
 
     // MARK: - Func
+    func extractRowsAndMakeNewDocumentsForChartPointsFromNodes()
+    {
+        guard
+            let scene = self.chartView.scene as? ChartScene,
+            let parent = self.parentViewController as? ExtractSelectedChartPointsProtocol
+            else {return}
+        
+        for selectedPointsFromNode in scene.selectedDataPointsArrayFromNodes()
+        {
+            let indexset = NSMutableIndexSet()
+            for chartdatapoint in selectedPointsFromNode.chartDataPoints
+            {
+                indexset.addIndex(Int(chartdatapoint.xValue))//this is the row
+            }
+            
+            parent.extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexset, nameOfDataSet: selectedPointsFromNode.nodeName)
+        }
+    }
+    
+    
 
     func reSortThisChartDataSet(dataSetName dataSetName:String?) {
         guard let scene = self.chartView.scene as? ChartScene else {return}

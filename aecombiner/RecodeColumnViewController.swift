@@ -13,7 +13,6 @@ class RecodeColumnViewController: HeadingsViewController {
 
     // MARK: - class vars
     var arrayExtractedParameters = DataMatrix()
-    
 
     // MARK: - class constants
     let kParametersArrayParametersIndex = 0

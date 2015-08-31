@@ -35,7 +35,7 @@ class GroupParametersViewController: RecodeColumnViewController {
     @IBOutlet weak var buttonExtractAllStatistics: NSButton!
     @IBOutlet weak var popupAddOrMultiply: NSPopUpButton!
     
-    // MARK: - @IBOutlet
+    // MARK: - @IBAction
 
     @IBAction func combineAndExtractColumnsTapped(sender: NSButton) {
         self.combineCoumnsAndExtract()

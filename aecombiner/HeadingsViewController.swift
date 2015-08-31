@@ -9,8 +9,13 @@
 import Cocoa
 import SpriteKit
 
-class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
-        
+class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate, ExtractSelectedChartPointsProtocol {
+    
+    
+    // MARK: - Var
+    var dataModelExtracted = DataMatrix()//used in some subclasses
+
+    
     // MARK: - @IBOutlet
     
     @IBOutlet weak var tableViewHeaders: NSTableView!
@@ -57,7 +62,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     
     
-    // MARK: - Charts
+    // MARK: - @IBAction Charts
     @IBAction func sortSelectedDataSet(sender: AnyObject) {
         guard
             let chartviewC = self.chartViewController,
@@ -75,6 +80,11 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         chartviewC.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: self.headerStringForColumnIndex(columnIndex))
     }
     
+    // MARK: - ExtractSelectedChartPointsProtocol
+
+    func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
+        // over ridden in subclasses
+    }
     
     // MARK: - Sorting Tables on header click
     func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
