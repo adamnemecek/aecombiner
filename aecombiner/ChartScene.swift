@@ -155,6 +155,41 @@ class ChartScene: SKScene {
 
     }
     
+    func labelNodeForRect(rect rect: CGRect, atPostion:CGPoint, verticalLocation: SKLabelVerticalAlignmentMode)->SKLabelNode
+    {
+        let label = SKLabelNode(text: "")
+        label.fontColor = kColour_Selected
+        label.fontSize = 18
+        switch verticalLocation
+        {
+        case .Top:
+            label.verticalAlignmentMode = rect.size.height > 0 ? .Top : .Bottom
+            label.position = CGPointZero
+            label.text = String(atPostion.y)
+        case .Bottom:
+            label.verticalAlignmentMode = rect.size.height < 0 ? .Top : .Bottom
+            label.position = CGPoint(x: rect.size.width, y: rect.size.height)
+            label.text = String(atPostion.y+rect.size.height)
+       default:
+            label.verticalAlignmentMode = .Top
+        }
+        
+        return label
+    }
+    
+    
+    func rectNodeForRect(rect rect: CGRect, atPostion:CGPoint)->SKShapeNode
+    {
+        let rectNode = SKShapeNode(rect: rect)
+        rectNode.name = kNodeName_SelectionRect
+        rectNode.strokeColor = kColour_Selected
+        rectNode.position = atPostion
+        rectNode.addChild(self.labelNodeForRect(rect: rect, atPostion: atPostion, verticalLocation: .Top))
+        rectNode.addChild(self.labelNodeForRect(rect: rect, atPostion: atPostion, verticalLocation: .Bottom))
+        
+        return rectNode
+    }
+    
     override func mouseDown(theEvent: NSEvent) {
         /* Called when a mouse click occurs */
         
@@ -165,11 +200,7 @@ class ChartScene: SKScene {
         case .Crosshair:
             self.removeRectNodes()
             self.clearSelectedPointsArray()
-            let rectNode = SKShapeNode(rect: CGRectZero)
-            rectNode.name = kNodeName_SelectionRect
-            rectNode.strokeColor = kColour_Selected
-            self.addChild(rectNode)
-            rectNode.position = theEvent.locationInNode(self)
+            self.addChild(rectNodeForRect(rect: CGRectZero,atPostion: theEvent.locationInNode(self)))
 
         case .ZoomIn:
             self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
@@ -207,11 +238,7 @@ class ChartScene: SKScene {
             let startPos = oldNode.position
             let newPos = theEvent.locationInNode(self)
             self.removeRectNodes()
-            let rectNode = SKShapeNode(rect: CGRect(x: 0.0, y: 0.0, width: newPos.x-startPos.x, height: newPos.y-startPos.y))
-            rectNode.name = kNodeName_SelectionRect
-            rectNode.strokeColor = kColour_Selected
-            self.addChild(rectNode)
-            rectNode.position = startPos
+            self.addChild(self.rectNodeForRect(rect: CGRect(x: 0.0, y: 0.0, width: newPos.x-startPos.x, height: newPos.y-startPos.y), atPostion: startPos))
         case .ZoomIn:
             break
         case .ZoomOut:
