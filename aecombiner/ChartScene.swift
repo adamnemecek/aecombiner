@@ -155,26 +155,44 @@ class ChartScene: SKScene {
 
     }
     
-    func labelNodeForRect(rect rect: CGRect, atPostion:CGPoint, verticalLocation: SKLabelVerticalAlignmentMode)->SKLabelNode
+    func labelNodeForRect(rect rect: CGRect, atPostion:CGPoint, verticalLocation: SKLabelVerticalAlignmentMode)->SKSpriteNode
     {
-        let label = SKLabelNode(text: "")
-        label.fontColor = kColour_Selected
-        label.fontSize = 18
+        let upOrDownFactor:CGFloat
+        let labelsText:String
+        let correctedPosition: CGPoint
+        let anchorPoint: CGPoint
         switch verticalLocation
         {
         case .Top:
-            label.verticalAlignmentMode = rect.size.height > 0 ? .Top : .Bottom
-            label.position = CGPointZero
-            label.text = String(atPostion.y)
+            anchorPoint = rect.size.height < 0 ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0.5, y: 1)
+            upOrDownFactor = rect.size.height < 0 ? 0 : -1.0
+            correctedPosition = rect.size.height < 0 ? CGPoint(x: 0.0, y: 5.0) : CGPoint(x: 0.0, y: -5.0)
+            labelsText = String(atPostion.y)
         case .Bottom:
-            label.verticalAlignmentMode = rect.size.height < 0 ? .Top : .Bottom
-            label.position = CGPoint(x: rect.size.width, y: rect.size.height)
-            label.text = String(atPostion.y+rect.size.height)
+            anchorPoint = rect.size.height > 0 ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0.5, y: 1)
+            upOrDownFactor = rect.size.height > 0 ? 0 : -1.0
+            correctedPosition = rect.size.height > 0 ? CGPoint(x: rect.size.width, y: rect.size.height+5.0) : CGPoint(x: rect.size.width, y: rect.size.height-5.0)
+            labelsText = String(atPostion.y+rect.size.height)
        default:
-            label.verticalAlignmentMode = .Top
-        }
+            anchorPoint = rect.size.height < 0 ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0.5, y: 1)
+            correctedPosition = CGPointZero
+            upOrDownFactor = 0
+            labelsText = "??"
+       }
+        let label = SKLabelNode(text: labelsText)
+        label.fontColor = kColour_Selected
+        label.fontSize = 16
+        label.fontName = NSFont.boldSystemFontOfSize(label.fontSize).fontName
+        label.position = CGPoint(x: 0, y: upOrDownFactor * label.frame.size.height)
+      
         
-        return label
+        let backNode = SKSpriteNode(texture: nil, color: self.backgroundColor, size: label.frame.size)
+        backNode.name = kNodeName_LabelContainer
+        backNode.addChild(label)
+        backNode.position = correctedPosition
+        backNode.anchorPoint = anchorPoint
+        
+        return backNode
     }
     
     
@@ -186,6 +204,7 @@ class ChartScene: SKScene {
         rectNode.position = atPostion
         rectNode.addChild(self.labelNodeForRect(rect: rect, atPostion: atPostion, verticalLocation: .Top))
         rectNode.addChild(self.labelNodeForRect(rect: rect, atPostion: atPostion, verticalLocation: .Bottom))
+        rectNode.zPosition = CGFloat(Int.max)
         
         return rectNode
     }

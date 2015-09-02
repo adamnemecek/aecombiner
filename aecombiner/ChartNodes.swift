@@ -13,6 +13,7 @@ let kNodeName_DataPoint = "p"
 let kNodeName_DataSet = "s"
 let kNodeName_SelectionRect = "r"
 let kNodeName_ZoomButton = "z"
+let kNodeName_LabelContainer = "l"
 
 let kColour_Selected = NSColor.redColor()
 let kColour_Unselected = NSColor.greenColor()
