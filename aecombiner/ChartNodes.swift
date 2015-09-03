@@ -18,7 +18,7 @@ let kNodeName_LabelContainer = "l"
 let kColour_Selected = NSColor.redColor()
 let kColour_Unselected = NSColor.greenColor()
 
-let kBorderDefaultSize:CGFloat = 10.0  // single border
+let kBorderDefaultSize:CGFloat = 30.0  // single border
 
 struct ChartBorders {
     var top = kBorderDefaultSize

@@ -155,6 +155,21 @@ class ChartScene: SKScene {
 
     }
     
+    
+    typealias PointString = (xText:String, yText:String)
+    func textForLabelForPointWithinNode(point point:CGPoint)-> PointString
+    {
+        var correctedString:PointString = ("","")
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
+            guard let dsNode = (topnode as? DataSetNode) where dsNode.calculateAccumulatedFrame().contains(point)
+                else {return}
+            found.memory = true
+            let convPoint = dsNode.convertPoint(point, fromNode: dsNode.scene!)
+            correctedString = (String(format: "%.02f", convPoint.x),String(format: "%.02f", convPoint.y))
+        }
+        return correctedString
+    }
+    
     func labelNodeForRect(rect rect: CGRect, atPostion:CGPoint, verticalLocation: SKLabelVerticalAlignmentMode)->SKSpriteNode
     {
         let upOrDownFactor:CGFloat
@@ -167,12 +182,12 @@ class ChartScene: SKScene {
             anchorPoint = rect.size.height < 0 ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0.5, y: 1)
             upOrDownFactor = rect.size.height < 0 ? 0 : -1.0
             correctedPosition = rect.size.height < 0 ? CGPoint(x: 0.0, y: 5.0) : CGPoint(x: 0.0, y: -5.0)
-            labelsText = String(atPostion.y)
+            labelsText = self.textForLabelForPointWithinNode(point: CGPoint(x: atPostion.x, y: atPostion.y)).yText//String(atPostion.y)
         case .Bottom:
             anchorPoint = rect.size.height > 0 ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0.5, y: 1)
             upOrDownFactor = rect.size.height > 0 ? 0 : -1.0
             correctedPosition = rect.size.height > 0 ? CGPoint(x: rect.size.width, y: rect.size.height+5.0) : CGPoint(x: rect.size.width, y: rect.size.height-5.0)
-            labelsText = String(atPostion.y+rect.size.height)
+            labelsText = self.textForLabelForPointWithinNode(point: CGPoint(x: atPostion.x, y: atPostion.y+rect.size.height)).yText// String(atPostion.y+rect.size.height)
        default:
             anchorPoint = rect.size.height < 0 ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0.5, y: 1)
             correctedPosition = CGPointZero
