@@ -18,7 +18,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     // MARK: - @IBOutlet
     
-    @IBOutlet weak var tableViewHeaders: NSTableView!
+    @IBOutlet weak var tvHeaders: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     
     weak var chartViewController: ChartViewController!
@@ -40,22 +40,22 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
             alert.runModal()
             return
         }
-        self.associatedCSVdataViewController()?.renameColumnAtIndex(self.tableViewHeaders.selectedRow, newName: self.textFieldColumnRecodedName.stringValue)
+        self.associatedCSVdataViewController()?.renameColumnAtIndex(self.tvHeaders.selectedRow, newName: self.textFieldColumnRecodedName.stringValue)
     }
     
     @IBAction func deleteHeading(sender: AnyObject) {
         
         let alert = NSAlert()
         alert.alertStyle = .CriticalAlertStyle
-        alert.messageText = "Are you sure you want to delete '"+self.titleForSelectedColumnInHeaders(self.tableViewHeaders)+"'?\nIt cannot be undone."
+        alert.messageText = "Are you sure you want to delete '"+self.titleForSelectedColumnInHeaders(self.tvHeaders)+"'?\nIt cannot be undone."
         alert.addButtonWithTitle("Delete")
         alert.addButtonWithTitle("Cancel")
         
         alert.beginSheetModalForWindow(self.view.window!) { (response) -> Void in
             if response == NSAlertFirstButtonReturn
             {
-                self.associatedCSVdataViewController()?.deleteColumnAtIndex(self.tableViewHeaders.selectedRow)
-                self.tableViewHeaders.reloadData()
+                self.associatedCSVdataViewController()?.deleteColumnAtIndex(self.tvHeaders.selectedRow)
+                self.tvHeaders.reloadData()
             }
         }
     }
@@ -66,7 +66,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBAction func sortSelectedDataSet(sender: AnyObject) {
         guard
             let chartviewC = self.chartViewController,
-            let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders)
+            let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeaders)
             else {return}
         chartviewC.reSortThisChartDataSet(dataSetName: self.headerStringForColumnIndex(columnIndex))
     }
@@ -74,7 +74,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     @IBAction func chartSelectedDataSet(sender: NSButton) {
         guard
                 let chartviewC = self.chartViewController,
-                let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders),
+                let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeaders),
                 let dataSet = self.associatedCSVdataViewController()?.chartDataSetFromColumnIndex(columnIndex: columnIndex)
             else {return}
         chartviewC.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: self.headerStringForColumnIndex(columnIndex))
@@ -140,7 +140,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     override func viewDidAppear() {
         super.viewDidAppear()
         // Do view setup here.
-        self.tableViewHeaders?.reloadData()
+        self.tvHeaders?.reloadData()
     }
 
     
@@ -176,7 +176,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         
         switch tvidentifier
         {
-        case "tableViewHeaders":
+        case "tvHeaders":
             return csvdo.numberOfColumnsInData()
         default:
             return 0
@@ -200,7 +200,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         }
         switch tvidentifier
         {
-        case "tableViewHeaders":
+        case "tvHeaders":
             cellView = self.cellForHeadersTable(tableView: tableView, row: row)
             
         default:
@@ -220,7 +220,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
 
         switch tableViewID
         {
-            case "tableViewHeaders":
+            case "tvHeaders":
             self.enableButtons(enabled: selected.count>0)
             default:
                 break

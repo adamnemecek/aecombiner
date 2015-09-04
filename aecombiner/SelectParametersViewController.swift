@@ -25,14 +25,14 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     // MARK: - @IBOutlet
     
-    //@IBOutlet weak var tableViewCSVdata: NSTableView!
-    @IBOutlet weak var tableViewANDparameters: NSTableView!
-    @IBOutlet weak var buttonRemoveANDParameter: NSButton!
-    @IBOutlet weak var tableViewORparameters: NSTableView!
+    //@IBOutlet weak var tvCSVdata: NSTableView!
+    @IBOutlet weak var tvSelectHeaders: NSTableView!
+    @IBOutlet weak var tvHeadersForChart: NSTableView!
+    @IBOutlet weak var tvANDparameters: NSTableView!
+    @IBOutlet weak var tvORparameters: NSTableView!
     @IBOutlet weak var buttonRemoveORParameter: NSButton!
-    
+    @IBOutlet weak var buttonRemoveANDParameter: NSButton!
     @IBOutlet weak var buttonChartExtractedRows: NSButton!
-    @IBOutlet weak var tableViewHeadersForChart: NSTableView!
 
     /* MARK: - Represented Object
     override func updateRepresentedObjectToCSVData(csvdata:CSVdata)
@@ -83,7 +83,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     func chartExtractedRows(sender: NSButton) {
         guard
             let chartviewC = self.chartViewController,
-            let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeadersForChart)
+            let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeadersForChart)
             else {return}
         let dataset = ChartDataSet(data: self.extractedDataMatrixForChart, forColumnIndex: columnIndex)
         chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: self.headerStringForColumnIndex(columnIndex))
@@ -100,9 +100,10 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     override func viewDidAppear() {
         super.viewDidAppear()
-        self.tableViewHeaders?.reloadData()
-        self.tableViewExtractedParameters?.reloadData()
-        self.tableViewHeadersForChart?.reloadData()
+        self.tvHeaders?.reloadData()
+        self.tvExtractedParameters?.reloadData()
+        self.tvHeadersForChart?.reloadData()
+        self.tvSelectHeaders?.reloadData()
     }
     
     override func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
@@ -110,13 +111,13 @@ class SelectParametersViewController: RecodeColumnViewController {
         guard let tvidentifier = tableView.identifier else {return}
         switch tvidentifier
         {
-        case "tableViewSelectedHeaders":
+        case "tvSelectedHeaders":
             break
-        case "tableViewSelectedExtractedParameters":
+        case "tvSelectedExtractedParameters":
             super.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn)
-        case "tableViewANDparameters":
+        case "tvANDparameters":
             break
-        case "tableViewORparameters":
+        case "tvORparameters":
             break
         default:
             break
@@ -132,16 +133,18 @@ class SelectParametersViewController: RecodeColumnViewController {
         guard let tvidentifier = tableView.identifier,let csvdo = self.associatedCSVdataViewController()  else {return 0}
         switch tvidentifier
         {
-        case "tableViewSelectedHeaders":
+        case "tvSelectedHeaders":
             return csvdo.numberOfColumnsInData()
-        case "tableViewHeadersForChart":
+        case "tvHeadersForChart":
             return csvdo.numberOfColumnsInData()
-        case "tableViewSelectedExtractedParameters":
+        case "tvSelectedExtractedParameters":
             return self.arrayExtractedParameters.count
-        case "tableViewANDparameters":
+        case "tvANDparameters":
             return self.arrayANDpredicates.count
-        case "tableViewORparameters":
+        case "tvORparameters":
             return self.arrayORpredicates.count
+        case "tvSelectHeaders":
+            return 8
             
         default:
             return 0
@@ -157,11 +160,11 @@ class SelectParametersViewController: RecodeColumnViewController {
         }
         switch tvidentifier
         {
-        case "tableViewHeadersForChart":
+        case "tvHeadersForChart":
             cellView = self.cellForHeadersTable(tableView: tableView, row: row)
-        case "tableViewSelectedHeaders":
+        case "tvSelectedHeaders":
             cellView = self.cellForHeadersTable(tableView: tableView, row: row)
-        case "tableViewSelectedExtractedParameters":
+        case "tvSelectedExtractedParameters":
             switch tableColumn!.identifier
             {
             case "parameter":
@@ -174,8 +177,8 @@ class SelectParametersViewController: RecodeColumnViewController {
             default:
                 break
             }
-        case "tableViewANDparameters", "tableViewORparameters":
-            let col_parameter = tvidentifier == "tableViewANDparameters" ? self.arrayANDpredicates[row] : self.arrayORpredicates[row]
+        case "tvANDparameters", "tvORparameters":
+            let col_parameter = tvidentifier == "tvANDparameters" ? self.arrayANDpredicates[row] : self.arrayORpredicates[row]
             let columnNumber = Int(col_parameter[kSelectedParametersArrayColumnIndex])
             
             switch tableColumn!.identifier
@@ -189,7 +192,16 @@ class SelectParametersViewController: RecodeColumnViewController {
             default:
                 break
             }
-            
+        case "tvSelectHeaders":
+            switch row
+            {
+            case 0:
+                cellView = tableView.makeViewWithIdentifier("cellPopup", owner: self) as! NSTableCellView
+
+            default:
+                cellView = tableView.makeViewWithIdentifier("cellText", owner: self) as! NSTableCellView
+
+            }
         default:
             break;
         }
@@ -204,14 +216,14 @@ class SelectParametersViewController: RecodeColumnViewController {
         let tableView = notification.object as! NSTableView
         switch tableView.identifier!
         {
-        case "tableViewSelectedHeaders":
+        case "tvSelectedHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-        case "tableViewANDparameters":
+        case "tvANDparameters":
             self.buttonRemoveANDParameter.enabled = tableView.selectedRow != -1
-        case "tableViewORparameters":
+        case "tvORparameters":
             self.buttonRemoveORParameter.enabled = tableView.selectedRow != -1
-        case "tableViewHeadersForChart":
+        case "tvHeadersForChart":
             break
         default:
             break;
@@ -227,10 +239,10 @@ class SelectParametersViewController: RecodeColumnViewController {
         switch arrayIdentifier
         {
         case "removeANDarray", "addANDarray", "clearANDarray":
-            self.tableViewANDparameters.reloadData()
+            self.tvANDparameters.reloadData()
             self.buttonRemoveANDParameter.enabled = false
         case "removeORarray", "addORarray", "clearORarray":
-            self.tableViewORparameters.reloadData()
+            self.tvORparameters.reloadData()
             self.buttonRemoveORParameter.enabled = false
         default:
             break
@@ -241,8 +253,8 @@ class SelectParametersViewController: RecodeColumnViewController {
     func addColumnAndSelectedParameter(arrayIdentifier: String)
     {
         guard let csvdo = self.associatedCSVdataViewController() else {return}
-        let columnIndex = self.tableViewHeaders.selectedRow
-        let parameterRows = self.tableViewExtractedParameters.selectedRowIndexes
+        let columnIndex = self.tvHeaders.selectedRow
+        let parameterRows = self.tvExtractedParameters.selectedRowIndexes
 
         guard
             columnIndex >= 0 &&
@@ -271,7 +283,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     func removeColumnAndSelectedParameter(arrayIdentifier: String)
     {
-        let selectedRowInTable = arrayIdentifier == "removeANDarray" ? self.tableViewANDparameters.selectedRow : self.tableViewORparameters.selectedRow
+        let selectedRowInTable = arrayIdentifier == "removeANDarray" ? self.tvANDparameters.selectedRow : self.tvORparameters.selectedRow
         guard selectedRowInTable >= 0
             else
         {

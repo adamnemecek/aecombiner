@@ -538,18 +538,18 @@ class CSVdataDocument: NSDocument {
         return col
     }
 
-    func columnsClearAndRebuild(tableViewCSVdata:NSTableView){
+    func columnsClearAndRebuild(tvCSVdata:NSTableView){
         
-        while tableViewCSVdata.tableColumns.count > 0
+        while tvCSVdata.tableColumns.count > 0
         {
-            tableViewCSVdata.removeTableColumn(tableViewCSVdata.tableColumns.last!)
+            tvCSVdata.removeTableColumn(tvCSVdata.tableColumns.last!)
         }
         for var c = 0; c < numberOfColumnsInData(); c++
         {
-            tableViewCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(self.csvDataModel.headers[c]))
+            tvCSVdata.addTableColumn(self.columnWithUniqueIdentifierAndTitle(self.csvDataModel.headers[c]))
             
         }
-        tableViewCSVdata.reloadData()
+        tvCSVdata.reloadData()
     }
 
     func updateCSVTableView()

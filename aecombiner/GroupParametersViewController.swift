@@ -23,7 +23,7 @@ class GroupParametersViewController: RecodeColumnViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         // Do view setup here.
-        self.tableViewGroupHeadersSecondary?.reloadData()
+        self.tvGroupHeadersSecondary?.reloadData()
         self.arrayButtonsForExtracting.append(self.buttonCombineColumns)
         self.arrayButtonsForExtracting.append(self.buttonExtractAllStatistics)
         self.arrayButtonsForExtracting.append(self.buttonModel)
@@ -31,7 +31,7 @@ class GroupParametersViewController: RecodeColumnViewController {
     }
 
     // MARK: - @IBOutlet
-    @IBOutlet weak var tableViewGroupHeadersSecondary: NSTableView!
+    @IBOutlet weak var tvGroupHeadersSecondary: NSTableView!
     
     @IBOutlet weak var buttonCombineColumns: NSButton!
     @IBOutlet weak var buttonExtractAllStatistics: NSButton!
@@ -55,7 +55,7 @@ class GroupParametersViewController: RecodeColumnViewController {
     // MARK: - Buttons
     func updateButtonsForExtracting()
     {
-        let enabled = self.tableViewGroupHeadersSecondary.selectedRowIndexes.count>0
+        let enabled = self.tvGroupHeadersSecondary.selectedRowIndexes.count>0
         for button in self.arrayButtonsForExtracting
         {
             button.enabled = enabled
@@ -83,9 +83,9 @@ class GroupParametersViewController: RecodeColumnViewController {
             else {return}
         
         let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
-        let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: self.tableViewHeaders.selectedRow, columnIndexesToGroup: self.tableViewGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
+        let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: self.tvHeaders.selectedRow, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
         self.extractedDataMatrixForChart = dataAndName.csvDataMatrix
-        self.headersExtractedDataModelForChart = [dvc.headerStringForColumnIndex(self.tableViewHeaders.selectedRow),dataAndName.nameOfColumn]
+        self.headersExtractedDataModelForChart = [dvc.headerStringForColumnIndex(self.tvHeaders.selectedRow),dataAndName.nameOfColumn]
         let dataset = ChartDataSet(data: dataAndName.csvDataMatrix, forColumnIndex: kCsvDataData_column_value)
         cvc.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfColumn)
     }
@@ -117,9 +117,9 @@ class GroupParametersViewController: RecodeColumnViewController {
             let csvdo = self.associatedCSVdataViewController()
             else {return false}
         guard
-            self.tableViewHeaders.selectedRow >= 0 &&
-            self.tableViewHeaders.selectedRow < csvdo.numberOfColumnsInData() &&
-            self.tableViewGroupHeadersSecondary.selectedRowIndexes.count > 0 &&
+            self.tvHeaders.selectedRow >= 0 &&
+            self.tvHeaders.selectedRow < csvdo.numberOfColumnsInData() &&
+            self.tvGroupHeadersSecondary.selectedRowIndexes.count > 0 &&
             self.arrayExtractedParameters.count > 0
             else {return false}
         
@@ -136,7 +136,7 @@ class GroupParametersViewController: RecodeColumnViewController {
         let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
         
         
-        dvc.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.tableViewHeaders.selectedRow, columnIndexesToGroup: self.tableViewGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup)
+        dvc.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.tvHeaders.selectedRow, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup)
         
     }
 
@@ -151,7 +151,7 @@ class GroupParametersViewController: RecodeColumnViewController {
         let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
         
         
-        dvc.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: self.tableViewHeaders.selectedRow, columnIndexesToGroup: self.tableViewGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
+        dvc.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: self.tvHeaders.selectedRow, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
         
     }
     
@@ -164,9 +164,9 @@ class GroupParametersViewController: RecodeColumnViewController {
         }
         switch tvidentifier
         {
-        case "tableViewGroupHeaders", "tableViewGroupHeadersSecondary":
+        case "tvGroupHeaders", "tvGroupHeadersSecondary":
             return csvdo.numberOfColumnsInData()
-        case "tableViewGroupParameters":
+        case "tvGroupParameters":
             self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) in group"
             return self.arrayExtractedParameters.count
         default:
@@ -183,9 +183,9 @@ class GroupParametersViewController: RecodeColumnViewController {
         }
         switch tvidentifier
         {
-        case "tableViewGroupHeaders", "tableViewGroupHeadersSecondary":
+        case "tvGroupHeaders", "tvGroupHeadersSecondary":
             cellView = self.cellForHeadersTable(tableView: tableView, row: row)
-        case "tableViewGroupParameters":
+        case "tvGroupParameters":
             switch tableColumn!.identifier
             {
             case "parameter":
@@ -212,11 +212,11 @@ class GroupParametersViewController: RecodeColumnViewController {
         let tableView = notification.object as! NSTableView
         switch tableView.identifier!
         {
-        case "tableViewGroupHeaders":
+        case "tvGroupHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-            self.tableViewGroupHeadersSecondary.reloadData()
-        case "tableViewGroupHeadersSecondary":
+            self.tvGroupHeadersSecondary.reloadData()
+        case "tvGroupHeadersSecondary":
             break
         default:
             break;

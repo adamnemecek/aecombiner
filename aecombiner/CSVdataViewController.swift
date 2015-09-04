@@ -19,7 +19,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     
     // MARK: - @IBOutlet
-    @IBOutlet weak var tableViewCSVdata: NSTableView!
+    @IBOutlet weak var tvCSVdata: NSTableView!
     @IBOutlet weak var segmentSortTextOrValue: NSSegmentedControl!
     @IBOutlet weak var labelNumRows: NSTextField!
 
@@ -53,7 +53,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     func extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)
     {
         self.associatedCSVdataDocument.extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
-        self.tableViewCSVdata.reloadData()
+        self.tvCSVdata.reloadData()
     }
     
     func extractedDataMatrixForChartWithPredicates(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)->DataMatrix
@@ -120,7 +120,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
    func columnsClearAndRebuild(){
         
-        self.associatedCSVdataDocument.columnsClearAndRebuild(self.tableViewCSVdata)
+        self.associatedCSVdataDocument.columnsClearAndRebuild(self.tvCSVdata)
         self.labelNumRows.stringValue = String(self.associatedCSVdataDocument.numberOfRowsOfData())
     }
     
@@ -128,8 +128,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     {
         guard columnIndex >= 0 && !newName.isEmpty else {return}
         self.associatedCSVdataDocument.csvDataModel.headers[columnIndex] = newName
-        self.tableViewCSVdata.tableColumns[columnIndex].title = newName
-        self.tableViewCSVdata.reloadData()
+        self.tvCSVdata.tableColumns[columnIndex].title = newName
+        self.tvCSVdata.reloadData()
     }
 
     
@@ -138,9 +138,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.associatedCSVdataDocument.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray)
         
         //Safe to add column to table now
-        self.tableViewCSVdata.addTableColumn(self.associatedCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
-        self.tableViewCSVdata.reloadData()
-        self.tableViewCSVdata.scrollColumnToVisible(self.tableViewCSVdata.numberOfColumns-1)
+        self.tvCSVdata.addTableColumn(self.associatedCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
+        self.tvCSVdata.reloadData()
+        self.tvCSVdata.scrollColumnToVisible(self.tvCSVdata.numberOfColumns-1)
         self.documentMakeDirty()
     }
     
@@ -149,8 +149,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         guard self.associatedCSVdataDocument.deletedColumnAtIndex(columnIndex) else {return}
         
         //Safe to delete column to table now
-        self.tableViewCSVdata.removeTableColumn(self.tableViewCSVdata.tableColumns[columnIndex])
-        self.tableViewCSVdata.reloadData()
+        self.tvCSVdata.removeTableColumn(self.tvCSVdata.tableColumns[columnIndex])
+        self.tvCSVdata.reloadData()
         self.documentMakeDirty()
 
     }
@@ -159,9 +159,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     func addColumnWithIdentifier(notification: NSNotification)
     {
         guard let title = notification.object as? String else {return}
-        self.tableViewCSVdata.addTableColumn(self.associatedCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
-        self.tableViewCSVdata.reloadData()
-        self.tableViewCSVdata.scrollColumnToVisible(self.tableViewCSVdata.numberOfColumns-1)
+        self.tvCSVdata.addTableColumn(self.associatedCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
+        self.tvCSVdata.reloadData()
+        self.tvCSVdata.scrollColumnToVisible(self.tvCSVdata.numberOfColumns-1)
     }
 
 
@@ -173,7 +173,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         let sortdirection = ascending ? kAscending : kDescending
         self.associatedCSVdataDocument.sortCSVrowsInColumnAsTextOrValues(columnIndexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, direction:sortdirection)
         tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !ascending)
-        self.tableViewCSVdata.reloadData()
+        self.tvCSVdata.reloadData()
 
     }
     
@@ -184,7 +184,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         }
         switch tvidentifier
         {
-        case "tableViewCSVdata":
+        case "tvCSVdata":
             return self.associatedCSVdataDocument.numberOfRowsOfData()
         default:
             return 0
@@ -200,7 +200,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         }
         switch tvidentifier
         {
-        case "tableViewCSVdata":
+        case "tvCSVdata":
             cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
             // Set the stringValue of the cell's text field to the nameArray value at row
             let colIndex = tableView.columnWithIdentifier((tableColumn?.identifier)!)
