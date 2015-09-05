@@ -25,8 +25,8 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     // MARK: - @IBOutlet
     
-    //@IBOutlet weak var tvCSVdata: NSTableView!
-    @IBOutlet weak var tvSelectHeaders: NSTableView!
+    @IBOutlet weak var tvMEDRA: NSTableView!
+    //@IBOutlet weak var tvSelectHeaders: NSTableView!
     @IBOutlet weak var tvHeadersForChart: NSTableView!
     @IBOutlet weak var tvANDparameters: NSTableView!
     @IBOutlet weak var tvORparameters: NSTableView!
@@ -103,7 +103,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         self.tvHeaders?.reloadData()
         self.tvExtractedParameters?.reloadData()
         self.tvHeadersForChart?.reloadData()
-        self.tvSelectHeaders?.reloadData()
+        self.tvMEDRA?.reloadData()
     }
     
     override func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
@@ -143,7 +143,7 @@ class SelectParametersViewController: RecodeColumnViewController {
             return self.arrayANDpredicates.count
         case "tvORparameters":
             return self.arrayORpredicates.count
-        case "tvSelectHeaders":
+        case "tvMEDRA":
             return 8
             
         default:
@@ -192,16 +192,9 @@ class SelectParametersViewController: RecodeColumnViewController {
             default:
                 break
             }
-        case "tvSelectHeaders":
-            switch row
-            {
-            case 0:
-                cellView = tableView.makeViewWithIdentifier("cellPopup", owner: self) as! NSTableCellView
-
-            default:
-                cellView = tableView.makeViewWithIdentifier("cellText", owner: self) as! NSTableCellView
-
-            }
+        case "tvMEDRA":
+            cellView = tableView.makeViewWithIdentifier("cellMEDRA", owner: self) as! NSTableCellView
+            cellView.textField!.stringValue = String(row)
         default:
             break;
         }
