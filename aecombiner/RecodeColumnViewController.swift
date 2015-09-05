@@ -25,7 +25,7 @@ class RecodeColumnViewController: HeadingsViewController {
     
     // MARK: - @IBOutlet
 
-    @IBOutlet weak var tableViewExtractedParameters: NSTableView!
+    @IBOutlet weak var tvExtractedParameters: NSTableView!
     @IBOutlet weak var labelNumberOfParameterOrGroupingItems: NSTextField!
 
     @IBOutlet weak var segmentedSortAsTextOrNumbers: NSSegmentedControl!
@@ -45,7 +45,7 @@ class RecodeColumnViewController: HeadingsViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.tableViewExtractedParameters?.reloadData()
+        self.tvExtractedParameters?.reloadData()
 
 
     }
@@ -79,9 +79,9 @@ class RecodeColumnViewController: HeadingsViewController {
         }
         switch tvidentifier
         {
-        case "tableViewRecodeHeaders":
+        case "tvRecodeHeaders":
             return csvdo.numberOfColumnsInData()
-        case "tableViewExtractedParameters":
+        case "tvExtractedParameters":
             self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) parameters"
             return self.arrayExtractedParameters.count
         default:
@@ -98,9 +98,9 @@ class RecodeColumnViewController: HeadingsViewController {
         }
            switch tvidentifier
             {
-            case "tableViewRecodeHeaders":
+            case "tvRecodeHeaders":
                 cellView = self.cellForHeadersTable(tableView: tableView, row: row)
-            case "tableViewExtractedParameters":
+            case "tvExtractedParameters":
                 switch tableColumn!.identifier
                 {
                 case "parameter":
@@ -128,10 +128,10 @@ class RecodeColumnViewController: HeadingsViewController {
         let tableView = notification.object as! NSTableView
         switch tableView.identifier!
         {
-        case "tableViewRecodeHeaders":
+        case "tvRecodeHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-            self.textFieldColumnRecodedName?.stringValue = self.headerStringForColumnIndex(self.tableViewHeaders.selectedRow)
+            self.textFieldColumnRecodedName?.stringValue = self.headerStringForColumnIndex(self.tvHeaders.selectedRow)
       default:
             break;
         }
@@ -154,13 +154,13 @@ class RecodeColumnViewController: HeadingsViewController {
         let sortdirection = ascending ? kAscending : kDescending
         generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.arrayExtractedParameters, columnIndexToSort: columnIndex, textOrvalue: self.segmentedSortAsTextOrNumbers.selectedSegment, direction: sortdirection)
         tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !ascending)
-        self.tableViewExtractedParameters.reloadData()
+        self.tvExtractedParameters.reloadData()
     }
     
     func resetExtractedParameters()
     {
         self.arrayExtractedParameters = DataMatrix()
-        self.tableViewExtractedParameters?.reloadData()
+        self.tvExtractedParameters?.reloadData()
         self.textFieldColumnRecodedName?.stringValue = ""
         self.labelNumberOfParameterOrGroupingItems?.stringValue = ""
     }
@@ -168,7 +168,7 @@ class RecodeColumnViewController: HeadingsViewController {
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        guard let csvdo = self.associatedCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
+        guard let csvdo = self.associatedCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeaders), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
         
         var subArray = Array(set)
         // replace blanks with string
@@ -186,7 +186,7 @@ class RecodeColumnViewController: HeadingsViewController {
             self.arrayExtractedParameters.append([subArray[row],""])
         }
         
-        self.tableViewExtractedParameters.reloadData()
+        self.tvExtractedParameters.reloadData()
         
     }
     
@@ -194,7 +194,7 @@ class RecodeColumnViewController: HeadingsViewController {
     {
         guard self.arrayExtractedParameters.count > 0  else {return}
         guard   let csvVC = self.associatedCSVdataViewController(),
-                let columnIndex = self.selectedColumnFromHeadersTableView(self.tableViewHeaders)
+                let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeaders)
                 else {return}
         //give a name if none
         let colTitle = self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(columnIndex) : self.textFieldColumnRecodedName!.stringValue
@@ -203,7 +203,7 @@ class RecodeColumnViewController: HeadingsViewController {
         csvVC.addRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters)
         
         //reload etc
-        self.tableViewHeaders.reloadData()
+        self.tvHeaders.reloadData()
         self.resetExtractedParameters()
         
         

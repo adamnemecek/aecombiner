@@ -165,7 +165,8 @@ class ChartScene: SKScene {
                 else {return}
             found.memory = true
             let convPoint = dsNode.convertPoint(point, fromNode: dsNode.scene!)
-            correctedString = (String(format: "%.02f", convPoint.x),String(format: "%.02f", convPoint.y))
+            correctedString = (String.localizedStringWithFormat("%.02f", convPoint.x), String.localizedStringWithFormat("%.02f", convPoint.y))
+                
         }
         return correctedString
     }
