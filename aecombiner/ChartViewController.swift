@@ -21,6 +21,7 @@ class ChartViewController: NSViewController {
     
     // MARK: - @IBOutlet
     @IBOutlet weak var chartView: ChartView!
+    @IBOutlet weak var segmentSort: NSSegmentedControl!
     @IBOutlet weak var segmentCursorState: NSSegmentedControl!
     @IBOutlet weak var buttonExportSelected: NSButton!
 
@@ -30,22 +31,12 @@ class ChartViewController: NSViewController {
     }
     
     @IBAction func segmentChartTypeTapped(sender: NSSegmentedControl) {
-        guard
-                let scene = self.chartView.scene as? ChartScene,
-                let imagename = sender.imageForSegment((sender.selectedSegment))?.name()
-                else {return}
-        
-        switch imagename
-        {
-        case "scatterChart":
-            scene.unSortAllDataSets()
-        case "lineChart":
-            scene.reSortAllDataSets()
+        self.changeChartSorting(flipDirection: false)
+    }
+    
+    @IBAction func reSortChart(sender: AnyObject) {
+        self.changeChartSorting(flipDirection: true)
 
-            default: break
-        }
-        
-        
     }
     
     @IBAction func exportSelectedTapped(sender: AnyObject) {
@@ -59,6 +50,42 @@ class ChartViewController: NSViewController {
     }
 
     // MARK: - Func
+    func changeChartSorting(flipDirection flipDirection:Bool)
+    {
+        guard
+            let scene = self.chartView.scene as? ChartScene,
+            let imagename = self.segmentSort.imageForSegment((self.segmentSort.selectedSegment))?.name()
+            else {return}
+        
+        switch imagename
+        {
+        case "scatterChart":
+            scene.unSortAllDataSets(flipDirection: flipDirection)
+        case "lineChart":
+            scene.reSortAllDataSets(flipDirection: flipDirection)
+            
+        default: break
+        }
+
+    }
+    
+    func chartIsSorted()->Bool
+    {
+        guard
+            let imagename = self.segmentSort.imageForSegment((self.segmentSort.selectedSegment))?.name()
+            else {return false}
+        
+        switch imagename
+        {
+        case "scatterChart":
+            return false
+        case "lineChart":
+            return true
+        default:
+            return false
+        }
+    }
+
     func extractRowsAndMakeNewDocumentsForChartPointsFromNodes()
     {
         guard
@@ -80,15 +107,16 @@ class ChartViewController: NSViewController {
     
     
 
-    func reSortThisChartDataSet(dataSetName dataSetName:String?) {
+    func reSortThisChartDataSet(dataSetName dataSetName:String?, flipDirection:Bool) {
         guard let scene = self.chartView.scene as? ChartScene else {return}
-        scene.reSortThisChartDataSet(dataSetName: dataSetName)
+        scene.reSortThisChartDataSet(dataSetName: dataSetName, flipDirection:flipDirection)
 
     }
     
     func plotNewChartDataSet(dataSet dataSet: ChartDataSet, nameOfChartDataSet: String) {
         guard let scene = self.chartView.scene as? ChartScene else {return}
-        scene.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: nameOfChartDataSet)
+    
+        scene.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: nameOfChartDataSet, sortFirst: self.chartIsSorted())
     }
     
 

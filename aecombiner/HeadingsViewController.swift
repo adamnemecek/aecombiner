@@ -68,7 +68,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
             let chartviewC = self.chartViewController,
             let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeaders)
             else {return}
-        chartviewC.reSortThisChartDataSet(dataSetName: self.headerStringForColumnIndex(columnIndex))
+        chartviewC.reSortThisChartDataSet(dataSetName: self.headerStringForColumnIndex(columnIndex),flipDirection:true)
     }
 
     @IBAction func chartSelectedDataSet(sender: NSButton) {

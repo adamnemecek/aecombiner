@@ -10,10 +10,10 @@ import Foundation
 import SpriteKit
 
 enum ChartCursorStates:Int {
-    case Hand
-    case Crosshair
     case ZoomIn
     case ZoomOut
+    case Hand
+    case Crosshair
     
 }
 
@@ -34,7 +34,7 @@ class ChartView: SKView {
     override func viewDidEndLiveResize() {
         super.viewDidEndLiveResize()
         guard let scene = self.scene as? ChartScene else {self.scene?.hidden = false; return}
-        scene.autoLocateAndChartAllDataSets()
+        scene.autoLocateAndChartAllDataSets(sortFirst: false)
         scene.hidden = false
     }
     

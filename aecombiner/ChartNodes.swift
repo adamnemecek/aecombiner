@@ -87,36 +87,50 @@ class DataSetNode: SKNode {
         }
     }
     
-    func unSortYourDataSet()
+    func adjustSortDirection(flipDirection flipDirection:Bool)
     {
-        switch self.sortDirection
+        if flipDirection == true
+        {
+            switch self.sortDirection
+            {
+            case kAscending:
+                self.sortDirection =  kDescending
+            case kDescending:
+                self.sortDirection =  kAscending
+            default:
+                break
+            }
+        }
+    }
+    
+    func unSortYourDataSet(flipDirection flipDirection:Bool)
+    {
+        self.adjustSortDirection(flipDirection: flipDirection)
+       switch self.sortDirection
         {
         case kAscending:
             self.dataSet.dataPoints.sortInPlace(){$0.xValue > $1.xValue}
-            self.sortDirection = kDescending
         case kDescending:
             self.dataSet.dataPoints.sortInPlace(){$0.xValue < $1.xValue}
-            self.sortDirection = kAscending
         default:
             break
         }
-        self.autolocateAndChartDataSet()
+        self.autolocateAndChartDataSet(sortFirst: false)
     }
     
-    func reSortYourDataSet()
+    func reSortYourDataSet(flipDirection flipDirection:Bool)
     {
-        switch self.sortDirection
+        self.adjustSortDirection(flipDirection: flipDirection)
+       switch self.sortDirection
         {
         case kAscending:
             self.dataSet.dataPoints.sortInPlace(){$0.yValue > $1.yValue}
-            self.sortDirection = kDescending
         case kDescending:
             self.dataSet.dataPoints.sortInPlace(){$0.yValue < $1.yValue}
-            self.sortDirection = kAscending
         default:
             break
         }
-        self.autolocateAndChartDataSet()
+        self.autolocateAndChartDataSet(sortFirst: false)
     }
     
     func sceneSize()->(yExtent:CGFloat, xExent:CGFloat)
@@ -157,13 +171,17 @@ class DataSetNode: SKNode {
     }
     
     
-    func autolocateAndChartDataSet()
+    func autolocateAndChartDataSet(sortFirst sortFirst:Bool)
     {
         //process the dataSet
         self.removeAllChildren()
         self.calculateScalesForXandY()
         self.autolocate(centrePoint: self.midPointOfDataDistribution())
         
+        if sortFirst == true
+        {
+            self.reSortYourDataSet(flipDirection: false)
+        }
         for var row:Int = 0; row<self.dataSet.dataPoints.count; ++row
         {
             let node = DataPointNode(imageNamed: "ball")

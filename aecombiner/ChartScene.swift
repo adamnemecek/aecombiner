@@ -25,7 +25,26 @@ class ChartScene: SKScene {
     var minifyValue = kMinifyDefault
     var magnifyValue = kMagnifyDefault
     
-    func removeRectNodes()
+    var buttonExportSelected:NSButton?
+    {
+        get {
+            guard let subviews2search = self.view?.superview?.subviews else {return nil}
+            for view in subviews2search
+            {
+                guard let id = view.identifier else {continue}
+                if id == "buttonExportSelected"
+                {
+                    return view as? NSButton
+                }
+            }
+            return nil
+        }
+    }
+    
+
+    
+    // MARK: - Remove
+   func removeRectNodes()
     {
         self.enumerateChildNodesWithName(kNodeName_SelectionRect) { (node, found) -> Void in
             node.removeFromParent()
@@ -39,6 +58,7 @@ class ChartScene: SKScene {
        }
     }
     
+    // MARK: - DataPoints
     func selectedDataPointsArrayFromNodes()->[ChartDataPointsFromNode]
     {
         var arrayOfPoints = [ChartDataPointsFromNode]()
@@ -53,71 +73,71 @@ class ChartScene: SKScene {
     }
 
     
-    func autoLocateAndChartAllDataSets()
+    func autoLocateAndChartAllDataSets(sortFirst sortFirst:Bool)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-            (node as! DataSetNode).autolocateAndChartDataSet()
+            (node as! DataSetNode).autolocateAndChartDataSet(sortFirst: sortFirst)
         }
 
     }
     
-    func reSortAllDataSets()
+    func reSortAllDataSets(flipDirection flipDirection:Bool)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-            (node as! DataSetNode).reSortYourDataSet()
+            (node as! DataSetNode).reSortYourDataSet(flipDirection: flipDirection)
         }
     }
     
-    func unSortAllDataSets()
+    func unSortAllDataSets(flipDirection flipDirection:Bool)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
-            (node as! DataSetNode).unSortYourDataSet()
+            (node as! DataSetNode).unSortYourDataSet(flipDirection: flipDirection)
         }
     }
     
-    func reSortThisChartDataSet(dataSetName dataSetName:String?)
+    func reSortThisChartDataSet(dataSetName dataSetName:String?, flipDirection:Bool)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
             guard let dsNode = (node as? DataSetNode) else {return}
             if dataSetName == nil || dsNode.dataSetName == dataSetName
             {
-                dsNode.reSortYourDataSet()
+                dsNode.reSortYourDataSet(flipDirection: flipDirection)
             }
         }
         
     }
     
-    func unSortThisChartDataSet(dataSetName dataSetName:String?)
+    func unSortThisChartDataSet(dataSetName dataSetName:String?, flipDirection:Bool)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
             guard let dsNode = (node as? DataSetNode) else {return}
             if dataSetName == nil || dsNode.dataSetName == dataSetName
             {
-                dsNode.unSortYourDataSet()
+                dsNode.unSortYourDataSet(flipDirection: flipDirection)
             }
         }
         
     }
 
     
-    func reChartTheseDataSets(dataSetNameOrNil dataSetName:String?)
+    func reChartTheseDataSets(dataSetNameOrNil dataSetName:String?, sortFirst:Bool)
     {
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
             guard let dsNode = (node as? DataSetNode) else {return}
             if dataSetName == nil || dsNode.dataSetName == dataSetName
             {
-                dsNode.autolocateAndChartDataSet()
+                dsNode.autolocateAndChartDataSet(sortFirst: sortFirst)
             }
         }
         
     }
     
-    func plotNewChartDataSet(dataSet dataSet:ChartDataSet, nameOfChartDataSet:String)
+    func plotNewChartDataSet(dataSet dataSet:ChartDataSet, nameOfChartDataSet:String, sortFirst:Bool)
     {
         self.removeDataSetNodes()
         let topNode = DataSetNode(dataSet: dataSet, nameOfChartDataSet: nameOfChartDataSet, colour:kColour_Unselected)
         self.addChild(topNode)
-        self.reChartTheseDataSets(dataSetNameOrNil: nameOfChartDataSet)
+        self.reChartTheseDataSets(dataSetNameOrNil: nameOfChartDataSet, sortFirst: sortFirst)
     }
     
     
@@ -129,8 +149,9 @@ class ChartScene: SKScene {
         }
     }
     
-    func rebuildSelectedPointsArray(rectNode:SKNode)
+    func rebuildSelectedPointsArray(rectNode:SKNode)->Bool
     {
+        var foundNodesInRect = false
         self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
             guard let dsNode = (topnode as? DataSetNode) else {return}
             dsNode.selectedDataPoints = ChartDataPointsArray()
@@ -140,6 +161,7 @@ class ChartScene: SKScene {
                 {
                     (topnode as! DataSetNode).selectedDataPoints.append(ptNode.dataPoint)
                     ptNode.color = kColour_Selected
+                    foundNodesInRect = true
                 }
                 else
                 {
@@ -147,15 +169,12 @@ class ChartScene: SKScene {
                 }
             }
         }
+        return foundNodesInRect
     }
     
     
-    override func didMoveToView(view: SKView) {
-        /* Setup your scene here*/
-
-    }
     
-    
+    // MARK: - Selection Rect
     typealias PointString = (xText:String, yText:String)
     func textForLabelForPointWithinNode(point point:CGPoint)-> PointString
     {
@@ -225,6 +244,7 @@ class ChartScene: SKScene {
         return rectNode
     }
     
+    // MARK: - override Mouse
     override func mouseDown(theEvent: NSEvent) {
         /* Called when a mouse click occurs */
         
@@ -236,7 +256,7 @@ class ChartScene: SKScene {
             self.removeRectNodes()
             self.clearSelectedPointsArray()
             self.addChild(rectNodeForRect(rect: CGRectZero,atPostion: theEvent.locationInNode(self)))
-
+            self.buttonExportSelected?.enabled = false
         case .ZoomIn:
             self.enumerateChildNodesWithName(kNodeName_DataSet) { (topnode, found) -> Void in
                 let dsNode = (topnode as! DataSetNode)
@@ -290,8 +310,9 @@ class ChartScene: SKScene {
             break
         case .Crosshair:
             guard let rectNode = self.childNodeWithName(kNodeName_SelectionRect)  else {break}
-            self.rebuildSelectedPointsArray(rectNode)
+            self.buttonExportSelected?.enabled = self.rebuildSelectedPointsArray(rectNode)
             self.removeRectNodes()
+
         case .ZoomIn:
             break
         case .ZoomOut:
@@ -302,9 +323,14 @@ class ChartScene: SKScene {
         }
     }
     
+    // MARK: - override
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
     }
     
+    override func didMoveToView(view: SKView) {
+        /* Setup your scene here*/
+        
+    }
     
 }
