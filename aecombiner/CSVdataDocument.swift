@@ -576,7 +576,7 @@ class CSVdataDocument: NSDocument {
             var rowMatchedOR = true
             
             // rowOfColumns is a [string] array of row columns
-            // the predicate is a [column#][query text]
+            // the predicate is a [column#][query text] both strings
             //do AND first as if just one is unmatched then we reject the row
             for predicateAND in ANDpredicates
             {
@@ -671,7 +671,21 @@ class CSVdataDocument: NSDocument {
         }
         return set.count == 0 ? nil : set
     }
-
+    
+    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->Set<String>?
+    {
+        var set = Set<String>()
+        for parameter in self.csvDataModel.csvData
+        {
+            // parameter is a [string] array of row columns
+            if parameter[matchColumn] == matchString
+            {
+                set.insert(parameter[fromColumn])
+            }
+        }
+        return set.count == 0 ? nil : set
+    }
+    
     func headerStringForColumnIndex(columnIndex:Int?) -> String
     {
         guard let index = columnIndex where columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return "???"}

@@ -76,6 +76,11 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.associatedCSVdataDocument.setOfParametersFromColumn(fromColumn: columnIndex)
     }
     
+    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->Set<String>?
+    {
+        return self.associatedCSVdataDocument.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn: fromColumn, matchString: matchString, matchColumn: matchColumn)
+    }
+    
     func dataMatrixFromAssociatedCSVdataDocument()->DataMatrix?
     {
         return self.associatedCSVdataDocument.csvDataModel.csvData

@@ -18,6 +18,8 @@ import SpriteKit
 
 class ChartViewController: NSViewController {
 
+    var associatedChartViewControllerDelegate: ChartViewControllerDelegate?
+
     
     // MARK: - @IBOutlet
     @IBOutlet weak var chartView: ChartView!
@@ -44,10 +46,6 @@ class ChartViewController: NSViewController {
     }
     
 
-    func associatedChartViewControllerDelegate() -> ChartViewControllerDelegate?
-    {
-        return self.parentViewController as? ChartViewControllerDelegate
-    }
 
     // MARK: - Func
     func changeChartSorting(flipDirection flipDirection:Bool)
@@ -90,7 +88,7 @@ class ChartViewController: NSViewController {
     {
         guard
             let scene = self.chartView.scene as? ChartScene,
-            let assocCVCD = self.associatedChartViewControllerDelegate()
+            let assocCVCD = self.associatedChartViewControllerDelegate
             else {return}
         
         for selectedPointsFromNode in scene.selectedDataPointsArrayFromNodes()
@@ -125,11 +123,19 @@ class ChartViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+    
+
+    }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        self.associatedChartViewControllerDelegate = self.parentViewController as? ChartViewControllerDelegate
+        self.chartView?.showChartSceneInView()
     }
     
     override func viewDidAppear() {
         super.viewDidAppear()
-        self.chartView?.showChartSceneInView()
+        
         
     }
     

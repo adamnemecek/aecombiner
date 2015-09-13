@@ -26,21 +26,6 @@ class ChartScene: SKScene {
     var magnifyValue = kMagnifyDefault
     
     var buttonExportSelected:NSButton?
-    {
-        get {
-            guard let subviews2search = self.view?.superview?.subviews else {return nil}
-            for view in subviews2search
-            {
-                guard let id = view.identifier else {continue}
-                if id == "buttonExportSelected"
-                {
-                    return view as? NSButton
-                }
-            }
-            return nil
-        }
-    }
-    
 
     
     // MARK: - Remove
@@ -330,7 +315,24 @@ class ChartScene: SKScene {
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here*/
-        
+        self.linkChartViewControls()
     }
     
+    func linkChartViewControls()
+    {
+        self.buttonExportSelected = nil
+        guard let subviews2search = self.view?.superview?.subviews else {return}
+        for view in subviews2search
+        {
+            guard let id = view.identifier else {continue}
+            switch id
+            {
+            case "buttonExportSelected":
+                self.buttonExportSelected = view as? NSButton
+                
+            default:
+                break
+            }
+        }
+    }
 }

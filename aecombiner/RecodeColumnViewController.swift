@@ -73,7 +73,7 @@ class RecodeColumnViewController: HeadingsViewController {
     
 
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier, let csvdo = self.associatedCSVdataViewController() else
+        guard let tvidentifier = tableView.identifier, let csvdo = self.associatedCSVdataViewController else
         {
             return 0
         }
@@ -165,11 +165,9 @@ class RecodeColumnViewController: HeadingsViewController {
         self.labelNumberOfParameterOrGroupingItems?.stringValue = ""
     }
     
-    func extractParametersIntoSetFromColumn()
+    
+    func dataMatrixWithNoBlanksFromSet(set set:Set<String>)->DataMatrix
     {
-        //called from Process menu
-        guard let csvdo = self.associatedCSVdataViewController(), let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeaders), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
-        
         var subArray = Array(set)
         // replace blanks with string
         for var c=0;c < subArray.count; ++c
@@ -179,13 +177,22 @@ class RecodeColumnViewController: HeadingsViewController {
                 subArray[c] = kStringEmpty
             }
         }
-        //clear the parameters array
-        self.arrayExtractedParameters = DataMatrix()
+        
+        var matrix = DataMatrix()
         for var row = 0; row<subArray.count; ++row
         {
-            self.arrayExtractedParameters.append([subArray[row],""])
+            matrix.append([subArray[row],""])
         }
+
+        return matrix
+    }
+    
+    func extractParametersIntoSetFromColumn()
+    {
+        //called from Process menu
+        guard let csvdo = self.associatedCSVdataViewController, let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeaders), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
         
+        self.arrayExtractedParameters = self.dataMatrixWithNoBlanksFromSet(set: set)
         self.tvExtractedParameters.reloadData()
         
     }
@@ -193,7 +200,7 @@ class RecodeColumnViewController: HeadingsViewController {
     func doTheRecodeParametersAndAddNewColumn()
     {
         guard self.arrayExtractedParameters.count > 0  else {return}
-        guard   let csvVC = self.associatedCSVdataViewController(),
+        guard   let csvVC = self.associatedCSVdataViewController,
                 let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeaders)
                 else {return}
         //give a name if none

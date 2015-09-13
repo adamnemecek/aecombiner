@@ -17,7 +17,8 @@ class SelectParametersViewController: RecodeColumnViewController {
     // MARK: - class vars
     var arrayANDpredicates = DataMatrix()
     var arrayORpredicates = DataMatrix()
-    
+    var arrayCol1Params = DataMatrix()
+    var arrayCol2Params = DataMatrix()
     
     
     // MARK: - class constants
@@ -25,11 +26,16 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     // MARK: - @IBOutlet
     
-    @IBOutlet weak var tvMEDRA: NSTableView!
-    //@IBOutlet weak var tvSelectHeaders: NSTableView!
+    @IBOutlet weak var tabv1Col2Col: NSTabView!
+    
+    @IBOutlet weak var tv2colHeaders1: NSTableView!
+    @IBOutlet weak var tv2colHeaders2: NSTableView!
+    @IBOutlet weak var tv2colParameters2: NSTableView!
+    @IBOutlet weak var tv2colParameters1: NSTableView!
     @IBOutlet weak var tvHeadersForChart: NSTableView!
     @IBOutlet weak var tvANDparameters: NSTableView!
     @IBOutlet weak var tvORparameters: NSTableView!
+    
     @IBOutlet weak var buttonRemoveORParameter: NSButton!
     @IBOutlet weak var buttonRemoveANDParameter: NSButton!
     @IBOutlet weak var buttonChartExtractedRows: NSButton!
@@ -57,13 +63,13 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     @IBAction func extractRowsBasedOnPredicatesIntoNewFile(sender: NSButton) {
-        guard let cdvc = self.associatedCSVdataViewController() else {return}
+        guard let cdvc = self.associatedCSVdataViewController else {return}
         
         cdvc.extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
     }
     
     @IBAction func extractRowsBasedOnPredicatesIntoModelForChart(sender: NSButton) {
-        guard let cdvc = self.associatedCSVdataViewController() else {return}
+        guard let cdvc = self.associatedCSVdataViewController else {return}
         
         self.extractedDataMatrixForChart = cdvc.extractedDataMatrixForChartWithPredicates(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
         
@@ -74,7 +80,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
-        guard let csvdatavc = self.associatedCSVdataViewController() else {return}
+        guard let csvdatavc = self.associatedCSVdataViewController else {return}
         // we use self.extractedDataMatrixForChart
         let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixForChart)
         csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
@@ -101,9 +107,12 @@ class SelectParametersViewController: RecodeColumnViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         self.tvHeaders?.reloadData()
-        self.tvExtractedParameters?.reloadData()
+        self.tv2colHeaders1?.reloadData()
+        self.tv2colHeaders2?.reloadData()
         self.tvHeadersForChart?.reloadData()
-        self.tvMEDRA?.reloadData()
+        
+        self.tvExtractedParameters?.reloadData()
+
     }
     
     override func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
@@ -130,21 +139,21 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier,let csvdo = self.associatedCSVdataViewController()  else {return 0}
+        guard let tvidentifier = tableView.identifier,let csvdo = self.associatedCSVdataViewController  else {return 0}
         switch tvidentifier
         {
-        case "tvSelectedHeaders":
-            return csvdo.numberOfColumnsInData()
-        case "tvHeadersForChart":
+        case "tvSelectedHeaders", "tv2colHeaders1", "tv2colHeaders2",  "tvHeadersForChart":
             return csvdo.numberOfColumnsInData()
         case "tvSelectedExtractedParameters":
             return self.arrayExtractedParameters.count
+        case "tv2colParameters1":
+            return self.arrayCol1Params.count
+        case "tv2colParameters2":
+            return self.arrayCol2Params.count
         case "tvANDparameters":
             return self.arrayANDpredicates.count
         case "tvORparameters":
             return self.arrayORpredicates.count
-        case "tvMEDRA":
-            return 8
             
         default:
             return 0
@@ -160,9 +169,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         }
         switch tvidentifier
         {
-        case "tvHeadersForChart":
-            cellView = self.cellForHeadersTable(tableView: tableView, row: row)
-        case "tvSelectedHeaders":
+        case "tvSelectedHeaders", "tvHeadersForChart", "tv2colHeaders1", "tv2colHeaders2":
             cellView = self.cellForHeadersTable(tableView: tableView, row: row)
         case "tvSelectedExtractedParameters":
             switch tableColumn!.identifier
@@ -177,6 +184,14 @@ class SelectParametersViewController: RecodeColumnViewController {
             default:
                 break
             }
+            
+        case "tv2colParameters1":
+            cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
+            cellView.textField!.stringValue = self.arrayCol1Params[row][kParametersArrayParametersIndex]
+        case "tv2colParameters2":
+            cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
+            cellView.textField!.stringValue = self.arrayCol2Params[row][kParametersArrayParametersIndex]
+            
         case "tvANDparameters", "tvORparameters":
             let col_parameter = tvidentifier == "tvANDparameters" ? self.arrayANDpredicates[row] : self.arrayORpredicates[row]
             let columnNumber = Int(col_parameter[kSelectedParametersArrayColumnIndex])
@@ -192,9 +207,7 @@ class SelectParametersViewController: RecodeColumnViewController {
             default:
                 break
             }
-        case "tvMEDRA":
-            cellView = tableView.makeViewWithIdentifier("cellMEDRA", owner: self) as! NSTableCellView
-            cellView.textField!.stringValue = String(row)
+
         default:
             break;
         }
@@ -212,6 +225,18 @@ class SelectParametersViewController: RecodeColumnViewController {
         case "tvSelectedHeaders":
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
+            
+            
+        case "tv2colHeaders1":
+            self.resetCol1ExtractedParameters()
+            self.extractCol1ParametersIntoSetFromColumn()
+        case "tv2colParameters1":
+            self.tv2colHeaders2?.reloadData()
+            self.resetCol2ExtractedParameters()
+        case "tv2colHeaders2":
+            self.resetCol2ExtractedParameters()
+            self.extractCol2ParametersIntoSetFromHeaders2()
+
         case "tvANDparameters":
             self.buttonRemoveANDParameter.enabled = tableView.selectedRow != -1
         case "tvORparameters":
@@ -225,8 +250,61 @@ class SelectParametersViewController: RecodeColumnViewController {
     }
     
     
-    // MARK: - Column parameters    
+    // MARK: - Column 1 2 parameters
     
+    func resetCol1ExtractedParameters()
+    {
+        self.arrayCol1Params = DataMatrix()
+        self.arrayCol2Params = DataMatrix()
+        self.tv2colParameters1?.reloadData()
+        self.tv2colParameters2?.reloadData()
+        self.tv2colHeaders2?.reloadData()
+    }
+    
+    func resetCol2ExtractedParameters()
+    {
+        self.arrayCol2Params = DataMatrix()
+        self.tv2colParameters2?.reloadData()
+    }
+    
+    func extractCol1ParametersIntoSetFromColumn()
+    {
+        guard let csvdo = self.associatedCSVdataViewController, let columnIndex = self.selectedColumnFromHeadersTableView(self.tv2colHeaders1), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
+        
+        self.arrayCol1Params = dataMatrixWithNoBlanksFromSet(set: set)
+        self.tv2colParameters1.reloadData()
+        
+    }
+
+    func param1SelectedIndex()->Int?
+    {
+        let index = self.tv2colParameters1.selectedRow
+        return  index >= 0 && index < self.arrayCol1Params.count ? index : nil
+    }
+
+    
+    func extractCol2ParametersIntoSetFromHeaders2()
+    {
+        guard
+            let csvdo = self.associatedCSVdataViewController,
+            let columnToMatchIndex = self.selectedColumnFromHeadersTableView(self.tv2colHeaders1),
+            let columnToExtractIndex = self.selectedColumnFromHeadersTableView(self.tv2colHeaders2),
+            let safeParam1Index = self.param1SelectedIndex()
+        else { return }
+
+        let matchStr = self.arrayCol1Params[safeParam1Index][kParametersArrayParametersIndex]
+        guard
+            let set = csvdo.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn:columnToExtractIndex, matchString:matchStr, matchColumn:columnToMatchIndex)
+        else { return }
+        self.arrayCol2Params = dataMatrixWithNoBlanksFromSet(set: set)
+        self.tv2colParameters2.reloadData()
+
+        
+    }
+
+    
+    // MARK: - AND OR tables
+
     func updateTableViewSelectedColumnAndParameters(arrayIdentifier: String)
     {
         switch arrayIdentifier
@@ -245,7 +323,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     func addColumnAndSelectedParameter(arrayIdentifier: String)
     {
-        guard let csvdo = self.associatedCSVdataViewController() else {return}
+        guard let csvdo = self.associatedCSVdataViewController else {return}
         let columnIndex = self.tvHeaders.selectedRow
         let parameterRows = self.tvExtractedParameters.selectedRowIndexes
 

@@ -14,6 +14,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     // MARK: - Var
     var extractedDataMatrixForChart = DataMatrix()//used in some subclasses
+    var associatedCSVdataViewController: CSVdataViewController?
 
     
     // MARK: - @IBOutlet
@@ -40,7 +41,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
             alert.runModal()
             return
         }
-        self.associatedCSVdataViewController()?.renameColumnAtIndex(self.tvHeaders.selectedRow, newName: self.textFieldColumnRecodedName.stringValue)
+        self.associatedCSVdataViewController?.renameColumnAtIndex(self.tvHeaders.selectedRow, newName: self.textFieldColumnRecodedName.stringValue)
     }
     
     @IBAction func deleteHeading(sender: AnyObject) {
@@ -54,7 +55,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         alert.beginSheetModalForWindow(self.view.window!) { (response) -> Void in
             if response == NSAlertFirstButtonReturn
             {
-                self.associatedCSVdataViewController()?.deleteColumnAtIndex(self.tvHeaders.selectedRow)
+                self.associatedCSVdataViewController?.deleteColumnAtIndex(self.tvHeaders.selectedRow)
                 self.tvHeaders.reloadData()
             }
         }
@@ -75,7 +76,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         guard
                 let chartviewC = self.chartViewController,
                 let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeaders),
-                let dataSet = self.associatedCSVdataViewController()?.chartDataSetFromColumnIndex(columnIndex: columnIndex)
+                let dataSet = self.associatedCSVdataViewController?.chartDataSetFromColumnIndex(columnIndex: columnIndex)
             else {return}
         chartviewC.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: self.headerStringForColumnIndex(columnIndex))
     }
@@ -84,7 +85,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
 
     func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
         // over ridden in subclasses
-        guard let csvdatavc = self.associatedCSVdataViewController(),
+        guard let csvdatavc = self.associatedCSVdataViewController,
                 let datamatrix = csvdatavc.dataMatrixFromAssociatedCSVdataDocument()
         else {return}
         // we use self.extractedDataMatrixForChart
@@ -121,13 +122,13 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
     {
-        guard let vc = self.associatedCSVdataViewController() else {return false}
+        guard let vc = self.associatedCSVdataViewController else {return false}
         return vc.requestedColumnIndexIsOK(columnIndex)
     }
     
     func headerStringForColumnIndex(columnIndex:Int?) -> String
     {
-        guard let csvdo = self.associatedCSVdataViewController() else {return "???"}
+        guard let csvdo = self.associatedCSVdataViewController else {return "???"}
         return csvdo.headerStringForColumnIndex(columnIndex)
     }
     
@@ -137,16 +138,16 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
 
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        self.associatedCSVdataViewController = (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
+        self.tvHeaders?.reloadData()
+
+    }
+    
     override func viewDidAppear() {
         super.viewDidAppear()
         // Do view setup here.
-        self.tvHeaders?.reloadData()
-    }
-
-    
-    func associatedCSVdataViewController() -> CSVdataViewController?
-    {
-        return (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
     }
 
     
@@ -166,13 +167,13 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     func documentMakeDirty()
     {
-        self.associatedCSVdataViewController()?.documentMakeDirty()
+        self.associatedCSVdataViewController?.documentMakeDirty()
     }
         
     // MARK: - TableView overrides
         
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier, let csvdo = self.associatedCSVdataViewController() else { return 0 }
+        guard let tvidentifier = tableView.identifier, let csvdo = self.associatedCSVdataViewController else { return 0 }
         
         switch tvidentifier
         {
