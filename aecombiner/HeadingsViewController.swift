@@ -97,13 +97,23 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     // MARK: - Sorting Tables on header click
     func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
-        self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn)
+        // inheriteds override
+    
     }
     
 
-   func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
+    func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn, inout arrayToSort:DataMatrix, textOrValue:Int)
     {
-        //subclasses override
+        guard tableView.columnWithIdentifier(tableColumn.identifier) >= 0 else {return}
+        if tableColumn.sortDescriptorPrototype == nil
+        {
+            tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)
+        }
+        
+        let columnIndex = tableView.columnWithIdentifier(tableColumn.identifier)
+        let sortdirection = tableColumn.sortDescriptorPrototype!.ascending
+        generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &arrayToSort, columnIndexToSort: columnIndex, textOrvalue: textOrValue, direction: sortdirection)
+        tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !sortdirection)
     }
 
     

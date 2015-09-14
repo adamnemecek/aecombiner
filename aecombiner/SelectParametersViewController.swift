@@ -112,16 +112,24 @@ class SelectParametersViewController: RecodeColumnViewController {
         self.tvExtractedParameters?.reloadData()
 
     }
-    
-    override func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
-    {
+    // MARK: - Sorting Tables on header click
+    override func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
+        // inheriteds override
         guard let tvidentifier = tableView.identifier else {return}
         switch tvidentifier
         {
         case "tvSelectedHeaders":
             break
         case "tvSelectedExtractedParameters":
-            super.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn)
+            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayExtractedParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            tableView.reloadData()
+        case "tv2colParameters1":
+            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayCol1Params, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            tableView.reloadData()
+        case "tv2colParameters2":
+            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayCol2Params, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            tableView.reloadData()
+            
         case "tvANDparameters":
             break
         case "tvORparameters":
@@ -129,7 +137,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         default:
             break
         }
-    
+
     }
 
     
@@ -324,21 +332,26 @@ class SelectParametersViewController: RecodeColumnViewController {
         guard let csvdo = self.associatedCSVdataViewController else {return}
         let columnIndex: Int
         let parameterRows: NSIndexSet
-
+        let arrayParamsToUse: DataMatrix
+        
         switch arrayIdentifier
         {
         case "addANDarray","addORarray":
             columnIndex = self.tvHeaders.selectedRow
             parameterRows = self.tvExtractedParameters.selectedRowIndexes
+            arrayParamsToUse = self.arrayExtractedParameters
         case "addANDarrayCol1","addORarrayCol1":
             columnIndex = self.tv2colHeaders1.selectedRow
             parameterRows = self.tv2colParameters1.selectedRowIndexes
+            arrayParamsToUse = self.arrayCol1Params
         case "addANDarrayCol2","addORarrayCol2":
             columnIndex = self.tv2colHeaders2.selectedRow
             parameterRows = self.tv2colParameters2.selectedRowIndexes
+            arrayParamsToUse = self.arrayCol2Params
         default:
             columnIndex = -1
             parameterRows = NSIndexSet()
+            arrayParamsToUse = DataMatrix()
         }
 
         
@@ -350,14 +363,14 @@ class SelectParametersViewController: RecodeColumnViewController {
         
         for parameterIndex in parameterRows
         {
-            if parameterIndex >= 0 && parameterIndex < self.arrayExtractedParameters.count
+            if parameterIndex >= 0 && parameterIndex < arrayParamsToUse.count
             {
                 switch arrayIdentifier
                 {
                 case "addANDarray", "addANDarrayCol1", "addANDarrayCol2":
-                    self.arrayANDpredicates.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
+                    self.arrayANDpredicates.append([String(columnIndex),arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex]])
                 case "addORarray","addORarrayCol1", "addORarrayCol2":
-                    self.arrayORpredicates.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
+                    self.arrayORpredicates.append([String(columnIndex),arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex]])
                 default:
                     break
                 }

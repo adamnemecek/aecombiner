@@ -138,24 +138,20 @@ class RecodeColumnViewController: HeadingsViewController {
         
     }
     
+    // MARK: - Sorting Tables on header click
+    override func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
+        // inheriteds override
+        self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayExtractedParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+        self.tvExtractedParameters.reloadData()
+    }
+
+    
     // MARK: - Column parameters
     func stringForRecodedColumn(columnIndex:Int) -> String
     {
         return self.headerStringForColumnIndex(columnIndex)+kStringRecodedColumnNameSuffix
     }
     
-    override func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn)
-    {
-        guard tableView.columnWithIdentifier(tableColumn.identifier) >= 0 else {return}
-        if tableColumn.sortDescriptorPrototype == nil {tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)}
-
-        let columnIndex = tableView.columnWithIdentifier(tableColumn.identifier)
-        let ascending = tableColumn.sortDescriptorPrototype!.ascending
-        let sortdirection = ascending ? kAscending : kDescending
-        generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.arrayExtractedParameters, columnIndexToSort: columnIndex, textOrvalue: self.segmentedSortAsTextOrNumbers.selectedSegment, direction: sortdirection)
-        tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !ascending)
-        self.tvExtractedParameters.reloadData()
-    }
     
     func resetExtractedParameters()
     {

@@ -8,8 +8,8 @@
 
 import Cocoa
 
-let kAscending = 1
-let kDescending = 0
+let kAscending = true
+let kDescending = false
 let kSortOriginal = -1
 let kSortAsText = 0
 let kSortAsValue = 1
@@ -38,7 +38,7 @@ struct AggregatedStats {
     var logCount:Int = 0
 }
 
-func generic_SortArrayOfColumnsAsTextOrValues(inout arrayToSort arrayToSort:DataMatrix, columnIndexToSort:Int, textOrvalue:Int, direction: Int)
+func generic_SortArrayOfColumnsAsTextOrValues(inout arrayToSort arrayToSort:DataMatrix, columnIndexToSort:Int, textOrvalue:Int, direction: Bool)
 {
     switch (direction, textOrvalue)
     {
@@ -561,7 +561,7 @@ class CSVdataDocument: NSDocument {
         return columnIndex >= 0 && columnIndex < self.numberOfColumnsInData()
     }
 
-    func sortCSVrowsInColumnAsTextOrValues(columnIndexToSort columnIndexToSort:Int, textOrvalue:Int, direction: Int)
+    func sortCSVrowsInColumnAsTextOrValues(columnIndexToSort columnIndexToSort:Int, textOrvalue:Int, direction: Bool)
     {
         generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.csvDataModel.csvData, columnIndexToSort: columnIndexToSort, textOrvalue: textOrvalue, direction: direction)
     }

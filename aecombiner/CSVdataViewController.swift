@@ -174,10 +174,14 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
         let columnIndex = tableView.columnWithIdentifier(tableColumn.identifier)
         guard columnIndex >= 0 else {return}
-        guard let ascending = tableColumn.sortDescriptorPrototype?.ascending else {return}
-        let sortdirection = ascending ? kAscending : kDescending
+        if tableColumn.sortDescriptorPrototype == nil
+        {
+            tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)
+        }
+
+        let sortdirection = tableColumn.sortDescriptorPrototype!.ascending
         self.associatedCSVdataDocument.sortCSVrowsInColumnAsTextOrValues(columnIndexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, direction:sortdirection)
-        tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !ascending)
+        tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !sortdirection)
         self.tvCSVdata.reloadData()
 
     }

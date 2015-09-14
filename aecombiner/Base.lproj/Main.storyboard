@@ -1827,7 +1827,7 @@
                                 <rect key="frame" x="13" y="304" width="633" height="298"/>
                                 <font key="font" metaFont="system"/>
                                 <tabViewItems>
-                                    <tabViewItem label="1 Column" identifier="1" id="IVM-aW-SzY">
+                                    <tabViewItem label="Single Level" identifier="1" id="IVM-aW-SzY">
                                         <view key="view" id="fDF-GF-Gdm">
                                             <rect key="frame" x="10" y="33" width="613" height="252"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1872,9 +1872,9 @@
                                                                                     </textField>
                                                                                 </subviews>
                                                                                 <constraints>
-                                                                                    <constraint firstItem="89E-Y1-Ge6" firstAttribute="centerY" secondItem="hyh-ji-0po" secondAttribute="centerY" id="TMq-fn-prt"/>
-                                                                                    <constraint firstAttribute="trailing" secondItem="89E-Y1-Ge6" secondAttribute="trailing" constant="3" id="YfB-nM-kXT"/>
-                                                                                    <constraint firstItem="89E-Y1-Ge6" firstAttribute="leading" secondItem="hyh-ji-0po" secondAttribute="leading" constant="3" id="pCc-Yv-uoS"/>
+                                                                                    <constraint firstItem="89E-Y1-Ge6" firstAttribute="leading" secondItem="hyh-ji-0po" secondAttribute="leading" constant="3" id="GnJ-Wf-1VE"/>
+                                                                                    <constraint firstAttribute="trailing" secondItem="89E-Y1-Ge6" secondAttribute="trailing" constant="3" id="Ne0-bc-1Dp"/>
+                                                                                    <constraint firstItem="89E-Y1-Ge6" firstAttribute="centerY" secondItem="hyh-ji-0po" secondAttribute="centerY" id="sF2-8F-63i"/>
                                                                                 </constraints>
                                                                                 <connections>
                                                                                     <outlet property="textField" destination="89E-Y1-Ge6" id="CWj-2o-tsq"/>
@@ -1932,9 +1932,6 @@
                                                                                 <subviews>
                                                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="qzH-9H-pzj">
                                                                                         <rect key="frame" x="1" y="0.0" width="383" height="17"/>
-                                                                                        <constraints>
-                                                                                            <constraint firstAttribute="width" constant="379" id="t4w-Ib-xPb"/>
-                                                                                        </constraints>
                                                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="lTn-Nt-v0t">
                                                                                             <font key="font" metaFont="system"/>
                                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1943,9 +1940,9 @@
                                                                                     </textField>
                                                                                 </subviews>
                                                                                 <constraints>
-                                                                                    <constraint firstItem="qzH-9H-pzj" firstAttribute="leading" secondItem="glq-fv-me1" secondAttribute="leading" constant="3" id="0cV-xy-Rwt"/>
-                                                                                    <constraint firstAttribute="trailing" secondItem="qzH-9H-pzj" secondAttribute="trailing" constant="3" id="V3u-os-8ge"/>
-                                                                                    <constraint firstItem="qzH-9H-pzj" firstAttribute="centerY" secondItem="glq-fv-me1" secondAttribute="centerY" id="kPa-hF-566"/>
+                                                                                    <constraint firstAttribute="trailing" secondItem="qzH-9H-pzj" secondAttribute="trailing" constant="3" id="HvF-zV-WI6"/>
+                                                                                    <constraint firstItem="qzH-9H-pzj" firstAttribute="leading" secondItem="glq-fv-me1" secondAttribute="leading" constant="3" id="JNK-IC-XhM"/>
+                                                                                    <constraint firstItem="qzH-9H-pzj" firstAttribute="centerY" secondItem="glq-fv-me1" secondAttribute="centerY" id="mNk-nh-BNk"/>
                                                                                 </constraints>
                                                                                 <connections>
                                                                                     <outlet property="textField" destination="qzH-9H-pzj" id="BGq-NK-ZMb"/>
@@ -2018,7 +2015,7 @@
                                             </constraints>
                                         </view>
                                     </tabViewItem>
-                                    <tabViewItem label="2 Columns" identifier="2" id="sCn-MX-kWk">
+                                    <tabViewItem label="Two Levels" identifier="2" id="sCn-MX-kWk">
                                         <view key="view" id="3OW-rJ-ZmU">
                                             <rect key="frame" x="10" y="33" width="613" height="252"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
