@@ -21,8 +21,6 @@ class SelectParametersViewController: RecodeColumnViewController {
     var arrayCol2Params = DataMatrix()
     
     
-    // MARK: - class constants
-    
     
     // MARK: - @IBOutlet
     
@@ -309,10 +307,10 @@ class SelectParametersViewController: RecodeColumnViewController {
     {
         switch arrayIdentifier
         {
-        case "removeANDarray", "addANDarray", "clearANDarray":
+        case "removeANDarray", "clearANDarray", "addANDarray","addANDarrayCol1","addANDarrayCol2":
             self.tvANDparameters.reloadData()
             self.buttonRemoveANDParameter.enabled = false
-        case "removeORarray", "addORarray", "clearORarray":
+        case "removeORarray", "clearORarray", "addORarray","addORarrayCol1","addORarrayCol2":
             self.tvORparameters.reloadData()
             self.buttonRemoveORParameter.enabled = false
         default:
@@ -324,9 +322,26 @@ class SelectParametersViewController: RecodeColumnViewController {
     func addColumnAndSelectedParameter(arrayIdentifier: String)
     {
         guard let csvdo = self.associatedCSVdataViewController else {return}
-        let columnIndex = self.tvHeaders.selectedRow
-        let parameterRows = self.tvExtractedParameters.selectedRowIndexes
+        let columnIndex: Int
+        let parameterRows: NSIndexSet
 
+        switch arrayIdentifier
+        {
+        case "addANDarray","addORarray":
+            columnIndex = self.tvHeaders.selectedRow
+            parameterRows = self.tvExtractedParameters.selectedRowIndexes
+        case "addANDarrayCol1","addORarrayCol1":
+            columnIndex = self.tv2colHeaders1.selectedRow
+            parameterRows = self.tv2colParameters1.selectedRowIndexes
+        case "addANDarrayCol2","addORarrayCol2":
+            columnIndex = self.tv2colHeaders2.selectedRow
+            parameterRows = self.tv2colParameters2.selectedRowIndexes
+        default:
+            columnIndex = -1
+            parameterRows = NSIndexSet()
+        }
+
+        
         guard
             columnIndex >= 0 &&
             columnIndex < csvdo.numberOfColumnsInData() &&
@@ -339,9 +354,9 @@ class SelectParametersViewController: RecodeColumnViewController {
             {
                 switch arrayIdentifier
                 {
-                case "addANDarray":
+                case "addANDarray", "addANDarrayCol1", "addANDarrayCol2":
                     self.arrayANDpredicates.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
-                case "addORarray":
+                case "addORarray","addORarrayCol1", "addORarrayCol2":
                     self.arrayORpredicates.append([String(columnIndex),self.arrayExtractedParameters[parameterIndex][kParametersArrayParametersIndex]])
                 default:
                     break
