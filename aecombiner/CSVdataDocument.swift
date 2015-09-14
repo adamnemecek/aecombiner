@@ -22,6 +22,8 @@ let kGroupGeoMean = "Geometric Mean"
 let kGroupMax = "Maximum"
 let kGroupMin = "Minimum"
 let kGroupRange = "Range"
+let kGroupLogRange = "Log Range"
+let kGroupLogSum = "Log Sum"
 let kGroupAllStats = "AllStats"
 
 
@@ -179,7 +181,7 @@ class CSVdataDocument: NSDocument {
     {
         switch groupMethod
         {
-        case kGroupAddition, kGroupCount, kGroupMean, kGroupGeoMean, kGroupMax:
+        case kGroupAddition, kGroupLogSum, kGroupCount, kGroupMean, kGroupGeoMean, kGroupMax:
             return 0.0
         case kGroupMin:
             return Double(Int.max)
@@ -206,7 +208,7 @@ class CSVdataDocument: NSDocument {
             {
                 valuesForGroup[parameter] = (groupStartValue,0.0)
             }
-        case kGroupRange:
+        case kGroupRange, kGroupLogRange:
             for parameter in arrayOfParamatersInGroup
             {
                 rangesForGroup[parameter] = (self.groupStartValueForString(kGroupMin),self.groupStartValueForString(kGroupMax))
@@ -222,7 +224,7 @@ class CSVdataDocument: NSDocument {
             {
                 switch groupMethod
                 {
-                case kGroupRange:
+                case kGroupRange, kGroupLogRange:
                     guard let running = rangesForGroup[paramID],
                         let value = Double(row[columnIndexInGroup]) else {continue}
                     rangesForGroup[paramID] = (fmin(running.minm, value), fmax(running.maxm,value))
@@ -249,6 +251,19 @@ class CSVdataDocument: NSDocument {
             for (key,value) in rangesForGroup
             {
                 processedDict[key] = value.maxm-value.minm
+            }
+        case kGroupLogRange:
+            for (key,value) in rangesForGroup
+            {
+                if value.maxm-value.minm > 0
+                {
+                    processedDict[key] = log(value.maxm-value.minm)
+                }
+                else
+                {
+                    processedDict[key] = -1.00 // arbitrary value - log in user guide
+                }
+
             }
         case kGroupMean, kGroupGeoMean:
             for (key,value) in valuesForGroup
@@ -296,6 +311,8 @@ class CSVdataDocument: NSDocument {
         {
         case kGroupAddition:
             nameOfNewColumn = "Sum("+namesOfCombinedColumn.joinWithSeparator("+")+")"
+        case kGroupLogSum:
+            nameOfNewColumn = "Log Sum("+namesOfCombinedColumn.joinWithSeparator("+")+")"
         case kGroupMultiplication:
             nameOfNewColumn = "Product("+namesOfCombinedColumn.joinWithSeparator("*")+")"
         case kGroupCount:
@@ -310,6 +327,8 @@ class CSVdataDocument: NSDocument {
             nameOfNewColumn = "Max("+namesOfCombinedColumn.joinWithSeparator("_")+")"
         case kGroupRange:
             nameOfNewColumn = "Range("+namesOfCombinedColumn.joinWithSeparator("_")+")"
+        case kGroupLogRange:
+            nameOfNewColumn = "Log Range("+namesOfCombinedColumn.joinWithSeparator("_")+")"
         case kGroupAllStats:
             nameOfNewColumn = namesOfCombinedColumn.joinWithSeparator("_")
         default:
@@ -325,7 +344,7 @@ class CSVdataDocument: NSDocument {
         //trap others
         switch groupMethod
         {
-        case kGroupMean,kGroupGeoMean, kGroupRange:
+        case kGroupMean,kGroupGeoMean, kGroupRange, kGroupLogRange:
             return self.combinedColumnForMeansAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
         default:
             break
@@ -339,7 +358,7 @@ class CSVdataDocument: NSDocument {
         var countsForGroup = [String : Int]()
         switch groupMethod
         {
-        case kGroupAddition, kGroupMultiplication, kGroupMax, kGroupMin:
+        case kGroupAddition, kGroupLogSum, kGroupMultiplication, kGroupMax, kGroupMin:
             for parameter in arrayOfParamatersInGroup
             {
                 valuesForGroup[parameter] = groupStartValue
@@ -372,6 +391,12 @@ class CSVdataDocument: NSDocument {
                     guard let running = valuesForGroup[paramID],
                         let value = Double(row[columnIndexInGroup]) else {continue}
                     valuesForGroup[paramID] = running + value
+                case kGroupLogSum:
+                    guard let running = valuesForGroup[paramID],
+                        let value = Double(row[columnIndexInGroup])
+                        where value > 0
+                        else {continue}
+                    valuesForGroup[paramID] = running + log(value)
                 case kGroupMultiplication:
                     guard let running = valuesForGroup[paramID],
                     let value = Double(row[columnIndexInGroup]) else {continue}
@@ -392,7 +417,7 @@ class CSVdataDocument: NSDocument {
         var csvDataData = DataMatrix()
         switch groupMethod
         {
-        case kGroupAddition, kGroupMultiplication, kGroupMin, kGroupMax:
+        case kGroupAddition, kGroupLogSum, kGroupMultiplication, kGroupMin, kGroupMax:
             for (parameter,value) in valuesForGroup
             {
                 csvDataData.append([parameter, String(value)])
@@ -445,14 +470,21 @@ class CSVdataDocument: NSDocument {
             }
         }
         let nameOfColumn:String = self.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: kGroupAllStats)
-        let headers:HeadersMatrix = [self.headerStringForColumnIndex(columnIndexForGrouping),"Count("+nameOfColumn+")","Sum("+nameOfColumn+")","Product("+nameOfColumn+")","Max("+nameOfColumn+")","Min("+nameOfColumn+")","Range("+nameOfColumn+")","Mean("+nameOfColumn+")","GeoMean("+nameOfColumn+")"]
+        let headers:HeadersMatrix = [self.headerStringForColumnIndex(columnIndexForGrouping),"Count("+nameOfColumn+")","Sum("+nameOfColumn+")","Log Sum("+nameOfColumn+")","Product("+nameOfColumn+")","Max("+nameOfColumn+")","Min("+nameOfColumn+")","Range("+nameOfColumn+")","Log Range("+nameOfColumn+")","Mean("+nameOfColumn+")","GeoMean("+nameOfColumn+")"]
         
         //createTheCSVdata
         var csvDataData = DataMatrix()
         for (parameter,stats) in statsForGroup
         {
-            var row = [parameter, String(stats.count), String(stats.sum), String(stats.product), String(stats.maxm), String(stats.minm)]
+            var row = [parameter, String(stats.count), String(stats.sum),String(stats.logSum), String(stats.product), String(stats.maxm), String(stats.minm)]
             row.append(String(stats.maxm-stats.minm))
+            if stats.maxm-stats.minm > 0
+            {
+                row.append(String(log(stats.maxm-stats.minm)))
+            } else
+            {
+                row.append("*")
+            }
             row.append(String(stats.sum/Double(stats.count)))
             row.append(String(exp(stats.logSum/Double(stats.logCount))))
             csvDataData.append(row)
