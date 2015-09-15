@@ -84,25 +84,25 @@ class GroupParametersViewController: RecodeColumnViewController {
         
         let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
         let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: self.tvHeaders.selectedRow, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
-        self.extractedDataMatrixForChart = dataAndName.csvDataMatrix
-        self.headersExtractedDataModelForChart = [dvc.headerStringForColumnIndex(self.tvHeaders.selectedRow),dataAndName.nameOfColumn]
-        let dataset = ChartDataSet(data: dataAndName.csvDataMatrix, forColumnIndex: kCsvDataData_column_value)
-        cvc.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfColumn)
+        self.extractedDataMatrixForChart = dataAndName.matrixOfData
+        self.headersExtractedDataModelForChart = [dvc.headerStringForColumnIndex(self.tvHeaders.selectedRow),dataAndName.nameOfData]
+        let dataset = ChartDataSet(data: dataAndName.matrixOfData, forColumnIndex: kCsvDataData_column_value)
+        cvc.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfData)
     }
     
 
     // MARK: - Columns
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup: [String], groupMethod:String) -> (csvDataMatrix:DataMatrix, nameOfColumn:String)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:DataMatrix, nameOfColumn:String)
     {
-        guard let csvdo = self.associatedCSVdataViewController else {return (DataMatrix(), "")}
+        guard let csvdo = self.associatedCSVdataViewController else {return NamedDataMatrix(matrix:DataMatrix(),name: "")}
         return csvdo.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
     
-    func arrayOfExtractedParametersInGroup()->[String]
+    func arrayOfExtractedParametersInGroup()->ArrayOfStringOneRow
     {
         //create an array with the keys the params we extracted for grouping
-        var arrayOfExtractedParametersInGroup = [String]()
+        var arrayOfExtractedParametersInGroup = ArrayOfStringOneRow()
         for parameter in self.arrayExtractedParameters
         {
             arrayOfExtractedParametersInGroup.append(parameter[kParametersArrayParametersIndex])

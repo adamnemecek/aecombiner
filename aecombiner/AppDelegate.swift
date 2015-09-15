@@ -25,7 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func importFile(sender: NSToolbarItem)
     {
         let panel = NSOpenPanel()
-        var types = [String]()
+        var types = ArrayOfStringOneRow()
         types.append("txt")
         panel.allowedFileTypes = types
         if panel.runModal() == NSFileHandlingPanelOKButton
@@ -40,7 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
                 if doc is CSVdataDocument
                 {
-                    (doc as! CSVdataDocument).csvDataModel = CSVdata(stringTAB: csvstring)
+                    (doc as! CSVdataDocument).csvDataModel = CSVdata(stringTAB: csvstring, name:doc.displayName)
                     (doc as! CSVdataDocument).updateChangeCount(.ChangeDone)
                 }
             } catch {
