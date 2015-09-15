@@ -16,51 +16,66 @@ let carriageReturn = "\n"
 let tabDelimiter = "\t"
 
 typealias DataMatrix = [[String]]
-typealias HeadersMatrix = [String]
+typealias ArrayOfStringOneRow = [String]
+typealias HeadersMatrix = ArrayOfStringOneRow
+
+struct NamedDataMatrix
+{
+    var matrixOfData: DataMatrix
+    var nameOfData: String
+    init (matrix:DataMatrix, name:String)
+    {
+        matrixOfData = matrix
+        nameOfData = name
+    }
+}
 
 
 class CSVdata {
 
-    var headers = HeadersMatrix()
-    var csvData = DataMatrix()
-    var processedDataOK = false
+    var headers:HeadersMatrix// = HeadersMatrix()
+    var csvData:DataMatrix// = DataMatrix()
+    var processedDataOK:Bool// = false
+    var name:String// = ""
     
     init()
     {
         self.headers = HeadersMatrix()
         self.csvData = DataMatrix()
         self.processedDataOK = false
+        self.name = ""
     }
     
-    convenience init (headers:HeadersMatrix, csvdata:DataMatrix)
+    convenience init (headers:HeadersMatrix, csvdata:DataMatrix, name:String)
     {
         self.init()
         self.headers = headers
         self.csvData = csvdata
+        self.name = name
         processedDataOK = true
     }
     
-    convenience init (dataCSV: NSData)
+    convenience init (dataCSV: NSData, name:String)
     {
         self.init()
         guard let dataAsString = NSString(data: dataCSV, encoding: NSUTF8StringEncoding) else {return}
-        self.importCSVstring(dataAsString: dataAsString)
+        self.importCSVstring(dataAsString: dataAsString, name:name)
     }
     
-    convenience init (dataTAB: NSData)
+    convenience init (dataTAB: NSData, name:String)
     {
         self.init()
         guard let dataAsString = NSString(data: dataTAB, encoding: NSUTF8StringEncoding) else {return}
-        self.importTABstring(dataAsString: dataAsString)
+        self.importTABstring(dataAsString: dataAsString, name:name)
     }
     
-    convenience init (stringTAB: NSString)
+    convenience init (stringTAB: NSString, name:String)
     {
         self.init()
-        self.importTABstring(dataAsString: stringTAB)
+        self.importTABstring(dataAsString: stringTAB, name:name)
     }
     
-    func importCSVstring(dataAsString dataAsString:NSString)
+    func importCSVstring(dataAsString dataAsString:NSString, name:String)
     {
         var arrayOfRowArrays = DataMatrix()
         dataAsString.enumerateLinesUsingBlock({ (line, okay) -> Void in
@@ -90,10 +105,11 @@ class CSVdata {
             arrayOfRowArrays.removeAtIndex(0)
             self.csvData = arrayOfRowArrays
             self.processedDataOK = true
+            self.name = name
         }
     }
     
-    func importTABstring(dataAsString dataAsString:NSString)
+    func importTABstring(dataAsString dataAsString:NSString, name:String)
     {
         var arrayOfRowArrays = DataMatrix()
         dataAsString.enumerateLinesUsingBlock({ (line, okay) -> Void in
@@ -106,6 +122,7 @@ class CSVdata {
             arrayOfRowArrays.removeAtIndex(0)
             self.csvData = arrayOfRowArrays
             self.processedDataOK = true
+            self.name = name
         }
     }
 
@@ -131,7 +148,7 @@ class CSVdata {
             guard rowIndex<numRows else {continue}
             extractedRows.append(self.csvData[rowIndex])
         }
-        return CSVdata(headers: self.headers, csvdata: extractedRows)
+        return CSVdata(headers: self.headers, csvdata: extractedRows, name:"")
     }
         
     class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:DataMatrix)->DataMatrix
