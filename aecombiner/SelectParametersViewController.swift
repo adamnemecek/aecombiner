@@ -8,7 +8,17 @@
 
 import Cocoa
 
-
+struct GroupingPredicate {
+    var columnIndexToMatch:Int
+    var stringToMatch:String
+    var booleanOperator:String
+    init (columnIndex:Int,string:String,boolean:String)
+    {
+        booleanOperator = boolean
+        stringToMatch = string
+        columnIndexToMatch = columnIndex
+    }
+}
 
 
 class SelectParametersViewController: RecodeColumnViewController {
@@ -19,7 +29,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     var arrayORpredicates = DataMatrix()
     var arrayCol1Params = DataMatrix()
     var arrayCol2Params = DataMatrix()
-    
+    var arrayPredicates = [GroupingPredicate]()
     
     
     // MARK: - @IBOutlet
@@ -33,11 +43,14 @@ class SelectParametersViewController: RecodeColumnViewController {
     @IBOutlet weak var tvHeadersForChart: NSTableView!
     @IBOutlet weak var tvANDparameters: NSTableView!
     @IBOutlet weak var tvORparameters: NSTableView!
+    @IBOutlet weak var tvParameterImageCell: NSTableView!
     
     @IBOutlet weak var buttonRemoveORParameter: NSButton!
     @IBOutlet weak var buttonRemoveANDParameter: NSButton!
     @IBOutlet weak var buttonChartExtractedRows: NSButton!
 
+    
+    
     /* MARK: - Represented Object
     override func updateRepresentedObjectToCSVData(csvdata:CSVdata)
     {
@@ -160,7 +173,8 @@ class SelectParametersViewController: RecodeColumnViewController {
             return self.arrayANDpredicates.count
         case "tvORparameters":
             return self.arrayORpredicates.count
-            
+        case "tvParameterImageCell":
+            return self.arrayPredicates.count
         default:
             return 0
         }
@@ -197,7 +211,11 @@ class SelectParametersViewController: RecodeColumnViewController {
         case "tv2colParameters2":
             cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
             cellView.textField!.stringValue = self.arrayCol2Params[row][kParametersArrayParametersIndex]
-            
+        case "tvParameterImageCell":
+            cellView = tableView.makeViewWithIdentifier("parameterImageCell", owner: self) as! NSTableCellView
+            cellView.textField!.stringValue = self.headerStringForColumnIndex(self.arrayPredicates[row].columnIndexToMatch)+" -> "+self.arrayPredicates[row].stringToMatch
+            cellView.imageView!.image = NSImage(named: self.arrayPredicates[row].booleanOperator)
+
         case "tvANDparameters", "tvORparameters":
             let col_parameter = tvidentifier == "tvANDparameters" ? self.arrayANDpredicates[row] : self.arrayORpredicates[row]
             let columnNumber = Int(col_parameter[kSelectedParametersArrayColumnIndex])
@@ -313,6 +331,8 @@ class SelectParametersViewController: RecodeColumnViewController {
 
     func updateTableViewSelectedColumnAndParameters(arrayIdentifier: String)
     {
+        self.tvParameterImageCell.reloadData()
+
         switch arrayIdentifier
         {
         case "removeANDarray", "clearANDarray", "addANDarray","addANDarrayCol1","addANDarrayCol2":
@@ -365,15 +385,19 @@ class SelectParametersViewController: RecodeColumnViewController {
         {
             if parameterIndex >= 0 && parameterIndex < arrayParamsToUse.count
             {
+                let boolS:String
                 switch arrayIdentifier
                 {
                 case "addANDarray", "addANDarrayCol1", "addANDarrayCol2":
                     self.arrayANDpredicates.append([String(columnIndex),arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex]])
+                    boolS = "AND"
                 case "addORarray","addORarrayCol1", "addORarrayCol2":
                     self.arrayORpredicates.append([String(columnIndex),arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex]])
+                    boolS = "OR"
                 default:
-                    break
+                    boolS = ""
                 }
+                self.arrayPredicates.append(GroupingPredicate(columnIndex: columnIndex, string: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], boolean: boolS))
             }
         }
 

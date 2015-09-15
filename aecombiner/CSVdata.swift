@@ -23,6 +23,11 @@ struct NamedDataMatrix
 {
     var matrixOfData: DataMatrix
     var nameOfData: String
+    init ()
+    {
+        matrixOfData = DataMatrix()
+        nameOfData = ""
+    }
     init (matrix:DataMatrix, name:String)
     {
         matrixOfData = matrix
