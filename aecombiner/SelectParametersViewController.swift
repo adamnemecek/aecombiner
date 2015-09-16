@@ -28,17 +28,22 @@ struct GroupingPredicate {
         return comparator.stringToMatch > stringToMatch
     }
 }
+typealias GroupingPredicatesArray = [GroupingPredicate]
 
+struct PredicatesByBoolean {
+    var ANDpredicates = GroupingPredicatesArray()
+    var ORpredicates = GroupingPredicatesArray()
+    var NOTpredicates = GroupingPredicatesArray()
+    
+}
 
 class SelectParametersViewController: RecodeColumnViewController {
     
     
     // MARK: - class vars
-    var arrayANDpredicates = DataMatrix()
-    var arrayORpredicates = DataMatrix()
     var arrayCol1Params = DataMatrix()
     var arrayCol2Params = DataMatrix()
-    var arrayPredicates = [GroupingPredicate]()
+    var arrayPredicates = GroupingPredicatesArray()
     
     
     // MARK: - @IBOutlet
@@ -50,12 +55,9 @@ class SelectParametersViewController: RecodeColumnViewController {
     @IBOutlet weak var tv2colParameters2: NSTableView!
     @IBOutlet weak var tv2colParameters1: NSTableView!
     @IBOutlet weak var tvHeadersForChart: NSTableView!
-    @IBOutlet weak var tvANDparameters: NSTableView!
-    @IBOutlet weak var tvORparameters: NSTableView!
-    @IBOutlet weak var tvParameterImageCell: NSTableView!
+    @IBOutlet weak var tvPredicates: NSTableView!
     
-    @IBOutlet weak var buttonRemoveORParameter: NSButton!
-    @IBOutlet weak var buttonRemoveANDParameter: NSButton!
+    @IBOutlet weak var buttonRemovePredicate: NSButton!
     @IBOutlet weak var buttonChartExtractedRows: NSButton!
 
     
@@ -78,20 +80,20 @@ class SelectParametersViewController: RecodeColumnViewController {
     }
     
     @IBAction func clearANORarray(sender: NSButton) {
-        self.clearANDorORarray(sender.identifier!)
+        self.clearPredicates(sender.identifier!)
     }
     
     
     @IBAction func extractRowsBasedOnPredicatesIntoNewFile(sender: NSButton) {
         guard let cdvc = self.associatedCSVdataViewController else {return}
         
-        cdvc.extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
+        cdvc.extractRowsBasedOnPredicatesIntoNewFile(predicates: self.arrayPredicates)
     }
     
     @IBAction func extractRowsBasedOnPredicatesIntoModelForChart(sender: NSButton) {
         guard let cdvc = self.associatedCSVdataViewController else {return}
         
-        self.extractedDataMatrixForChart = cdvc.extractedDataMatrixForChartWithPredicates(ANDpredicates: self.arrayANDpredicates, ORpredicates: self.arrayORpredicates)
+        self.extractedDataMatrixForChart = cdvc.extractedDataMatrixForChartWithPredicates(predicates: self.arrayPredicates)
         
         self.buttonChartExtractedRows.enabled = self.extractedDataMatrixForChart.count>0
         self.chartExtractedRows(sender)
@@ -142,7 +144,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         {
         case "tvSelectedHeaders":
             break
-        case "tvSelectedExtractedParameters":
+        case "tv1colParameters":
             self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayExtractedParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
             tableView.reloadData()
         case "tv2colParameters1":
@@ -152,10 +154,6 @@ class SelectParametersViewController: RecodeColumnViewController {
             self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayCol2Params, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
             tableView.reloadData()
             
-        case "tvANDparameters":
-            break
-        case "tvORparameters":
-            break
         default:
             break
         }
@@ -172,17 +170,13 @@ class SelectParametersViewController: RecodeColumnViewController {
         {
         case "tvSelectedHeaders", "tv2colHeaders1", "tv2colHeaders2",  "tvHeadersForChart":
             return csvdo.numberOfColumnsInData()
-        case "tvSelectedExtractedParameters":
+        case "tv1colParameters":
             return self.arrayExtractedParameters.count
         case "tv2colParameters1":
             return self.arrayCol1Params.count
         case "tv2colParameters2":
             return self.arrayCol2Params.count
-        case "tvANDparameters":
-            return self.arrayANDpredicates.count
-        case "tvORparameters":
-            return self.arrayORpredicates.count
-        case "tvParameterImageCell":
+        case "tvPredicates":
             return self.arrayPredicates.count
         default:
             return 0
@@ -200,7 +194,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         {
         case "tvSelectedHeaders", "tvHeadersForChart", "tv2colHeaders1", "tv2colHeaders2":
             cellView = self.cellForHeadersTable(tableView: tableView, row: row)
-        case "tvSelectedExtractedParameters":
+        case "tv1colParameters":
             switch tableColumn!.identifier
             {
             case "parameter":
@@ -220,26 +214,12 @@ class SelectParametersViewController: RecodeColumnViewController {
         case "tv2colParameters2":
             cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
             cellView.textField!.stringValue = self.arrayCol2Params[row][kParametersArrayParametersIndex]
-        case "tvParameterImageCell":
+            
+        case "tvPredicates":
             cellView = tableView.makeViewWithIdentifier("parameterImageCell", owner: self) as! NSTableCellView
             cellView.textField!.stringValue = self.arrayPredicates[row].columnNameToMatch+" ->\n"+self.arrayPredicates[row].stringToMatch
             cellView.imageView!.image = NSImage(named: self.arrayPredicates[row].booleanOperator)
 
-        case "tvANDparameters", "tvORparameters":
-            let col_parameter = tvidentifier == "tvANDparameters" ? self.arrayANDpredicates[row] : self.arrayORpredicates[row]
-            let columnNumber = Int(col_parameter[kSelectedParametersArrayColumnIndex])
-            
-            switch tableColumn!.identifier
-            {
-            case "column":
-                cellView = tableView.makeViewWithIdentifier("selectedParameterCellC", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.headerStringForColumnIndex(columnNumber)
-            case "parameter":
-                cellView = tableView.makeViewWithIdentifier("selectedParameterCellP", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = col_parameter[kSelectedParametersArrayParameterIndex]
-            default:
-                break
-            }
 
         default:
             break;
@@ -270,10 +250,8 @@ class SelectParametersViewController: RecodeColumnViewController {
             self.resetCol2ExtractedParameters()
             self.extractCol2ParametersIntoSetFromHeaders2()
 
-        case "tvANDparameters":
-            self.buttonRemoveANDParameter.enabled = tableView.selectedRow != -1
-        case "tvORparameters":
-            self.buttonRemoveORParameter.enabled = tableView.selectedRow != -1
+        case "tvPredicates":
+            self.buttonRemovePredicate.enabled = tableView.selectedRow != -1
         case "tvHeadersForChart":
             break
         default:
@@ -340,16 +318,13 @@ class SelectParametersViewController: RecodeColumnViewController {
 
     func updateTableViewSelectedColumnAndParameters(arrayIdentifier: String)
     {
-        self.tvParameterImageCell.reloadData()
+        self.tvPredicates.reloadData()
 
         switch arrayIdentifier
         {
-        case "removeANDarray", "clearANDarray", "addANDarray","addANDarrayCol1","addANDarrayCol2":
-            self.tvANDparameters.reloadData()
-            self.buttonRemoveANDParameter.enabled = false
-        case "removeORarray", "clearORarray", "addORarray","addORarrayCol1","addORarrayCol2":
-            self.tvORparameters.reloadData()
-            self.buttonRemoveORParameter.enabled = false
+        case "removePredicate", "clearPredicates", "addANDarray","addANDarrayCol1","addANDarrayCol2":
+            self.tvPredicates.reloadData()
+            self.buttonRemovePredicate.enabled = false
         default:
             break
         }
@@ -394,19 +369,15 @@ class SelectParametersViewController: RecodeColumnViewController {
         {
             if parameterIndex >= 0 && parameterIndex < arrayParamsToUse.count
             {
-                let boolS:String
                 switch arrayIdentifier
                 {
                 case "addANDarray", "addANDarrayCol1", "addANDarrayCol2":
-                    self.arrayANDpredicates.append([String(columnIndex),arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex]])
-                    boolS = "AND"
+                    self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: "AND")
                 case "addORarray","addORarrayCol1", "addORarrayCol2":
-                    self.arrayORpredicates.append([String(columnIndex),arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex]])
-                    boolS = "OR"
+                    self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: "OR")
                 default:
-                    boolS = ""
+                    break
                 }
-                self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: boolS)
             }
         }
 
@@ -425,7 +396,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     func removeColumnAndSelectedParameter(arrayIdentifier: String)
     {
-        let selectedRowInTable = arrayIdentifier == "removeANDarray" ? self.tvANDparameters.selectedRow : self.tvORparameters.selectedRow
+        let selectedRowInTable = self.tvPredicates.selectedRow
         guard selectedRowInTable >= 0
             else
         {
@@ -433,24 +404,20 @@ class SelectParametersViewController: RecodeColumnViewController {
         }
         switch arrayIdentifier
         {
-        case "removeANDarray":
-            self.arrayANDpredicates.removeAtIndex(selectedRowInTable)
-        case "removeORarray":
-            self.arrayORpredicates.removeAtIndex(selectedRowInTable)
+        case "removePredicate":
+            self.arrayPredicates.removeAtIndex(selectedRowInTable)
         default:
             break
         }
         self.updateTableViewSelectedColumnAndParameters(arrayIdentifier)
     }
     
-    func clearANDorORarray(arrayIdentifier: String)
+    func clearPredicates(arrayIdentifier: String)
     {
         switch arrayIdentifier
         {
-        case "clearANDarray":
-            self.arrayANDpredicates.removeAll()
-        case "clearORarray":
-            self.arrayORpredicates.removeAll()
+        case "clearPredicates":
+            self.arrayPredicates.removeAll()
         default:
             break
         }

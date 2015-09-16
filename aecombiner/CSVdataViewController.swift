@@ -50,15 +50,15 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     // MARK: - extracting CSV data table
 
-    func extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)
+    func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:GroupingPredicatesArray)
     {
-        self.associatedCSVdataDocument.extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+        self.associatedCSVdataDocument.extractRowsBasedOnPredicatesIntoNewFile(predicates: predicates)
         self.tvCSVdata.reloadData()
     }
     
-    func extractedDataMatrixForChartWithPredicates(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)->DataMatrix
+    func extractedDataMatrixForChartWithPredicates(predicates predicates:GroupingPredicatesArray)->DataMatrix
     {
-        return self.associatedCSVdataDocument.extractedDataMatrixForChartWithPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+        return self.associatedCSVdataDocument.extractedDataMatrixWithPredicates(predicates: predicates)
     }
     
     func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet

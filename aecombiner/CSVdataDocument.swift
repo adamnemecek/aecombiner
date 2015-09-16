@@ -606,9 +606,32 @@ class CSVdataDocument: NSDocument {
         generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.csvDataModel.csvData, columnIndexToSort: columnIndexToSort, textOrvalue: textOrvalue, direction: direction)
     }
 
-    func extractedDataMatrixForChartWithPredicates(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)->DataMatrix
+    
+    func splitPredicatesByBoolean(predicatesToSplit predicatesToSplit:GroupingPredicatesArray)->PredicatesByBoolean
+    {
+        var splitpreds = PredicatesByBoolean()
+        for predicate in predicatesToSplit
+        {
+            switch predicate.booleanOperator
+            {
+            case "AND":
+                splitpreds.ANDpredicates.append(predicate)
+            case "OR":
+                splitpreds.ORpredicates.append(predicate)
+            case "NOT":
+                splitpreds.NOTpredicates.append(predicate)
+            default:
+                break
+            }
+        }
+        return splitpreds
+    }
+
+    
+    func extractedDataMatrixWithPredicates(predicates predicates:GroupingPredicatesArray)->DataMatrix
     {
         var extractedRows = DataMatrix()
+        let predicatesSplitByBoolean = self.splitPredicatesByBoolean(predicatesToSplit: predicates)
         for rowOfColumns in self.csvDataModel.csvData
         {
             //assume row is matched
@@ -618,27 +641,29 @@ class CSVdataDocument: NSDocument {
             // rowOfColumns is a [string] array of row columns
             // the predicate is a [column#][query text] both strings
             //do AND first as if just one is unmatched then we reject the row
-            for predicateAND in ANDpredicates
+            for predicateAND in predicatesSplitByBoolean.ANDpredicates
             {
-                if rowOfColumns[Int(predicateAND[0])!] != predicateAND[1]
+                guard let colIndex = self.columnIndexForHeaderString(predicateAND.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateAND.columnNameToMatch) failed");continue}//should alert here
+                if rowOfColumns[colIndex] != predicateAND.stringToMatch
                 {
-                    //we break this ANDpredicates loop with rowMatched false
+                    //we break this ANDpredicates loop with rowMatched false, as we need to fail only one AND to reject row
                     rowMatchedAND = false
                     break
                 }
             }
             
             // if we ended the AND loop without setting row matched false, and have OR predicates to match
-            if rowMatchedAND == true && ORpredicates.count > 0
+            if rowMatchedAND == true && predicatesSplitByBoolean.ORpredicates.count > 0
             {
                 //as we have OR predicates we must flip its value, so any OR can reset to true
                 rowMatchedOR = false
                 // check ORpredicates, just one true will exit and flip the rowMatched
-                for predicateOR in ORpredicates
+                for predicateOR in predicatesSplitByBoolean.ORpredicates
                 {
-                    if rowOfColumns[Int(predicateOR[0])!] == predicateOR[1]
+                    guard let colIndex = self.columnIndexForHeaderString(predicateOR.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateOR.columnNameToMatch) failed");continue}//should alert here
+                    if rowOfColumns[colIndex] == predicateOR.stringToMatch
                     {
-                        //we break this ORpredicates loop and flip the rowMatchedOR
+                        //we break this ORpredicates loop and flip the rowMatchedOR. We only need one OR to accept row
                         rowMatchedOR = true
                         break
                     }
@@ -654,9 +679,9 @@ class CSVdataDocument: NSDocument {
         return extractedRows
     }
     
-    func extractRowsBasedOnPredicatesIntoNewFile(ANDpredicates ANDpredicates:DataMatrix, ORpredicates:DataMatrix)
+    func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:GroupingPredicatesArray)
     {
-        let extractedData = self.extractedDataMatrixForChartWithPredicates(ANDpredicates: ANDpredicates, ORpredicates: ORpredicates)
+        let extractedData = self.extractedDataMatrixWithPredicates(predicates: predicates)
         if extractedData.count>0
         {
             self.createNewDocumentFromExtractedRows(cvsData: extractedData, headers: nil, name:nil)
@@ -731,7 +756,10 @@ class CSVdataDocument: NSDocument {
         return (self.csvDataModel.headers[index])
     }
     
-
+    func columnIndexForHeaderString(headerString:String)->Int?
+    {
+        return self.csvDataModel.headers.indexOf(headerString)
+    }
 
 }
 
