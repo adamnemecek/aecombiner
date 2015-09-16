@@ -9,14 +9,23 @@
 import Cocoa
 
 struct GroupingPredicate {
-    var columnIndexToMatch:Int
+    var columnNameToMatch:String
     var stringToMatch:String
     var booleanOperator:String
-    init (columnIndex:Int,string:String,boolean:String)
+    init (columnName:String,string:String,boolean:String)
     {
         booleanOperator = boolean
         stringToMatch = string
-        columnIndexToMatch = columnIndex
+        columnNameToMatch = columnName
+    }
+    
+    func isGreaterThan(comparator:GroupingPredicate)->Bool
+    {
+        if comparator.booleanOperator != booleanOperator
+            {return comparator.booleanOperator > booleanOperator}
+        if comparator.columnNameToMatch != columnNameToMatch
+            {return comparator.columnNameToMatch > columnNameToMatch}
+        return comparator.stringToMatch > stringToMatch
     }
 }
 
@@ -213,7 +222,7 @@ class SelectParametersViewController: RecodeColumnViewController {
             cellView.textField!.stringValue = self.arrayCol2Params[row][kParametersArrayParametersIndex]
         case "tvParameterImageCell":
             cellView = tableView.makeViewWithIdentifier("parameterImageCell", owner: self) as! NSTableCellView
-            cellView.textField!.stringValue = self.headerStringForColumnIndex(self.arrayPredicates[row].columnIndexToMatch)+" -> "+self.arrayPredicates[row].stringToMatch
+            cellView.textField!.stringValue = self.arrayPredicates[row].columnNameToMatch+" ->\n"+self.arrayPredicates[row].stringToMatch
             cellView.imageView!.image = NSImage(named: self.arrayPredicates[row].booleanOperator)
 
         case "tvANDparameters", "tvORparameters":
@@ -397,11 +406,21 @@ class SelectParametersViewController: RecodeColumnViewController {
                 default:
                     boolS = ""
                 }
-                self.arrayPredicates.append(GroupingPredicate(columnIndex: columnIndex, string: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], boolean: boolS))
+                self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: boolS)
             }
         }
 
         self.updateTableViewSelectedColumnAndParameters(arrayIdentifier)
+    }
+    
+    
+    func appendPredicateToArray(columnIndexToSearch columnName: String, matchString: String, booleanString: String)
+    {
+        self.arrayPredicates.append(GroupingPredicate(columnName: columnName, string: matchString, boolean: booleanString))
+        self.arrayPredicates.sortInPlace ()
+            {
+                $0.isGreaterThan($1)
+        }
     }
     
     func removeColumnAndSelectedParameter(arrayIdentifier: String)
