@@ -13,9 +13,9 @@ let kDescending = false
 let kSortOriginal = -1
 let kSortAsText = 0
 let kSortAsValue = 1
-let kBooleanStringAND = "AND"
-let kBooleanStringOR = "OR"
-let kBooleanStringNOT = "NOT"
+let kBooleanStringAND = "2AND"
+let kBooleanStringOR = "3OR"
+let kBooleanStringNOT = "1NOT"
 
 let kSubstituteValueForZeroInLogarithm = -1.00
 
@@ -638,25 +638,42 @@ class CSVdataDocument: NSDocument {
         for rowOfColumns in self.csvDataModel.csvData
         {
             //assume row is matched
+            var rowMatchedNOT = true
             var rowMatchedAND = true
             var rowMatchedOR = true
             
             // rowOfColumns is a [string] array of row columns
             // the predicate is a [column#][query text] both strings
-            //do AND first as if just one is unmatched then we reject the row
-            for predicateAND in predicatesSplitByBoolean.ANDpredicates
+            
+            
+            //do NOT first as if just one is matched then we reject the row
+            for predicateNOT in predicatesSplitByBoolean.NOTpredicates
             {
-                guard let colIndex = self.columnIndexForHeaderString(predicateAND.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateAND.columnNameToMatch) failed");continue}//should alert here
-                if rowOfColumns[colIndex] != predicateAND.stringToMatch
+                guard let colIndex = self.columnIndexForHeaderString(predicateNOT.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateNOT.columnNameToMatch) failed");continue}//should alert here
+                if rowOfColumns[colIndex] == predicateNOT.stringToMatch
                 {
-                    //we break this ANDpredicates loop with rowMatched false, as we need to fail only one AND to reject row
-                    rowMatchedAND = false
-                    break
+                    //we break this predicateNOT loop with rowMatched false, as we need to match only one NOT to reject row
+                    rowMatchedNOT = false
                 }
             }
             
-            // if we ended the AND loop without setting row matched false, and have OR predicates to match
-            if rowMatchedAND == true && predicatesSplitByBoolean.ORpredicates.count > 0
+            // if we ended the NOT loop without setting row matched false, and have AND predicates to match
+            //do AND next as if just one is unmatched then we reject the row
+            if rowMatchedNOT == true && predicatesSplitByBoolean.ANDpredicates.count > 0
+            {
+                for predicateAND in predicatesSplitByBoolean.ANDpredicates
+                {
+                    guard let colIndex = self.columnIndexForHeaderString(predicateAND.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateAND.columnNameToMatch) failed");continue}//should alert here
+                    if rowOfColumns[colIndex] != predicateAND.stringToMatch
+                    {
+                        //we break this ANDpredicates loop with rowMatched false, as we need to fail only one AND to reject row
+                        rowMatchedAND = false
+                    }
+                }
+            }
+            
+            // if we ended the NOT & AND loops without setting row matched false, and have OR predicates to match
+            if rowMatchedNOT == true && rowMatchedAND == true && predicatesSplitByBoolean.ORpredicates.count > 0
             {
                 //as we have OR predicates we must flip its value, so any OR can reset to true
                 rowMatchedOR = false
@@ -674,7 +691,7 @@ class CSVdataDocument: NSDocument {
             }
             
             // if we ended the AND and OR loops without setting row matched false, add row
-            if rowMatchedOR && rowMatchedAND
+            if rowMatchedNOT && rowMatchedOR && rowMatchedAND
             {
                 extractedRows.append(rowOfColumns)
             }

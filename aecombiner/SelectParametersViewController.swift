@@ -28,9 +28,9 @@ struct GroupingPredicate: Comparable
 }
 //you implement == type at GLOBAL level not within the body of the struct!!!
 func ==(lhs: GroupingPredicate, rhs: GroupingPredicate) -> Bool {
-    return  (lhs.booleanOperator == rhs.booleanOperator)
-            && (lhs.columnNameToMatch == rhs.columnNameToMatch)
-            && (lhs.stringToMatch == rhs.stringToMatch)
+    return  //(lhs.booleanOperator == rhs.booleanOperator)  && we ignore bool as u cant use the same search term in more than one bool type
+            (lhs.columnNameToMatch == rhs.columnNameToMatch) &&
+            (lhs.stringToMatch == rhs.stringToMatch)
 }
 func < (lhs: GroupingPredicate, rhs: GroupingPredicate) -> Bool {
     //phased approach. We test in precedence and ignore any unequalness below if the upper level is discordant
@@ -335,16 +335,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     func updateTableViewSelectedColumnAndParameters(arrayIdentifier: String)
     {
         self.tvPredicates.reloadData()
-
-        switch arrayIdentifier
-        {
-        case "removePredicate", "clearPredicates", "addANDarray","addANDarrayCol1","addANDarrayCol2":
-            self.tvPredicates.reloadData()
-            self.buttonRemovePredicate.enabled = false
-        default:
-            break
-        }
-
+        self.buttonRemovePredicate.enabled = false
     }
     
     func addColumnAndSelectedParameter(arrayIdentifier: String)
@@ -356,15 +347,15 @@ class SelectParametersViewController: RecodeColumnViewController {
         
         switch arrayIdentifier
         {
-        case "addANDarray","addORarray":
+        case "addANDarray","addORarray","addNOTarray":
             columnIndex = self.tvHeaders.selectedRow
             parameterRows = self.tvExtractedParameters.selectedRowIndexes
             arrayParamsToUse = self.arrayExtractedParameters
-        case "addANDarrayCol1","addORarrayCol1":
+        case "addANDarrayCol1","addORarrayCol1","addNOTarrayCol1":
             columnIndex = self.tv2colHeaders1.selectedRow
             parameterRows = self.tv2colParameters1.selectedRowIndexes
             arrayParamsToUse = self.arrayCol1Params
-        case "addANDarrayCol2","addORarrayCol2":
+        case "addANDarrayCol2","addORarrayCol2","addNOTarrayCol2":
             columnIndex = self.tv2colHeaders2.selectedRow
             parameterRows = self.tv2colParameters2.selectedRowIndexes
             arrayParamsToUse = self.arrayCol2Params
@@ -385,15 +376,21 @@ class SelectParametersViewController: RecodeColumnViewController {
         {
             if parameterIndex >= 0 && parameterIndex < arrayParamsToUse.count
             {
+                let boolS:String
                 switch arrayIdentifier
                 {
                 case "addANDarray", "addANDarrayCol1", "addANDarrayCol2":
-                    self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: kBooleanStringAND)
+                    boolS =  kBooleanStringAND
                 case "addORarray","addORarrayCol1", "addORarrayCol2":
-                    self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: kBooleanStringOR)
+                      boolS =  kBooleanStringOR
+                case "addNOTarray","addNOTarrayCol1", "addNOTarrayCol2":
+                      boolS =  kBooleanStringNOT
                 default:
+                      boolS = ""
                     break
                 }
+                self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: boolS)
+
             }
         }
 
@@ -404,7 +401,15 @@ class SelectParametersViewController: RecodeColumnViewController {
     func appendPredicateToArray(columnIndexToSearch columnName: String, matchString: String, booleanString: String)
     {
         let predicate = GroupingPredicate(columnName: columnName, string: matchString, boolean: booleanString)
-        guard self.arrayPredicates.indexOf(predicate) == nil else {print("duplicate"); return}
+        guard self.arrayPredicates.indexOf(predicate) == nil
+            else
+        {
+            let alert = NSAlert()
+            alert.alertStyle = .CriticalAlertStyle
+            alert.messageText = predicate.columnNameToMatch+" : "+predicate.stringToMatch+" has already been included"
+            alert.runModal()
+            return
+        }
         self.arrayPredicates.append(predicate)
         self.arrayPredicates.sortInPlace () {$0 < $1}
     }
