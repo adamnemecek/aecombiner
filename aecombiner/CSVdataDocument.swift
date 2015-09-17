@@ -13,6 +13,9 @@ let kDescending = false
 let kSortOriginal = -1
 let kSortAsText = 0
 let kSortAsValue = 1
+let kBooleanStringAND = "AND"
+let kBooleanStringOR = "OR"
+let kBooleanStringNOT = "NOT"
 
 let kSubstituteValueForZeroInLogarithm = -1.00
 
@@ -614,11 +617,11 @@ class CSVdataDocument: NSDocument {
         {
             switch predicate.booleanOperator
             {
-            case "AND":
+            case kBooleanStringAND:
                 splitpreds.ANDpredicates.append(predicate)
-            case "OR":
+            case kBooleanStringOR:
                 splitpreds.ORpredicates.append(predicate)
-            case "NOT":
+            case kBooleanStringNOT:
                 splitpreds.NOTpredicates.append(predicate)
             default:
                 break

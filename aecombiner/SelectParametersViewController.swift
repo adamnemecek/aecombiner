@@ -8,7 +8,14 @@
 
 import Cocoa
 
-struct GroupingPredicate {
+class GroupingPredicateTableCellView: NSTableCellView {
+    @IBOutlet weak var textFieldLower: NSTextField!
+
+}
+
+
+struct GroupingPredicate: Comparable
+{
     var columnNameToMatch:String
     var stringToMatch:String
     var booleanOperator:String
@@ -18,16 +25,24 @@ struct GroupingPredicate {
         stringToMatch = string
         columnNameToMatch = columnName
     }
-    
-    func isGreaterThan(comparator:GroupingPredicate)->Bool
-    {
-        if comparator.booleanOperator != booleanOperator
-            {return comparator.booleanOperator > booleanOperator}
-        if comparator.columnNameToMatch != columnNameToMatch
-            {return comparator.columnNameToMatch > columnNameToMatch}
-        return comparator.stringToMatch > stringToMatch
-    }
 }
+//you implement == type at GLOBAL level not within the body of the struct!!!
+func ==(lhs: GroupingPredicate, rhs: GroupingPredicate) -> Bool {
+    return  (lhs.booleanOperator == rhs.booleanOperator)
+            && (lhs.columnNameToMatch == rhs.columnNameToMatch)
+            && (lhs.stringToMatch == rhs.stringToMatch)
+}
+func < (lhs: GroupingPredicate, rhs: GroupingPredicate) -> Bool {
+    //phased approach. We test in precedence and ignore any unequalness below if the upper level is discordant
+    // so it may be > at a lower level 
+    // we do this to ensure the ANDs cluster apart from ORs, COLUMNs from each other and so on
+    if lhs.booleanOperator != rhs.booleanOperator
+    {return lhs.booleanOperator < rhs.booleanOperator}
+    if lhs.columnNameToMatch != rhs.columnNameToMatch
+    {return lhs.columnNameToMatch < rhs.columnNameToMatch}
+    return lhs.stringToMatch < rhs.stringToMatch
+}
+
 typealias GroupingPredicatesArray = [GroupingPredicate]
 
 struct PredicatesByBoolean {
@@ -216,10 +231,11 @@ class SelectParametersViewController: RecodeColumnViewController {
             cellView.textField!.stringValue = self.arrayCol2Params[row][kParametersArrayParametersIndex]
             
         case "tvPredicates":
-            cellView = tableView.makeViewWithIdentifier("parameterImageCell", owner: self) as! NSTableCellView
-            cellView.textField!.stringValue = self.arrayPredicates[row].columnNameToMatch+" ->\n"+self.arrayPredicates[row].stringToMatch
-            cellView.imageView!.image = NSImage(named: self.arrayPredicates[row].booleanOperator)
-
+            let predcellView = tableView.makeViewWithIdentifier("parameterImageCell", owner: self) as! GroupingPredicateTableCellView
+            predcellView.textField!.stringValue = self.arrayPredicates[row].columnNameToMatch
+            predcellView.textFieldLower!.stringValue = self.arrayPredicates[row].stringToMatch
+            predcellView.imageView!.image = NSImage(named: self.arrayPredicates[row].booleanOperator)
+            return predcellView
 
         default:
             break;
@@ -372,9 +388,9 @@ class SelectParametersViewController: RecodeColumnViewController {
                 switch arrayIdentifier
                 {
                 case "addANDarray", "addANDarrayCol1", "addANDarrayCol2":
-                    self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: "AND")
+                    self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: kBooleanStringAND)
                 case "addORarray","addORarrayCol1", "addORarrayCol2":
-                    self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: "OR")
+                    self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArrayParametersIndex], booleanString: kBooleanStringOR)
                 default:
                     break
                 }
@@ -387,11 +403,10 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     func appendPredicateToArray(columnIndexToSearch columnName: String, matchString: String, booleanString: String)
     {
-        self.arrayPredicates.append(GroupingPredicate(columnName: columnName, string: matchString, boolean: booleanString))
-        self.arrayPredicates.sortInPlace ()
-            {
-                $0.isGreaterThan($1)
-        }
+        let predicate = GroupingPredicate(columnName: columnName, string: matchString, boolean: booleanString)
+        guard self.arrayPredicates.indexOf(predicate) == nil else {print("duplicate"); return}
+        self.arrayPredicates.append(predicate)
+        self.arrayPredicates.sortInPlace () {$0 < $1}
     }
     
     func removeColumnAndSelectedParameter(arrayIdentifier: String)
