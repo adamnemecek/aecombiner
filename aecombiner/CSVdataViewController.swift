@@ -110,12 +110,22 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.associatedCSVdataDocument.numberOfColumnsInData()
     }
     
+    func headerStringsForAllColumns()->[String]
+    {
+        return self.associatedCSVdataDocument.headerStringsForAllColumns()
+    }
+
     func headerStringForColumnIndex(columnIndex:Int?) -> String
     {
         return self.associatedCSVdataDocument.headerStringForColumnIndex(columnIndex)
     }
     
-    func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
+    func checkedGroupingPredicatesArray(arrayToCheck:GroupingPredicatesArray)->GroupingPredicatesArray
+    {
+        return self.associatedCSVdataDocument.checkedGroupingPredicatesArray(arrayToCheck)
+    }
+    
+    func requestedColumnIndexIsOK(columnIndex:Int) -> Int?
     {
         return self.associatedCSVdataDocument.requestedColumnIndexIsOK(columnIndex)
     }

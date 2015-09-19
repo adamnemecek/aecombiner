@@ -599,9 +599,9 @@ class CSVdataDocument: NSDocument {
     {
     }
     
-    func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
+    func requestedColumnIndexIsOK(columnIndex:Int) -> Int?
     {
-        return columnIndex >= 0 && columnIndex < self.numberOfColumnsInData()
+        return columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() ? columnIndex : nil
     }
 
     func sortCSVrowsInColumnAsTextOrValues(columnIndexToSort columnIndexToSort:Int, textOrvalue:Int, direction: Bool)
@@ -770,6 +770,13 @@ class CSVdataDocument: NSDocument {
         return set.count == 0 ? nil : set
     }
     
+    // MARK: - Headers
+    
+    func headerStringsForAllColumns()->[String]
+    {
+        return self.csvDataModel.headers
+    }
+    
     func headerStringForColumnIndex(columnIndex:Int?) -> String
     {
         guard let index = columnIndex where columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return "???"}
@@ -781,5 +788,17 @@ class CSVdataDocument: NSDocument {
         return self.csvDataModel.headers.indexOf(headerString)
     }
 
+    func checkedGroupingPredicatesArray(arrayToCheck:GroupingPredicatesArray)->GroupingPredicatesArray
+    {
+        var checkedArray = GroupingPredicatesArray()
+        for var predicate in arrayToCheck
+        {
+            guard (self.csvDataModel.headers.indexOf(predicate.columnNameToMatch) == nil) else {checkedArray.append(predicate); continue}
+            predicate.columnNameToMatch = "⚠️ "+predicate.columnNameToMatch
+            checkedArray.append(predicate)
+        }
+        return checkedArray
+    }
+    
 }
 

@@ -120,9 +120,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     // MARK: - Columns
     func selectedColumnFromHeadersTableView(tableview: NSTableView) -> Int?
     {
-        guard self.requestedColumnIndexIsOK(tableview.selectedRow)
-            else {return nil}
-        return tableview.selectedRow
+        return self.requestedColumnIndexIsOK(tableview.selectedRow)
     }
     
     func titleForSelectedColumnInHeaders(tableview: NSTableView)->String
@@ -130,9 +128,9 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         return self.headerStringForColumnIndex(self.selectedColumnFromHeadersTableView(tableview))
     }
     
-    func requestedColumnIndexIsOK(columnIndex:Int) -> Bool
+    func requestedColumnIndexIsOK(columnIndex:Int) -> Int?
     {
-        guard let vc = self.associatedCSVdataViewController else {return false}
+        guard let vc = self.associatedCSVdataViewController else {return nil}
         return vc.requestedColumnIndexIsOK(columnIndex)
     }
     
@@ -160,6 +158,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         // Do view setup here.
     }
 
+    
     
     // MARK: - Segue
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {

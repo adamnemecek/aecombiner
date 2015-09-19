@@ -25,6 +25,42 @@ struct GroupingPredicate: Comparable
         stringToMatch = string
         columnNameToMatch = columnName
     }
+    static func extractNSArrayFromGroupingPredicatesArray(predicatesarray predicatesarray:GroupingPredicatesArray)->NSMutableArray
+    {
+        let newarray = NSMutableArray()
+        for predicate in predicatesarray
+        {
+            let newRow = NSArray(objects: predicate.booleanOperator,predicate.stringToMatch,predicate.columnNameToMatch)
+            newarray.addObject(newRow)
+        }
+        return newarray
+    }
+    static func extractGroupingPredicatesArrayFromNSArray(array:NSArray)->GroupingPredicatesArray
+    {
+        
+        var newarray = GroupingPredicatesArray()
+        for predicate in array
+        {
+            let predA = predicate as! NSArray
+            let newP = GroupingPredicate(columnName: predA.objectAtIndex(2) as! String, string: predA.objectAtIndex(1) as! String, boolean: predA.objectAtIndex(0) as! String)
+            newarray.append(newP)
+        }
+        return newarray
+    }
+
+    static func saveGroupingPredicatesArrayToURL(url url:NSURL, predicatesarray:GroupingPredicatesArray)
+    {
+        let nsarray = self.extractNSArrayFromGroupingPredicatesArray(predicatesarray: predicatesarray)
+        nsarray.writeToURL(url, atomically: true)
+    }
+    
+    static func loadGroupingPredicatesArrayFromURL(url url:NSURL)-> GroupingPredicatesArray?
+    {
+        guard let array = NSArray(contentsOfURL: url) where array.count > 0 else {return nil}
+        return self.extractGroupingPredicatesArrayFromNSArray(array)
+    }
+    
+
 }
 //you implement == type at GLOBAL level not within the body of the struct!!!
 func ==(lhs: GroupingPredicate, rhs: GroupingPredicate) -> Bool {
@@ -69,12 +105,14 @@ class SelectParametersViewController: RecodeColumnViewController {
     @IBOutlet weak var tv2colHeaders2: NSTableView!
     @IBOutlet weak var tv2colParameters2: NSTableView!
     @IBOutlet weak var tv2colParameters1: NSTableView!
-    @IBOutlet weak var tvHeadersForChart: NSTableView!
+    //@IBOutlet weak var tvHeadersForChart: NSTableView!
     @IBOutlet weak var tvPredicates: NSTableView!
     
     @IBOutlet weak var buttonRemovePredicate: NSButton!
     @IBOutlet weak var buttonChartExtractedRows: NSButton!
 
+    @IBOutlet weak var popupParameterToChart: NSPopUpButton!
+    @IBOutlet weak var popupColumnToInspect: NSPopUpButtonCell!
     
     
     /* MARK: - Represented Object
@@ -85,6 +123,9 @@ class SelectParametersViewController: RecodeColumnViewController {
 */
     // MARK: - @IBAction
     
+    @IBAction func popupButtonSelected(sender: NSPopUpButton) {
+        print(sender.selectedItem)
+    }
     
     @IBAction func addSelectedParameter(sender: NSButton) {
         self.addColumnAndSelectedParameter(sender.identifier!)
@@ -114,6 +155,30 @@ class SelectParametersViewController: RecodeColumnViewController {
         self.chartExtractedRows(sender)
     }
     
+    @IBAction func savePredicates(sender: NSButton) {
+        let sp = NSSavePanel()
+        if sp.runModal() == NSFileHandlingPanelOKButton
+        {
+            guard  let targetURL = sp.URL else {return}
+            GroupingPredicate.saveGroupingPredicatesArrayToURL(url: targetURL, predicatesarray: self.arrayPredicates)
+        }
+    }
+    
+    @IBAction func loadPredicates(sender: NSButton) {
+        guard let csvdatavc = self.associatedCSVdataViewController else {return}
+        let sp = NSOpenPanel()
+        sp.allowsMultipleSelection = false
+        sp.canChooseDirectories = false
+        if sp.runModal() == NSFileHandlingPanelOKButton
+        {
+            guard  sp.URLs.count>0 else {return}
+            guard  let newgpa = GroupingPredicate.loadGroupingPredicatesArrayFromURL(url: sp.URLs[0]) else {return}
+            self.arrayPredicates = csvdatavc.checkedGroupingPredicatesArray(newgpa)
+            self.updateTableViewSelectedColumnAndParameters()
+        }
+    }
+    
+    
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
@@ -126,10 +191,10 @@ class SelectParametersViewController: RecodeColumnViewController {
     func chartExtractedRows(sender: NSButton) {
         guard
             let chartviewC = self.chartViewController,
-            let columnIndex = self.selectedColumnFromHeadersTableView(self.tvHeadersForChart)
+            let colIndex = self.requestedColumnIndexIsOK(self.popupParameterToChart.indexOfSelectedItem)//self.selectedColumnFromHeadersTableView(self.tvHeadersForChart)
             else {return}
-        let dataset = ChartDataSet(data: self.extractedDataMatrixForChart, forColumnIndex: columnIndex)
-        chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: self.headerStringForColumnIndex(columnIndex))
+        let dataset = ChartDataSet(data: self.extractedDataMatrixForChart, forColumnIndex: colIndex)
+        chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: self.headerStringForColumnIndex(colIndex))
 
     }
     
@@ -140,17 +205,34 @@ class SelectParametersViewController: RecodeColumnViewController {
         // Do any additional setup after loading the view.
         //self.representedObject = CSVdata()
     }
-    
-    override func viewDidAppear() {
-        super.viewDidAppear()
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        self.populateChartPopup()
+        
         self.tvHeaders?.reloadData()
         self.tv2colHeaders1?.reloadData()
         self.tv2colHeaders2?.reloadData()
-        self.tvHeadersForChart?.reloadData()
+        //self.tvHeadersForChart?.reloadData()
         
         self.tvExtractedParameters?.reloadData()
 
     }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+
+    }
+    
+    func populateChartPopup()
+    {
+        guard let csvdo = self.associatedCSVdataViewController else { return}
+        self.popupParameterToChart.removeAllItems()
+        self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popupColumnToInspect.removeAllItems()
+        self.popupColumnToInspect.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popupColumnToInspect.selectItemAtIndex(-1)
+    }
+
     // MARK: - Sorting Tables on header click
     override func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
         // inheriteds override
@@ -183,7 +265,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         guard let tvidentifier = tableView.identifier,let csvdo = self.associatedCSVdataViewController  else {return 0}
         switch tvidentifier
         {
-        case "tvSelectedHeaders", "tv2colHeaders1", "tv2colHeaders2",  "tvHeadersForChart":
+        case "tvSelectedHeaders", "tv2colHeaders1", "tv2colHeaders2"  /*,"tvHeadersForChart"*/:
             return csvdo.numberOfColumnsInData()
         case "tv1colParameters":
             return self.arrayExtractedParameters.count
@@ -207,7 +289,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         }
         switch tvidentifier
         {
-        case "tvSelectedHeaders", "tvHeadersForChart", "tv2colHeaders1", "tv2colHeaders2":
+        case "tvSelectedHeaders", "tv2colHeaders1", "tv2colHeaders2" /*,"tvHeadersForChart"*/:
             cellView = self.cellForHeadersTable(tableView: tableView, row: row)
         case "tv1colParameters":
             switch tableColumn!.identifier
@@ -268,8 +350,8 @@ class SelectParametersViewController: RecodeColumnViewController {
 
         case "tvPredicates":
             self.buttonRemovePredicate.enabled = tableView.selectedRow != -1
-        case "tvHeadersForChart":
-            break
+        //case "tvHeadersForChart":
+        //    break
         default:
             break;
         }
@@ -332,7 +414,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     // MARK: - AND OR tables
 
-    func updateTableViewSelectedColumnAndParameters(arrayIdentifier: String)
+    func updateTableViewSelectedColumnAndParameters()
     {
         self.tvPredicates.reloadData()
         self.buttonRemovePredicate.enabled = false
@@ -394,7 +476,7 @@ class SelectParametersViewController: RecodeColumnViewController {
             }
         }
 
-        self.updateTableViewSelectedColumnAndParameters(arrayIdentifier)
+        self.updateTableViewSelectedColumnAndParameters()
     }
     
     
@@ -429,7 +511,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         default:
             break
         }
-        self.updateTableViewSelectedColumnAndParameters(arrayIdentifier)
+        self.updateTableViewSelectedColumnAndParameters()
     }
     
     func clearPredicates(arrayIdentifier: String)
@@ -441,7 +523,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         default:
             break
         }
-        self.updateTableViewSelectedColumnAndParameters(arrayIdentifier)
+        self.updateTableViewSelectedColumnAndParameters()
     }
     
 
