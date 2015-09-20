@@ -9,6 +9,7 @@
 import Cocoa
 import SpriteKit
 
+
 @objc protocol ChartViewControllerDelegate
 {
     func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes:NSMutableIndexSet, nameOfDataSet:String)

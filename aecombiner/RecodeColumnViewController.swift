@@ -183,6 +183,7 @@ class RecodeColumnViewController: HeadingsViewController {
         return matrix
     }
     
+    
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu

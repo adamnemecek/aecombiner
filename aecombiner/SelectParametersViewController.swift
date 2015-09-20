@@ -101,19 +101,18 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     @IBOutlet weak var tabv1Col2Col: NSTabView!
     
-    @IBOutlet weak var tv2colHeaders1: NSTableView!
-    @IBOutlet weak var tv2colHeaders2: NSTableView!
     @IBOutlet weak var tv2colParameters2: NSTableView!
     @IBOutlet weak var tv2colParameters1: NSTableView!
-    //@IBOutlet weak var tvHeadersForChart: NSTableView!
     @IBOutlet weak var tvPredicates: NSTableView!
     
     @IBOutlet weak var buttonRemovePredicate: NSButton!
     @IBOutlet weak var buttonChartExtractedRows: NSButton!
 
     @IBOutlet weak var popupParameterToChart: NSPopUpButton!
-    @IBOutlet weak var popupColumnToInspect: NSPopUpButtonCell!
-    
+    @IBOutlet weak var popup1ColHeaders: NSPopUpButton!
+    @IBOutlet weak var popup2colHeaders1: NSPopUpButton!
+    @IBOutlet weak var popup2colHeaders2: NSPopUpButton!
+
     
     /* MARK: - Represented Object
     override func updateRepresentedObjectToCSVData(csvdata:CSVdata)
@@ -123,8 +122,8 @@ class SelectParametersViewController: RecodeColumnViewController {
 */
     // MARK: - @IBAction
     
-    @IBAction func popupButtonSelected(sender: NSPopUpButton) {
-        print(sender.selectedItem)
+    @IBAction func popupHeadersButtonSelected(sender: NSPopUpButton) {
+        self.popupChargedSelection(sender)
     }
     
     @IBAction func addSelectedParameter(sender: NSButton) {
@@ -157,6 +156,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     @IBAction func savePredicates(sender: NSButton) {
         let sp = NSSavePanel()
+        sp.allowedFileTypes = ["aePreds"]
         if sp.runModal() == NSFileHandlingPanelOKButton
         {
             guard  let targetURL = sp.URL else {return}
@@ -169,6 +169,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         let sp = NSOpenPanel()
         sp.allowsMultipleSelection = false
         sp.canChooseDirectories = false
+        sp.allowedFileTypes = ["aePreds"]
         if sp.runModal() == NSFileHandlingPanelOKButton
         {
             guard  sp.URLs.count>0 else {return}
@@ -191,7 +192,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     func chartExtractedRows(sender: NSButton) {
         guard
             let chartviewC = self.chartViewController,
-            let colIndex = self.requestedColumnIndexIsOK(self.popupParameterToChart.indexOfSelectedItem)//self.selectedColumnFromHeadersTableView(self.tvHeadersForChart)
+            let colIndex = self.requestedColumnIndexIsOK(self.popupParameterToChart.indexOfSelectedItem)
             else {return}
         let dataset = ChartDataSet(data: self.extractedDataMatrixForChart, forColumnIndex: colIndex)
         chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: self.headerStringForColumnIndex(colIndex))
@@ -207,12 +208,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     }
     override func viewWillAppear() {
         super.viewWillAppear()
-        self.populateChartPopup()
-        
-        self.tvHeaders?.reloadData()
-        self.tv2colHeaders1?.reloadData()
-        self.tv2colHeaders2?.reloadData()
-        //self.tvHeadersForChart?.reloadData()
+        self.populateHeaderPopups()
         
         self.tvExtractedParameters?.reloadData()
 
@@ -223,15 +219,6 @@ class SelectParametersViewController: RecodeColumnViewController {
 
     }
     
-    func populateChartPopup()
-    {
-        guard let csvdo = self.associatedCSVdataViewController else { return}
-        self.popupParameterToChart.removeAllItems()
-        self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
-        self.popupColumnToInspect.removeAllItems()
-        self.popupColumnToInspect.addItemsWithTitles(csvdo.headerStringsForAllColumns())
-        self.popupColumnToInspect.selectItemAtIndex(-1)
-    }
 
     // MARK: - Sorting Tables on header click
     override func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
@@ -239,8 +226,6 @@ class SelectParametersViewController: RecodeColumnViewController {
         guard let tvidentifier = tableView.identifier else {return}
         switch tvidentifier
         {
-        case "tvSelectedHeaders":
-            break
         case "tv1colParameters":
             self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayExtractedParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
             tableView.reloadData()
@@ -258,15 +243,57 @@ class SelectParametersViewController: RecodeColumnViewController {
     }
 
     
+    // MARK: - header Popups
+    func populateHeaderPopups()
+    {
+        guard let csvdo = self.associatedCSVdataViewController else { return}
+        self.popupParameterToChart.removeAllItems()
+        self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        
+        self.popup1ColHeaders.removeAllItems()
+        self.popup1ColHeaders.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popup1ColHeaders.selectItemAtIndex(-1)
+        
+        self.popup2colHeaders1.removeAllItems()
+        self.popup2colHeaders1.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popup2colHeaders1.selectItemAtIndex(-1)
+
+        self.popup2colHeaders2.removeAllItems()
+        self.popup2colHeaders2.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popup2colHeaders2.selectItemAtIndex(-1)
+
+    }
+
+    func popupChargedSelection(popup: NSPopUpButton)
+    {
+        guard let id = popup.identifier else {return}
+        switch id
+        {
+        case "popup1ColHeaders":
+            self.resetExtractedParameters()
+            self.extract1ColParametersIntoSet(colIndex: popup.indexOfSelectedItem)
+
+        case "popup2colHeaders1":
+            self.resetCol1ExtractedParameters()
+            self.extractCol1ParametersIntoSetFromColumn()
+            self.popup2colHeaders2?.selectItemAtIndex(-1)
+            self.popup2colHeaders2.enabled = false
+       case "popup2colHeaders2":
+            self.resetCol2ExtractedParameters()
+            self.extractCol2ParametersIntoSetFromHeaders2()
+       default:
+            break;
+        }
+
+    }
+    
     // MARK: - TableView overrides
     
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier,let csvdo = self.associatedCSVdataViewController  else {return 0}
+        guard let tvidentifier = tableView.identifier  else {return 0}
         switch tvidentifier
         {
-        case "tvSelectedHeaders", "tv2colHeaders1", "tv2colHeaders2"  /*,"tvHeadersForChart"*/:
-            return csvdo.numberOfColumnsInData()
         case "tv1colParameters":
             return self.arrayExtractedParameters.count
         case "tv2colParameters1":
@@ -289,8 +316,6 @@ class SelectParametersViewController: RecodeColumnViewController {
         }
         switch tvidentifier
         {
-        case "tvSelectedHeaders", "tv2colHeaders1", "tv2colHeaders2" /*,"tvHeadersForChart"*/:
-            cellView = self.cellForHeadersTable(tableView: tableView, row: row)
         case "tv1colParameters":
             switch tableColumn!.identifier
             {
@@ -333,25 +358,14 @@ class SelectParametersViewController: RecodeColumnViewController {
         let tableView = notification.object as! NSTableView
         switch tableView.identifier!
         {
-        case "tvSelectedHeaders":
-            self.resetExtractedParameters()
-            self.extractParametersIntoSetFromColumn()
             
-            
-        case "tv2colHeaders1":
-            self.resetCol1ExtractedParameters()
-            self.extractCol1ParametersIntoSetFromColumn()
         case "tv2colParameters1":
-            self.tv2colHeaders2?.reloadData()
             self.resetCol2ExtractedParameters()
-        case "tv2colHeaders2":
-            self.resetCol2ExtractedParameters()
-            self.extractCol2ParametersIntoSetFromHeaders2()
+            self.popup2colHeaders2?.selectItemAtIndex(-1)
+            self.popup2colHeaders2.enabled = true
 
         case "tvPredicates":
             self.buttonRemovePredicate.enabled = tableView.selectedRow != -1
-        //case "tvHeadersForChart":
-        //    break
         default:
             break;
         }
@@ -360,6 +374,16 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     
     // MARK: - Column 1 2 parameters
+    func extract1ColParametersIntoSet(colIndex colIndex:Int)
+    {
+        //called from Process menu
+        guard let csvdo = self.associatedCSVdataViewController, let columnIndex = self.requestedColumnIndexIsOK(colIndex), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
+        
+        self.arrayExtractedParameters = self.dataMatrixWithNoBlanksFromSet(set: set)
+        self.tvExtractedParameters.reloadData()
+        
+    }
+
     
     func resetCol1ExtractedParameters()
     {
@@ -367,18 +391,17 @@ class SelectParametersViewController: RecodeColumnViewController {
         self.arrayCol2Params = DataMatrix()
         self.tv2colParameters1?.reloadData()
         self.tv2colParameters2?.reloadData()
-        self.tv2colHeaders2?.reloadData()
     }
     
     func resetCol2ExtractedParameters()
     {
         self.arrayCol2Params = DataMatrix()
         self.tv2colParameters2?.reloadData()
-    }
+   }
     
     func extractCol1ParametersIntoSetFromColumn()
     {
-        guard let csvdo = self.associatedCSVdataViewController, let columnIndex = self.selectedColumnFromHeadersTableView(self.tv2colHeaders1), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
+        guard let csvdo = self.associatedCSVdataViewController, let columnIndex = self.requestedColumnIndexIsOK(self.popup2colHeaders1.indexOfSelectedItem), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
         
         self.arrayCol1Params = dataMatrixWithNoBlanksFromSet(set: set)
         self.tv2colParameters1.reloadData()
@@ -396,8 +419,8 @@ class SelectParametersViewController: RecodeColumnViewController {
     {
         guard
             let csvdo = self.associatedCSVdataViewController,
-            let columnToMatchIndex = self.selectedColumnFromHeadersTableView(self.tv2colHeaders1),
-            let columnToExtractIndex = self.selectedColumnFromHeadersTableView(self.tv2colHeaders2),
+            let columnToMatchIndex = self.requestedColumnIndexIsOK(self.popup2colHeaders1.indexOfSelectedItem),
+            let columnToExtractIndex = self.requestedColumnIndexIsOK(self.popup2colHeaders2.indexOfSelectedItem),
             let safeParam1Index = self.param1SelectedIndex()
         else { return }
 
@@ -430,15 +453,15 @@ class SelectParametersViewController: RecodeColumnViewController {
         switch arrayIdentifier
         {
         case "addANDarray","addORarray","addNOTarray":
-            columnIndex = self.tvHeaders.selectedRow
+            columnIndex = self.popup1ColHeaders.indexOfSelectedItem
             parameterRows = self.tvExtractedParameters.selectedRowIndexes
             arrayParamsToUse = self.arrayExtractedParameters
         case "addANDarrayCol1","addORarrayCol1","addNOTarrayCol1":
-            columnIndex = self.tv2colHeaders1.selectedRow
+            columnIndex = self.popup2colHeaders1.indexOfSelectedItem
             parameterRows = self.tv2colParameters1.selectedRowIndexes
             arrayParamsToUse = self.arrayCol1Params
         case "addANDarrayCol2","addORarrayCol2","addNOTarrayCol2":
-            columnIndex = self.tv2colHeaders2.selectedRow
+            columnIndex = self.popup2colHeaders2.indexOfSelectedItem
             parameterRows = self.tv2colParameters2.selectedRowIndexes
             arrayParamsToUse = self.arrayCol2Params
         default:

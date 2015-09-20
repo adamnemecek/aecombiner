@@ -8,7 +8,6 @@
 
 import Foundation
 
-
 let kDataSetDefaultName = "Untitled"
 
 
@@ -47,15 +46,22 @@ class ChartDataSet {
     convenience init(data: DataMatrix, forColumnIndex columnIndex:Int)
     {
         self.init()
-        guard columnIndex>0 && columnIndex<data.count else {return}
+        guard data.count > 0 else {
+            alertWithMessage("No data to chart",style: .WarningAlertStyle)
+            return}
+
+        guard columnIndex>=0 && columnIndex<data[0].count else {
+            alertWithMessage("The data does not have the column you want to chart",style: .WarningAlertStyle)
+            return}
         
+        var hadErrors = 0
         for var r:Int = 0; r<data.count; r++
         {
             let row = data[r]
             guard
                 row[columnIndex].characters.count>0,
                 let Yvalue = Double(row[columnIndex])
-                else {continue}
+                else {hadErrors++ ; continue}
             let Xvalue = Double(r)
             self.minYvalue = fmin(self.minYvalue,Yvalue)
             self.maxYvalue = fmax(self.maxYvalue,Yvalue)
@@ -63,6 +69,25 @@ class ChartDataSet {
             self.maxXvalue = fmax(self.maxXvalue,Xvalue)
             // we store the row number as the X value and when we sort on the Y value we can always map back to the row in the data for extracting other values. !! If we sort the CSVdata we are lost
             self.dataPoints.append(ChartDataPoint(xvalue: Xvalue, yvalue: Yvalue))
+        }
+        if hadErrors>0
+        {
+            if self.dataPoints.count == 0
+            {
+                alertWithMessage("No values could be detected\nData must be numeric to be charted",style: .WarningAlertStyle)
+            }
+            else
+            {
+                if hadErrors == 1
+                {
+                    alertWithMessage("One value was rejected",style: .WarningAlertStyle)
+                }
+                else
+                {
+                    alertWithMessage("\(hadErrors) values were rejected",style: .WarningAlertStyle)
+                }
+            }
+
         }
     }
 }
