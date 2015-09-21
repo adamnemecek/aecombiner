@@ -15,27 +15,6 @@ class GroupParametersViewController: RecodeColumnViewController {
     var headersExtractedDataModelForChart = HeadersMatrix()
     
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
-    }
-    
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        // Do view setup here.
-        self.populateHeaderPopups()
-        self.tvGroupHeadersSecondary?.reloadData()
-        self.arrayButtonsForExtracting.append(self.buttonCombineColumns)
-        self.arrayButtonsForExtracting.append(self.buttonExtractAllStatistics)
-        self.arrayButtonsForExtracting.append(self.buttonModel)
-        self.arrayButtonsForExtracting.append(self.popupAddOrMultiply)
-
-    }
-    override func viewDidAppear() {
-        super.viewDidAppear()
-        // Do view setup here.
-    }
-
     // MARK: - @IBOutlet
     @IBOutlet weak var tvGroupHeadersSecondary: NSTableView!
     
@@ -68,7 +47,50 @@ class GroupParametersViewController: RecodeColumnViewController {
         }
     }
     
+    func addButtonsToArray()
+    {
+        guard self.buttonCombineColumns != nil else {return}
+        self.arrayButtonsForExtracting.append(self.buttonCombineColumns)
+        self.arrayButtonsForExtracting.append(self.buttonExtractAllStatistics)
+        self.arrayButtonsForExtracting.append(self.buttonModel)
+        self.arrayButtonsForExtracting.append(self.popupAddOrMultiply)
+    }
     
+    // MARK: - overrides
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do view setup here.
+    }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        // Do view setup here.
+        self.populateHeaderPopups()
+        self.tvGroupHeadersSecondary?.reloadData()
+        self.addButtonsToArray()
+        
+    }
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        // Do view setup here.
+    }
+    
+    // MARK: - header Popups
+    override func popupChangedSelection(popup: NSPopUpButton)
+    {
+        guard let id = popup.identifier else {return}
+        switch id
+        {
+        case "popupHeadersGroup":
+            self.resetExtractedParameters()
+            self.extractParametersIntoSetFromColumn()
+            self.tvGroupHeadersSecondary.reloadData()
+        default:
+            break
+        }
+    }
+    
+
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
@@ -162,21 +184,6 @@ class GroupParametersViewController: RecodeColumnViewController {
     }
     
     
-    // MARK: - TableView NSPopUpButton
-    override func popupChangedSelection(popup: NSPopUpButton)
-    {
-        guard let id = popup.identifier else {return}
-        switch id
-        {
-        case "popupHeadersGroup":
-            self.resetExtractedParameters()
-            self.extractParametersIntoSetFromColumn()
-            self.tvGroupHeadersSecondary.reloadData()
-        default:
-            break
-        }
-    }
-
     
     // MARK: - TableView overrides
     
