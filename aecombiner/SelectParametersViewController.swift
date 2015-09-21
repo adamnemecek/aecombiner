@@ -122,9 +122,6 @@ class SelectParametersViewController: RecodeColumnViewController {
 */
     // MARK: - @IBAction
     
-    @IBAction func popupHeadersButtonSelected(sender: NSPopUpButton) {
-        self.popupChargedSelection(sender)
-    }
     
     @IBAction func addSelectedParameter(sender: NSButton) {
         self.addColumnAndSelectedParameter(sender.identifier!)
@@ -244,7 +241,7 @@ class SelectParametersViewController: RecodeColumnViewController {
 
     
     // MARK: - header Popups
-    func populateHeaderPopups()
+    override func populateHeaderPopups()
     {
         guard let csvdo = self.associatedCSVdataViewController else { return}
         self.popupParameterToChart.removeAllItems()
@@ -264,7 +261,7 @@ class SelectParametersViewController: RecodeColumnViewController {
 
     }
 
-    func popupChargedSelection(popup: NSPopUpButton)
+    override func popupChangedSelection(popup: NSPopUpButton)
     {
         guard let id = popup.identifier else {return}
         switch id

@@ -43,6 +43,8 @@ struct AggregatedStats {
     var logSum:Double = 0
     var count:Int = 0
     var logCount:Int = 0
+    var skippedValues = 0
+    var skippedLogs = 0
 }
 
 
@@ -456,8 +458,9 @@ class CSVdataDocument: NSDocument {
             let paramID = row[columnIndexForGrouping]
             for columnIndexInGroup in columnIndexesToGroup
             {
-                guard var running = statsForGroup[paramID],
-                    let value = Double(row[columnIndexInGroup]) else {continue}
+                guard var running = statsForGroup[paramID] else {continue}
+                guard let value = Double(row[columnIndexInGroup])
+                    else {running.skippedValues++; continue}
                 running.minm = fmin(running.minm, value)
                 running.maxm = fmax(running.maxm, value)
                 running.sum += value
@@ -468,27 +471,39 @@ class CSVdataDocument: NSDocument {
                     running.logSum += log(value)
                     running.logCount += 1
                 }
+                else { running.skippedLogs++ }
                 statsForGroup[paramID] = running
             }
         }
         let nameOfColumn:String = self.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: kGroupAllStats)
-        let headers:HeadersMatrix = [self.headerStringForColumnIndex(columnIndexForGrouping),"Count("+nameOfColumn+")","Sum("+nameOfColumn+")","Log Sum("+nameOfColumn+")","Product("+nameOfColumn+")","Max("+nameOfColumn+")","Min("+nameOfColumn+")","Range("+nameOfColumn+")","Log Range("+nameOfColumn+")","Mean("+nameOfColumn+")","GeoMean("+nameOfColumn+")"]
+        let headers:HeadersMatrix = [self.headerStringForColumnIndex(columnIndexForGrouping),"Count("+nameOfColumn+")","Sum("+nameOfColumn+")","Log Sum("+nameOfColumn+")","Product("+nameOfColumn+")","Max("+nameOfColumn+")","Min("+nameOfColumn+")","Range("+nameOfColumn+")","Log Range("+nameOfColumn+")","Mean("+nameOfColumn+")","GeoMean("+nameOfColumn+")","Skipped Values("+nameOfColumn+")","Skipped Logs("+nameOfColumn+")"]
         
         //createTheCSVdata
         var csvDataData = DataMatrix()
         for (parameter,stats) in statsForGroup
         {
-            var row = [parameter, String(stats.count), String(stats.sum),String(stats.logSum), String(stats.product), String(stats.maxm), String(stats.minm)]
+            var row = [String]()
+            
+            row.append(parameter)
+            row.append(String(stats.count))
+            row.append(String(stats.sum))
+            row.append(String(stats.logSum))
+            row.append(String(stats.product))
+            row.append(String(stats.maxm))
+            row.append(String(stats.minm))
             row.append(String(stats.maxm-stats.minm))
             if stats.maxm-stats.minm > 0
             {
                 row.append(String(log(stats.maxm-stats.minm)))
-            } else
+            }
+            else
             {
-                row.append("*")
+                row.append("max-min<=0")
             }
             row.append(String(stats.sum/Double(stats.count)))
             row.append(String(exp(stats.logSum/Double(stats.logCount))))
+            row.append(String(stats.skippedValues))
+            row.append(String(stats.skippedLogs))
             csvDataData.append(row)
         }
         
