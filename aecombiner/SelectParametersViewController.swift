@@ -159,6 +159,10 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
         
     }
 
+    override func columnIndexForGrouping()->Int? // override in subclasses to substitute popup
+    {
+        return self.popupHeaders.indexOfSelectedItem == -1 ? nil : self.popupHeaders.indexOfSelectedItem
+    }
 
     // MARK: - ChartViewControllerDelegate
     
@@ -208,7 +212,9 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
     
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier  else {return 0}
+        guard let tvidentifier = tableView.identifier,
+            let csvdo = self.associatedCSVdataViewController
+            else {return 0}
         switch tvidentifier
         {
         case "tv1colParameters":
@@ -219,6 +225,12 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
             return self.arrayCol2Params.count
         case "tvPredicates":
             return self.arrayPredicates.count
+        case "tvGroupHeadersSecondaryExtract":
+            return csvdo.numberOfColumnsInData()
+        case "tvGroupParametersExtract":
+            self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) in group"
+   wrong         return self.arrayExtractedParameters.count
+
         default:
             return 0
         }
