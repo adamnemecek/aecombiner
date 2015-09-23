@@ -118,8 +118,10 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
     // MARK: - header Popups
     override func populateHeaderPopups()
     {
+        super.populateHeaderPopups()
+        
         guard let csvdo = self.associatedCSVdataViewController else { return}
-        self.popupParameterToChart.removeAllItems()
+       self.popupParameterToChart.removeAllItems()
         self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
         
         self.popup1ColHeaders.removeAllItems()
@@ -159,7 +161,7 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
         
     }
 
-    override func columnIndexForGrouping()->Int? // override in subclasses to substitute popup
+    override func columnIndexToGroupBy()->Int? // override in subclasses to substitute popup
     {
         return self.popupHeaders.indexOfSelectedItem == -1 ? nil : self.popupHeaders.indexOfSelectedItem
     }
@@ -206,7 +208,13 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
 
     }
 
+    // MARK: - Override for grouping
+    override func arrayToUseForfParametersToProcessIntoGroups()->DataMatrix
+    {
+        return self.extractedDataMatrixForChart//arrayExtractedParameters
+    }
     
+
     
     // MARK: - TableView overrides
     
@@ -215,6 +223,7 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
         guard let tvidentifier = tableView.identifier,
             let csvdo = self.associatedCSVdataViewController
             else {return 0}
+        
         switch tvidentifier
         {
         case "tv1colParameters":
@@ -227,10 +236,6 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
             return self.arrayPredicates.count
         case "tvGroupHeadersSecondaryExtract":
             return csvdo.numberOfColumnsInData()
-        case "tvGroupParametersExtract":
-            self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) in group"
-   wrong         return self.arrayExtractedParameters.count
-
         default:
             return 0
         }
@@ -273,6 +278,9 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
             predcellView.imageView!.image = NSImage(named: self.arrayPredicates[row].booleanOperator)
             return predcellView
 
+        case "tvGroupHeadersSecondaryExtract":
+            cellView = self.cellForHeadersTable(tableView: tableView, row: row)
+
         default:
             break;
         }
@@ -295,10 +303,14 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
 
         case "tvPredicates":
             self.buttonRemovePredicate.enabled = tableView.selectedRow != -1
+
+        case "tvGroupHeadersSecondaryExtract":
+            self.updateButtonsForGrouping()
+
         default:
             break;
         }
-        
+
     }
     
     
