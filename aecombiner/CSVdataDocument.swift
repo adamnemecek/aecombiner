@@ -646,7 +646,7 @@ class CSVdataDocument: NSDocument {
     }
 
     
-    func extractedDataMatrixWithPredicates(predicates predicates:ExtractingPredicatesArray)->DataMatrix
+    func extractDataMatrixUsingPredicates(predicates predicates:ExtractingPredicatesArray)->DataMatrix
     {
         var extractedRows = DataMatrix()
         let predicatesSplitByBoolean = self.splitPredicatesByBoolean(predicatesToSplit: predicates)
@@ -716,7 +716,7 @@ class CSVdataDocument: NSDocument {
     
     func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:ExtractingPredicatesArray)
     {
-        let extractedData = self.extractedDataMatrixWithPredicates(predicates: predicates)
+        let extractedData = self.extractDataMatrixUsingPredicates(predicates: predicates)
         if extractedData.count>0
         {
             self.createNewDocumentFromExtractedRows(cvsData: extractedData, headers: nil, name:nil)

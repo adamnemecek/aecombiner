@@ -99,8 +99,8 @@ class GroupParametersViewController: RecodeColumnViewController {
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
         guard let csvdatavc = self.associatedCSVdataViewController else {return}
-        // we use self.extractedDataMatrixForChart which is a list of USERIDs usually (paramater to group) and values
-        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixForChart)
+        // we use self.extractedDataMatrixUsingPredicates which is a list of USERIDs usually (paramater to group) and values
+        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixUsingPredicates)
         csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: self.headersExtractedDataModelForChart, name: nameOfDataSet)
     }
     
@@ -117,7 +117,7 @@ class GroupParametersViewController: RecodeColumnViewController {
         
         let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
         let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
-        self.extractedDataMatrixForChart = dataAndName.matrixOfData
+        self.extractedDataMatrixUsingPredicates = dataAndName.matrixOfData
         self.headersExtractedDataModelForChart = [dvc.headerStringForColumnIndex(columnIndexForGrouping),dataAndName.nameOfData]
         let dataset = ChartDataSet(data: dataAndName.matrixOfData, forColumnIndex: kCsvDataData_column_value)
         cvc.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfData)

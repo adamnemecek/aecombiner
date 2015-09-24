@@ -13,7 +13,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     
     // MARK: - Var
-    var extractedDataMatrixForChart = DataMatrix()//used in some subclasses
+    var extractedDataMatrixUsingPredicates = DataMatrix()//used in some subclasses
     var associatedCSVdataViewController: CSVdataViewController?
 
     
@@ -88,7 +88,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         guard let csvdatavc = self.associatedCSVdataViewController,
                 let datamatrix = csvdatavc.dataMatrixFromAssociatedCSVdataDocument()
         else {return}
-        // we use self.extractedDataMatrixForChart
+        // we use self.extractedDataMatrixUsingPredicates
         let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: datamatrix)
         csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
 

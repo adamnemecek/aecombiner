@@ -56,9 +56,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.tvCSVdata.reloadData()
     }
     
-    func extractedDataMatrixForChartWithPredicates(predicates predicates:ExtractingPredicatesArray)->DataMatrix
+    func extractDataMatrixUsingPredicates(predicates predicates:ExtractingPredicatesArray)->DataMatrix
     {
-        return self.associatedCSVdataDocument.extractedDataMatrixWithPredicates(predicates: predicates)
+        return self.associatedCSVdataDocument.extractDataMatrixUsingPredicates(predicates: predicates)
     }
     
     func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet

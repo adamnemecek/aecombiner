@@ -64,13 +64,14 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
     }
     
     @IBAction func extractRowsBasedOnPredicatesIntoModelForChart(sender: NSButton) {
-        guard let cdvc = self.associatedCSVdataViewController else {return}
+        guard self.extractedDataMatrixUsingPredicatesIntoArray() == true else {return}
         
-        self.extractedDataMatrixForChart = cdvc.extractedDataMatrixForChartWithPredicates(predicates: self.arrayPredicates)
         
-        self.buttonChartExtractedRows.enabled = self.extractedDataMatrixForChart.count>0
+        self.buttonChartExtractedRows.enabled = self.extractedDataMatrixUsingPredicates.count>0
         self.chartExtractedRows(sender)
     }
+    
+    
     
     @IBAction func savePredicates(sender: NSButton) {
         let sp = NSSavePanel()
@@ -170,8 +171,8 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
         guard let csvdatavc = self.associatedCSVdataViewController else {return}
-        // we use self.extractedDataMatrixForChart
-        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixForChart)
+        // we use self.extractedDataMatrixUsingPredicates
+        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixUsingPredicates)
         csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
     }
 
@@ -180,7 +181,7 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
             let chartviewC = self.chartViewController,
             let colIndex = self.requestedColumnIndexIsOK(self.popupParameterToChart.indexOfSelectedItem)
             else {return}
-        let dataset = ChartDataSet(data: self.extractedDataMatrixForChart, forColumnIndex: colIndex)
+        let dataset = ChartDataSet(data: self.extractedDataMatrixUsingPredicates, forColumnIndex: colIndex)
         chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: self.headerStringForColumnIndex(colIndex))
 
     }
@@ -211,11 +212,24 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
     // MARK: - Override for grouping
     override func arrayToUseForfParametersToProcessIntoGroups()->DataMatrix
     {
-        return self.extractedDataMatrixForChart//arrayExtractedParameters
+        return self.extractedDataMatrixUsingPredicates//arrayExtractedParameters
     }
     
-
+    override func groupAndChartData()
+    {
+        if self.extractedDataMatrixUsingPredicatesIntoArray()
+        {
+            super.groupAndChartData()
+        }
+    }
     
+    override func groupToFile()
+    {
+        if self.extractedDataMatrixUsingPredicatesIntoArray()
+        {
+            super.groupToFile()
+        }
+    }
     // MARK: - TableView overrides
     
     
@@ -377,6 +391,13 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
 
     
     // MARK: - AND OR tables
+    func extractedDataMatrixUsingPredicatesIntoArray()->Bool
+    {
+        guard let cdvc = self.associatedCSVdataViewController
+            else {return false}
+        self.extractedDataMatrixUsingPredicates = cdvc.extractDataMatrixUsingPredicates(predicates: self.arrayPredicates)
+        return true
+    }
 
     func updateTableViewSelectedColumnAndParameters()
     {
