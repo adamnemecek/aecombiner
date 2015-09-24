@@ -182,11 +182,11 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     // MARK: - TableView overrides
         
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier, let csvdo = self.associatedCSVdataViewController else { return 0 }
+        guard let csvdo = self.associatedCSVdataViewController else { return 0 }
         
-        switch tvidentifier
+        switch tableView
         {
-        case "tvHeaders":
+        case self.tvHeaders:
             return csvdo.numberOfColumnsInData()
         default:
             return 0
@@ -205,12 +205,10 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
-        guard let tvidentifier = tableView.identifier else {
-            return cellView
-        }
-        switch tvidentifier
+
+       switch tableView
         {
-        case "tvHeaders":
+        case self.tvHeaders:
             cellView = self.cellForHeadersTable(tableView: tableView, row: row)
             
         default:
@@ -224,14 +222,12 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     
     func tableViewSelectionDidChange(notification: NSNotification) {
-        guard let tableViewID = (notification.object as? NSTableView)?.identifier,
-                let selected = (notification.object as? NSTableView)?.selectedRowIndexes
-            else {return}
+        guard let tableView = (notification.object as? NSTableView) else {return}
 
-        switch tableViewID
+        switch tableView
         {
-            case "tvHeaders":
-            self.enableButtons(enabled: selected.count>0)
+        case self.tvHeaders:
+            self.enableButtons(enabled: tableView.selectedRowIndexes.count>0)
             default:
                 break
         }

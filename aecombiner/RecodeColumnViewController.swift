@@ -72,13 +72,12 @@ class RecodeColumnViewController: HeadingsViewController {
     
     func popupChangedSelection(popup: NSPopUpButton)
     {
-        guard let id = popup.identifier else {return}
-        switch id
+        switch popup
         {
-        case "popupHeaders":
+        case self.popupHeaders:
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-            self.textFieldColumnRecodedName?.stringValue = self.headerStringForColumnIndex(self.popupHeaders.indexOfSelectedItem)
+            self.textFieldColumnRecodedName?.stringValue = self.headerStringForColumnIndex(popup.indexOfSelectedItem)
         default:
             break
         }
@@ -108,11 +107,9 @@ class RecodeColumnViewController: HeadingsViewController {
     
 
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier
-            else  { return 0 }
-        switch tvidentifier
+        switch tableView
         {
-        case "tvExtractedParameters":
+        case self.tvExtractedParameters:
             self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) parameters"
             return self.arrayExtractedParameters.count
         default:
@@ -124,12 +121,9 @@ class RecodeColumnViewController: HeadingsViewController {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
-        guard let tvidentifier = tableView.identifier else {
-            return cellView
-        }
-           switch tvidentifier
-            {
-            case "tvExtractedParameters":
+        switch tableView
+        {
+        case self.tvExtractedParameters:
                 switch tableColumn!.identifier
                 {
                 case "parameter":
@@ -154,8 +148,8 @@ class RecodeColumnViewController: HeadingsViewController {
     
     
     override func tableViewSelectionDidChange(notification: NSNotification) {
-        let tableView = notification.object as! NSTableView
-        switch tableView.identifier!
+        guard let tableView = (notification.object as? NSTableView) else {return}
+        switch tableView
         {
       default:
             break;
@@ -166,8 +160,14 @@ class RecodeColumnViewController: HeadingsViewController {
     // MARK: - Sorting Tables on header click
     override func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
         // inheriteds override
-        self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayExtractedParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
-        self.tvExtractedParameters.reloadData()
+        switch tableView
+        {
+        case self.tvExtractedParameters:
+            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayExtractedParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            self.tvExtractedParameters.reloadData()
+        default: break
+        }
+        
     }
 
     

@@ -11,10 +11,57 @@ import Cocoa
 class GroupParametersViewController: RecodeColumnViewController {
     // MARK: - class vars
     var arrayHeadersSecondarySelected = DataMatrix()
-    var arrayButtonsForExtracting = [NSButton]()
+    var arrayButtonsForGrouping = [NSButton]()
     var headersExtractedDataModelForChart = HeadersMatrix()
     
     
+    // MARK: - @IBOutlet
+    @IBOutlet weak var tvGroupHeadersSecondary: NSTableView!
+    
+    @IBOutlet weak var buttonCombineColumns: NSButton!
+    @IBOutlet weak var buttonExtractAllStatistics: NSButton!
+    @IBOutlet weak var popupGroupMethod: NSPopUpButton!
+    
+    // MARK: - @IBAction
+
+    @IBAction func groupToFileTapped(sender: NSButton) {
+        self.groupToFile()
+        
+    }
+    
+    @IBAction func groupAndChartTapped(sender: NSButton) {
+        self.groupAndChartData()
+        
+    }
+    
+    @IBAction func groupAllStatsToFileTapped(sender: AnyObject) {
+        self.groupAllStatsToFile()
+    }
+    // MARK: - Buttons
+    func updateButtonsForGrouping()
+    {
+        let enabled = columnsToGroupTogether().count>0
+        for button in self.arrayButtonsForGrouping
+        {
+            button.enabled = enabled
+        }
+    }
+    
+    func addButtonsToArray()
+    {
+        guard
+                self.buttonCombineColumns != nil &&
+                self.buttonExtractAllStatistics != nil &&
+                self.buttonModel != nil &&
+                self.popupGroupMethod != nil
+            else {return}
+        self.arrayButtonsForGrouping.append(self.buttonCombineColumns)
+        self.arrayButtonsForGrouping.append(self.buttonExtractAllStatistics)
+        self.arrayButtonsForGrouping.append(self.buttonModel)
+        self.arrayButtonsForGrouping.append(self.popupGroupMethod)
+    }
+    
+    // MARK: - overrides
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -25,50 +72,29 @@ class GroupParametersViewController: RecodeColumnViewController {
         // Do view setup here.
         self.populateHeaderPopups()
         self.tvGroupHeadersSecondary?.reloadData()
-        self.arrayButtonsForExtracting.append(self.buttonCombineColumns)
-        self.arrayButtonsForExtracting.append(self.buttonExtractAllStatistics)
-        self.arrayButtonsForExtracting.append(self.buttonModel)
-        self.arrayButtonsForExtracting.append(self.popupAddOrMultiply)
-
+        self.addButtonsToArray()
+        
     }
     override func viewDidAppear() {
         super.viewDidAppear()
         // Do view setup here.
     }
-
-    // MARK: - @IBOutlet
-    @IBOutlet weak var tvGroupHeadersSecondary: NSTableView!
     
-    @IBOutlet weak var buttonCombineColumns: NSButton!
-    @IBOutlet weak var buttonExtractAllStatistics: NSButton!
-    @IBOutlet weak var popupAddOrMultiply: NSPopUpButton!
-    
-    // MARK: - @IBAction
-
-    @IBAction func combineAndExtractColumnsTapped(sender: NSButton) {
-        self.combineCoumnsAndExtract()
-        
-    }
-    
-    @IBAction func combineAndChartColumnsTapped(sender: NSButton) {
-        self.combineColumnsAndChartData()
-        
-    }
-    
-    @IBAction func combineAndExtractAllStatsToFile(sender: AnyObject) {
-        self.combineColumnsAndExtractAllStatsToFile()
-    }
-    // MARK: - Buttons
-    func updateButtonsForExtracting()
+    // MARK: - header Popups
+    override func popupChangedSelection(popup: NSPopUpButton)
     {
-        let enabled = self.tvGroupHeadersSecondary.selectedRowIndexes.count>0
-        for button in self.arrayButtonsForExtracting
+        switch popup
         {
-            button.enabled = enabled
+        case self.popupHeaders:
+            self.resetExtractedParameters()
+            self.extractParametersIntoSetFromColumn()
+            self.tvGroupHeadersSecondary.reloadData()
+        default:
+            break
         }
     }
     
-    
+
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
@@ -79,24 +105,41 @@ class GroupParametersViewController: RecodeColumnViewController {
     }
     
     
-    func combineColumnsAndChartData()
+    func groupAndChartData()
     {
-        guard self.okToCombine() else {return}
+        guard self.okToGroup() else {return}
         guard
-            let groupMethod = self.popupAddOrMultiply.titleOfSelectedItem,
+            let groupMethod = self.popupGroupMethod.titleOfSelectedItem,
             let cvc = self.chartViewController,
-            let dvc = self.associatedCSVdataViewController
+            let dvc = self.associatedCSVdataViewController,
+            let columnIndexForGrouping = self.columnIndexToGroupBy()
             else {return}
         
         let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
-        let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: self.popupHeaders.indexOfSelectedItem, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
+        let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
         self.extractedDataMatrixForChart = dataAndName.matrixOfData
-        self.headersExtractedDataModelForChart = [dvc.headerStringForColumnIndex(self.popupHeaders.indexOfSelectedItem),dataAndName.nameOfData]
+        self.headersExtractedDataModelForChart = [dvc.headerStringForColumnIndex(columnIndexForGrouping),dataAndName.nameOfData]
         let dataset = ChartDataSet(data: dataAndName.matrixOfData, forColumnIndex: kCsvDataData_column_value)
         cvc.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfData)
     }
     
 
+    // MARK: - Override for grouping
+    func arrayToUseForfParametersToProcessIntoGroups()->DataMatrix
+    {
+        return self.arrayExtractedParameters
+    }
+    
+    func columnIndexToGroupBy()->Int? // override in subclasses to substitute popup
+    {
+        return self.popupHeaders.indexOfSelectedItem == -1 ? nil : self.popupHeaders.indexOfSelectedItem
+    }
+    
+    func columnsToGroupTogether()->NSIndexSet // override in subclasses to substitute popup
+    {
+        return self.tvGroupHeadersSecondary.selectedRowIndexes
+    }
+    
     // MARK: - Columns
     
     func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:DataMatrix, nameOfColumn:String)
@@ -109,7 +152,7 @@ class GroupParametersViewController: RecodeColumnViewController {
     {
         //create an array with the keys the params we extracted for grouping
         var arrayOfExtractedParametersInGroup = ArrayOfStringOneRow()
-        for parameter in self.arrayExtractedParameters
+        for parameter in self.arrayToUseForfParametersToProcessIntoGroups()
         {
             arrayOfExtractedParametersInGroup.append(parameter[kParametersArrayParametersIndex])
         }
@@ -117,81 +160,68 @@ class GroupParametersViewController: RecodeColumnViewController {
     }
     
     
-    func okToCombine()->Bool
+    func okToGroup()->Bool
     {
         guard
             let csvdo = self.associatedCSVdataViewController
             else {return false}
         guard
-            self.popupHeaders.indexOfSelectedItem >= 0 &&
-            self.popupHeaders.indexOfSelectedItem < csvdo.numberOfColumnsInData() &&
-            self.tvGroupHeadersSecondary.selectedRowIndexes.count > 0 &&
-            self.arrayExtractedParameters.count > 0
+            self.columnIndexToGroupBy() >= 0 &&
+            self.columnIndexToGroupBy() < csvdo.numberOfColumnsInData() &&
+            columnsToGroupTogether().count > 0 &&
+            self.arrayToUseForfParametersToProcessIntoGroups().count > 0
             else {return false}
         
         return true
     }
     
     
-    func combineColumnsAndExtractAllStatsToFile()
+    func groupAllStatsToFile()
     {
-        guard self.okToCombine() else {return}
-        guard
-            let dvc = self.associatedCSVdataViewController else {return}
-        
-        let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
-        
-        
-        dvc.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.popupHeaders.indexOfSelectedItem, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup)
-        
-    }
-
-    func combineCoumnsAndExtract()
-    {
-        guard self.okToCombine() else {return}
+        guard self.okToGroup() else {return}
         guard
             let dvc = self.associatedCSVdataViewController,
-            let groupMethod = self.popupAddOrMultiply.titleOfSelectedItem
+            let columnIndexForGrouping = self.columnIndexToGroupBy()
             else {return}
         
         let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
         
         
-        dvc.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: self.popupHeaders.indexOfSelectedItem, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
+        dvc.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup)
+        
+    }
+
+    func groupToFile()
+    {
+        guard self.okToGroup() else {return}
+        guard
+            let dvc = self.associatedCSVdataViewController,
+            let columnIndexForGrouping = self.columnIndexToGroupBy(),
+            let groupMethod = self.popupGroupMethod.titleOfSelectedItem
+            else {return}
+        
+        let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
+        
+        
+        dvc.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup, groupMethod: groupMethod)
         
     }
     
     
-    // MARK: - TableView NSPopUpButton
-    override func popupChangedSelection(popup: NSPopUpButton)
-    {
-        guard let id = popup.identifier else {return}
-        switch id
-        {
-        case "popupHeadersGroup":
-            self.resetExtractedParameters()
-            self.extractParametersIntoSetFromColumn()
-            self.tvGroupHeadersSecondary.reloadData()
-        default:
-            break
-        }
-    }
-
     
     // MARK: - TableView overrides
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier, let csvdo = self.associatedCSVdataViewController else
-        {
-            return 0
-        }
+        guard   let tvidentifier = tableView.identifier,
+                let csvdo = self.associatedCSVdataViewController
+            else {return 0}
         switch tvidentifier
         {
         case "tvGroupHeadersSecondary":
             return csvdo.numberOfColumnsInData()
         case "tvGroupParameters":
-            self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) in group"
-            return self.arrayExtractedParameters.count
+            self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayToUseForfParametersToProcessIntoGroups().count) in group"
+            return self.arrayToUseForfParametersToProcessIntoGroups().count
         default:
             return 0
         }
@@ -213,11 +243,7 @@ class GroupParametersViewController: RecodeColumnViewController {
             {
             case "parameter":
                 cellView = tableView.makeViewWithIdentifier("dataSetCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArrayParametersIndex]
-        /*  case "value"://dataSet
-                cellView = tableView.makeViewWithIdentifier("dataSetValueCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArrayParametersValueIndex]
-                cellView.textField!.tag = row */
+                cellView.textField!.stringValue = self.arrayToUseForfParametersToProcessIntoGroups()[row][kParametersArrayParametersIndex]
             default:
                 break
             }
@@ -235,13 +261,12 @@ class GroupParametersViewController: RecodeColumnViewController {
         let tableView = notification.object as! NSTableView
         switch tableView.identifier!
         {
-
         case "tvGroupHeadersSecondary":
-            break
+            self.updateButtonsForGrouping()
+
         default:
             break;
         }
-        self.updateButtonsForExtracting()
     }
     
 

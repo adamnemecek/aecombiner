@@ -50,13 +50,13 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     // MARK: - extracting CSV data table
 
-    func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:GroupingPredicatesArray)
+    func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:ExtractingPredicatesArray)
     {
         self.associatedCSVdataDocument.extractRowsBasedOnPredicatesIntoNewFile(predicates: predicates)
         self.tvCSVdata.reloadData()
     }
     
-    func extractedDataMatrixForChartWithPredicates(predicates predicates:GroupingPredicatesArray)->DataMatrix
+    func extractedDataMatrixForChartWithPredicates(predicates predicates:ExtractingPredicatesArray)->DataMatrix
     {
         return self.associatedCSVdataDocument.extractedDataMatrixWithPredicates(predicates: predicates)
     }
@@ -120,9 +120,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.associatedCSVdataDocument.headerStringForColumnIndex(columnIndex)
     }
     
-    func checkedGroupingPredicatesArray(arrayToCheck:GroupingPredicatesArray)->GroupingPredicatesArray
+    func checkedExtractingPredicatesArray(arrayToCheck:ExtractingPredicatesArray)->ExtractingPredicatesArray
     {
-        return self.associatedCSVdataDocument.checkedGroupingPredicatesArray(arrayToCheck)
+        return self.associatedCSVdataDocument.checkedExtractingPredicatesArray(arrayToCheck)
     }
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Int?

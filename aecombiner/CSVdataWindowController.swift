@@ -59,8 +59,8 @@ class CSVdataWindowController: NSWindowController {
         case "RecodeColumnViewController":
             _ = (segue.destinationController as! RecodeColumnViewController)
             //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
-        case "SelectParametersViewController":
-            _ = (segue.destinationController as! SelectParametersViewController)
+        case "ExtractWithPredicatesViewController":
+            _ = (segue.destinationController as! ExtractWithPredicatesViewController)
             //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
             
             

@@ -1,5 +1,5 @@
 //
-//  SelectParametersViewController.swift
+//  ExtractWithPredicatesViewController.swift
 //  aecombiner
 //
 //  Created by David JM Lewis on 17/07/2015.
@@ -8,93 +8,14 @@
 
 import Cocoa
 
-class GroupingPredicateTableCellView: NSTableCellView {
-    @IBOutlet weak var textFieldLower: NSTextField!
 
-}
-
-
-struct GroupingPredicate: Comparable
-{
-    var columnNameToMatch:String
-    var stringToMatch:String
-    var booleanOperator:String
-    init (columnName:String,string:String,boolean:String)
-    {
-        booleanOperator = boolean
-        stringToMatch = string
-        columnNameToMatch = columnName
-    }
-    static func extractNSArrayFromGroupingPredicatesArray(predicatesarray predicatesarray:GroupingPredicatesArray)->NSMutableArray
-    {
-        let newarray = NSMutableArray()
-        for predicate in predicatesarray
-        {
-            let newRow = NSArray(objects: predicate.booleanOperator,predicate.stringToMatch,predicate.columnNameToMatch)
-            newarray.addObject(newRow)
-        }
-        return newarray
-    }
-    static func extractGroupingPredicatesArrayFromNSArray(array:NSArray)->GroupingPredicatesArray
-    {
-        
-        var newarray = GroupingPredicatesArray()
-        for predicate in array
-        {
-            let predA = predicate as! NSArray
-            let newP = GroupingPredicate(columnName: predA.objectAtIndex(2) as! String, string: predA.objectAtIndex(1) as! String, boolean: predA.objectAtIndex(0) as! String)
-            newarray.append(newP)
-        }
-        return newarray
-    }
-
-    static func saveGroupingPredicatesArrayToURL(url url:NSURL, predicatesarray:GroupingPredicatesArray)
-    {
-        let nsarray = self.extractNSArrayFromGroupingPredicatesArray(predicatesarray: predicatesarray)
-        nsarray.writeToURL(url, atomically: true)
-    }
-    
-    static func loadGroupingPredicatesArrayFromURL(url url:NSURL)-> GroupingPredicatesArray?
-    {
-        guard let array = NSArray(contentsOfURL: url) where array.count > 0 else {return nil}
-        return self.extractGroupingPredicatesArrayFromNSArray(array)
-    }
-    
-
-}
-//you implement == type at GLOBAL level not within the body of the struct!!!
-func ==(lhs: GroupingPredicate, rhs: GroupingPredicate) -> Bool {
-    return  //(lhs.booleanOperator == rhs.booleanOperator)  && we ignore bool as u cant use the same search term in more than one bool type
-            (lhs.columnNameToMatch == rhs.columnNameToMatch) &&
-            (lhs.stringToMatch == rhs.stringToMatch)
-}
-func < (lhs: GroupingPredicate, rhs: GroupingPredicate) -> Bool {
-    //phased approach. We test in precedence and ignore any unequalness below if the upper level is discordant
-    // so it may be > at a lower level 
-    // we do this to ensure the ANDs cluster apart from ORs, COLUMNs from each other and so on
-    if lhs.booleanOperator != rhs.booleanOperator
-    {return lhs.booleanOperator < rhs.booleanOperator}
-    if lhs.columnNameToMatch != rhs.columnNameToMatch
-    {return lhs.columnNameToMatch < rhs.columnNameToMatch}
-    return lhs.stringToMatch < rhs.stringToMatch
-}
-
-typealias GroupingPredicatesArray = [GroupingPredicate]
-
-struct PredicatesByBoolean {
-    var ANDpredicates = GroupingPredicatesArray()
-    var ORpredicates = GroupingPredicatesArray()
-    var NOTpredicates = GroupingPredicatesArray()
-    
-}
-
-class SelectParametersViewController: RecodeColumnViewController {
+class ExtractWithPredicatesViewController: GroupParametersViewController {
     
     
     // MARK: - class vars
     var arrayCol1Params = DataMatrix()
     var arrayCol2Params = DataMatrix()
-    var arrayPredicates = GroupingPredicatesArray()
+    var arrayPredicates = ExtractingPredicatesArray()
     
     
     // MARK: - @IBOutlet
@@ -157,7 +78,7 @@ class SelectParametersViewController: RecodeColumnViewController {
         if sp.runModal() == NSFileHandlingPanelOKButton
         {
             guard  let targetURL = sp.URL else {return}
-            GroupingPredicate.saveGroupingPredicatesArrayToURL(url: targetURL, predicatesarray: self.arrayPredicates)
+            ExtractingPredicate.saveExtractingPredicatesArrayToURL(url: targetURL, predicatesarray: self.arrayPredicates)
         }
     }
     
@@ -170,13 +91,81 @@ class SelectParametersViewController: RecodeColumnViewController {
         if sp.runModal() == NSFileHandlingPanelOKButton
         {
             guard  sp.URLs.count>0 else {return}
-            guard  let newgpa = GroupingPredicate.loadGroupingPredicatesArrayFromURL(url: sp.URLs[0]) else {return}
-            self.arrayPredicates = csvdatavc.checkedGroupingPredicatesArray(newgpa)
+            guard  let newgpa = ExtractingPredicate.loadExtractingPredicatesArrayFromURL(url: sp.URLs[0]) else {return}
+            self.arrayPredicates = csvdatavc.checkedExtractingPredicatesArray(newgpa)
             self.updateTableViewSelectedColumnAndParameters()
         }
     }
     
+    // MARK: - overrides
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+
+    }
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        
+        self.tvExtractedParameters?.reloadData()
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        
+    }
+    
+    // MARK: - header Popups
+    override func populateHeaderPopups()
+    {
+        super.populateHeaderPopups()
+        
+        guard let csvdo = self.associatedCSVdataViewController else { return}
+       self.popupParameterToChart.removeAllItems()
+        self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        
+        self.popup1ColHeaders.removeAllItems()
+        self.popup1ColHeaders.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popup1ColHeaders.selectItemAtIndex(-1)
+        
+        self.popup2colHeaders1.removeAllItems()
+        self.popup2colHeaders1.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popup2colHeaders1.selectItemAtIndex(-1)
+        
+        self.popup2colHeaders2.removeAllItems()
+        self.popup2colHeaders2.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popup2colHeaders2.selectItemAtIndex(-1)
+        
+    }
+    
+    override func popupChangedSelection(popup: NSPopUpButton)
+    {
+        guard let id = popup.identifier else {return}
+        switch id
+        {
+        case "popup1ColHeaders":
+            self.resetExtractedParameters()
+            self.extract1ColParametersIntoSet(colIndex: popup.indexOfSelectedItem)
+            
+        case "popup2colHeaders1":
+            self.resetCol1ExtractedParameters()
+            self.extractCol1ParametersIntoSetFromColumn()
+            self.popup2colHeaders2?.selectItemAtIndex(-1)
+            self.popup2colHeaders2.enabled = false
+        case "popup2colHeaders2":
+            self.resetCol2ExtractedParameters()
+            self.extractCol2ParametersIntoSetFromHeaders2()
+        default:
+            break;
+        }
+        
+    }
+
+    override func columnIndexToGroupBy()->Int? // override in subclasses to substitute popup
+    {
+        return self.popupHeaders.indexOfSelectedItem == -1 ? nil : self.popupHeaders.indexOfSelectedItem
+    }
+
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
@@ -193,26 +182,6 @@ class SelectParametersViewController: RecodeColumnViewController {
             else {return}
         let dataset = ChartDataSet(data: self.extractedDataMatrixForChart, forColumnIndex: colIndex)
         chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: self.headerStringForColumnIndex(colIndex))
-
-    }
-    
-    // MARK: - overrides
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        //self.representedObject = CSVdata()
-    }
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        self.populateHeaderPopups()
-        
-        self.tvExtractedParameters?.reloadData()
-
-    }
-    
-    override func viewDidAppear() {
-        super.viewDidAppear()
 
     }
     
@@ -239,56 +208,22 @@ class SelectParametersViewController: RecodeColumnViewController {
 
     }
 
+    // MARK: - Override for grouping
+    override func arrayToUseForfParametersToProcessIntoGroups()->DataMatrix
+    {
+        return self.extractedDataMatrixForChart//arrayExtractedParameters
+    }
     
-    // MARK: - header Popups
-    override func populateHeaderPopups()
-    {
-        guard let csvdo = self.associatedCSVdataViewController else { return}
-        self.popupParameterToChart.removeAllItems()
-        self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
-        
-        self.popup1ColHeaders.removeAllItems()
-        self.popup1ColHeaders.addItemsWithTitles(csvdo.headerStringsForAllColumns())
-        self.popup1ColHeaders.selectItemAtIndex(-1)
-        
-        self.popup2colHeaders1.removeAllItems()
-        self.popup2colHeaders1.addItemsWithTitles(csvdo.headerStringsForAllColumns())
-        self.popup2colHeaders1.selectItemAtIndex(-1)
 
-        self.popup2colHeaders2.removeAllItems()
-        self.popup2colHeaders2.addItemsWithTitles(csvdo.headerStringsForAllColumns())
-        self.popup2colHeaders2.selectItemAtIndex(-1)
-
-    }
-
-    override func popupChangedSelection(popup: NSPopUpButton)
-    {
-        guard let id = popup.identifier else {return}
-        switch id
-        {
-        case "popup1ColHeaders":
-            self.resetExtractedParameters()
-            self.extract1ColParametersIntoSet(colIndex: popup.indexOfSelectedItem)
-
-        case "popup2colHeaders1":
-            self.resetCol1ExtractedParameters()
-            self.extractCol1ParametersIntoSetFromColumn()
-            self.popup2colHeaders2?.selectItemAtIndex(-1)
-            self.popup2colHeaders2.enabled = false
-       case "popup2colHeaders2":
-            self.resetCol2ExtractedParameters()
-            self.extractCol2ParametersIntoSetFromHeaders2()
-       default:
-            break;
-        }
-
-    }
     
     // MARK: - TableView overrides
     
     
     override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier  else {return 0}
+        guard let tvidentifier = tableView.identifier,
+            let csvdo = self.associatedCSVdataViewController
+            else {return 0}
+        
         switch tvidentifier
         {
         case "tv1colParameters":
@@ -299,6 +234,8 @@ class SelectParametersViewController: RecodeColumnViewController {
             return self.arrayCol2Params.count
         case "tvPredicates":
             return self.arrayPredicates.count
+        case "tvGroupHeadersSecondaryExtract":
+            return csvdo.numberOfColumnsInData()
         default:
             return 0
         }
@@ -335,11 +272,14 @@ class SelectParametersViewController: RecodeColumnViewController {
             cellView.textField!.stringValue = self.arrayCol2Params[row][kParametersArrayParametersIndex]
             
         case "tvPredicates":
-            let predcellView = tableView.makeViewWithIdentifier("parameterImageCell", owner: self) as! GroupingPredicateTableCellView
+            let predcellView = tableView.makeViewWithIdentifier("parameterImageCell", owner: self) as! ExtractingPredicateTableCellView
             predcellView.textField!.stringValue = self.arrayPredicates[row].columnNameToMatch
             predcellView.textFieldLower!.stringValue = self.arrayPredicates[row].stringToMatch
             predcellView.imageView!.image = NSImage(named: self.arrayPredicates[row].booleanOperator)
             return predcellView
+
+        case "tvGroupHeadersSecondaryExtract":
+            cellView = self.cellForHeadersTable(tableView: tableView, row: row)
 
         default:
             break;
@@ -363,10 +303,14 @@ class SelectParametersViewController: RecodeColumnViewController {
 
         case "tvPredicates":
             self.buttonRemovePredicate.enabled = tableView.selectedRow != -1
+
+        case "tvGroupHeadersSecondaryExtract":
+            self.updateButtonsForGrouping()
+
         default:
             break;
         }
-        
+
     }
     
     
@@ -502,7 +446,7 @@ class SelectParametersViewController: RecodeColumnViewController {
     
     func appendPredicateToArray(columnIndexToSearch columnName: String, matchString: String, booleanString: String)
     {
-        let predicate = GroupingPredicate(columnName: columnName, string: matchString, boolean: booleanString)
+        let predicate = ExtractingPredicate(columnName: columnName, string: matchString, boolean: booleanString)
         guard self.arrayPredicates.indexOf(predicate) == nil
             else
         {
