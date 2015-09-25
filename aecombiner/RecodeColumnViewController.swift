@@ -8,6 +8,13 @@
 
 import Cocoa
 
+let kParametersArrayParametersIndex = 0
+let kParametersArrayParametersValueIndex = 1
+let kSelectedParametersArrayColumnIndex = 0
+let kSelectedParametersArrayParameterIndex = 1
+let kStringEmpty = "- Empty -"
+let kStringRecodedColumnNameSuffix = "_#_"
+
 class RecodeColumnViewController: HeadingsViewController {
     
 
@@ -15,12 +22,6 @@ class RecodeColumnViewController: HeadingsViewController {
     var arrayExtractedParameters = DataMatrix()
 
     // MARK: - class constants
-    let kParametersArrayParametersIndex = 0
-    let kParametersArrayParametersValueIndex = 1
-    let kSelectedParametersArrayColumnIndex = 0
-    let kSelectedParametersArrayParameterIndex = 1
-    let kStringEmpty = "- Empty -"
-    let kStringRecodedColumnNameSuffix = "_#_"
     
     
     // MARK: - @IBOutlet
@@ -187,37 +188,16 @@ class RecodeColumnViewController: HeadingsViewController {
     }
     
     
-    func dataMatrixWithNoBlanksFromSet(set set:Set<String>)->DataMatrix
-    {
-        var subArray = Array(set)
-        // replace blanks with string
-        for var c=0;c < subArray.count; ++c
-        {
-            if subArray[c].isEmpty
-            {
-                subArray[c] = kStringEmpty
-            }
-        }
-        
-        var matrix = DataMatrix()
-        for var row = 0; row<subArray.count; ++row
-        {
-            matrix.append([subArray[row],""])
-        }
-
-        return matrix
-    }
     
     
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
         guard   let csvdo = self.associatedCSVdataViewController,
-                let columnIndex = self.requestedColumnIndexIsOK(self.popupHeaders.indexOfSelectedItem),
-                let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex)
+                let dmOfParams = csvdo.dataMatrixOfParametersFromColumn(fromColumn: self.popupHeaders.indexOfSelectedItem)
             else { return }
         
-        self.arrayExtractedParameters = self.dataMatrixWithNoBlanksFromSet(set: set)
+        self.arrayExtractedParameters = dmOfParams
         self.tvExtractedParameters.reloadData()
         
     }

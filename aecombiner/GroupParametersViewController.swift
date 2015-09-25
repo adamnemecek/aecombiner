@@ -24,9 +24,8 @@ class GroupParametersViewController: RecodeColumnViewController {
     
     // MARK: - @IBAction
 
-    @IBAction func groupToFileTapped(sender: NSButton) {
-        self.groupToFile()
-        
+    @IBAction func groupToFileUsingOneMethodTapped(sender: NSButton) {
+        self.groupToFileUsingOneMethod()
     }
     
     @IBAction func groupAndChartTapped(sender: NSButton) {
@@ -37,6 +36,9 @@ class GroupParametersViewController: RecodeColumnViewController {
     @IBAction func groupAllStatsToFileTapped(sender: AnyObject) {
         self.groupAllStatsToFile()
     }
+    
+    
+    
     // MARK: - Buttons
     func updateButtonsForGrouping()
     {
@@ -107,7 +109,6 @@ class GroupParametersViewController: RecodeColumnViewController {
     
     func groupAndChartData()
     {
-        guard self.okToGroup() else {return}
         guard
             let groupMethod = self.popupGroupMethod.titleOfSelectedItem,
             let cvc = self.chartViewController,
@@ -148,37 +149,28 @@ class GroupParametersViewController: RecodeColumnViewController {
         return csvdo.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
     
-    func arrayOfExtractedParametersInGroup()->ArrayOfStringOneRow
+    
+    class func createArrayFromExtractedParametersToGroup(params params:DataMatrix)->ArrayOfStringOneRow
     {
         //create an array with the keys the params we extracted for grouping
         var arrayOfExtractedParametersInGroup = ArrayOfStringOneRow()
-        for parameter in self.arrayToUseForfParametersToProcessIntoGroups()
+        for parameter in params
         {
             arrayOfExtractedParametersInGroup.append(parameter[kParametersArrayParametersIndex])
         }
         return arrayOfExtractedParametersInGroup
+
     }
     
-    
-    func okToGroup()->Bool
+    func arrayOfExtractedParametersInGroup()->ArrayOfStringOneRow
     {
-        guard
-            let csvdo = self.associatedCSVdataViewController
-            else {return false}
-        guard
-            self.columnIndexToGroupBy() >= 0 &&
-            self.columnIndexToGroupBy() < csvdo.numberOfColumnsInData() &&
-            columnsToGroupTogether().count > 0 &&
-            self.arrayToUseForfParametersToProcessIntoGroups().count > 0
-            else {return false}
-        
-        return true
+        return GroupParametersViewController.createArrayFromExtractedParametersToGroup(params:self.arrayToUseForfParametersToProcessIntoGroups())
     }
+    
     
     
     func groupAllStatsToFile()
     {
-        guard self.okToGroup() else {return}
         guard
             let dvc = self.associatedCSVdataViewController,
             let columnIndexForGrouping = self.columnIndexToGroupBy()
@@ -191,9 +183,8 @@ class GroupParametersViewController: RecodeColumnViewController {
         
     }
 
-    func groupToFile()
+    func groupToFileUsingOneMethod()
     {
-        guard self.okToGroup() else {return}
         guard
             let dvc = self.associatedCSVdataViewController,
             let columnIndexForGrouping = self.columnIndexToGroupBy(),

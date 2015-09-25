@@ -9,7 +9,7 @@
 import Cocoa
 
 
-class ExtractWithPredicatesViewController: GroupParametersViewController {
+class ExtractWithPredicatesViewController: RecodeColumnViewController {
     
     
     // MARK: - class vars
@@ -25,6 +25,7 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
     @IBOutlet weak var tv2colParameters2: NSTableView!
     @IBOutlet weak var tv2colParameters1: NSTableView!
     @IBOutlet weak var tvPredicates: NSTableView!
+    @IBOutlet weak var tvGroupHeadersSecondaryExtract: NSTableView!
     
     @IBOutlet weak var buttonRemovePredicate: NSButton!
     @IBOutlet weak var buttonChartExtractedRows: NSButton!
@@ -162,11 +163,6 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
         
     }
 
-    override func columnIndexToGroupBy()->Int? // override in subclasses to substitute popup
-    {
-        return self.popupHeaders.indexOfSelectedItem == -1 ? nil : self.popupHeaders.indexOfSelectedItem
-    }
-
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
@@ -209,27 +205,31 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
 
     }
 
-    // MARK: - Override for grouping
-    override func arrayToUseForfParametersToProcessIntoGroups()->DataMatrix
+    // MARK: - Grouping
+    func columnIndexToGroupBy()->Int? // override in subclasses to substitute popup
     {
-        return self.extractedDataMatrixUsingPredicates//arrayExtractedParameters
+        return self.popupHeaders.indexOfSelectedItem == -1 ? nil : self.popupHeaders.indexOfSelectedItem
+    }
+    func columnsToGroupTogether()->NSIndexSet // override in subclasses to substitute popup
+    {
+        return self.tvGroupHeadersSecondaryExtract.selectedRowIndexes
     }
     
-    override func groupAndChartData()
+/*
+    func groupAllStatsToFile()
     {
-        if self.extractedDataMatrixUsingPredicatesIntoArray()
-        {
-            super.groupAndChartData()
-        }
+        guard
+            let dvc = self.associatedCSVdataViewController,
+            let columnIndexForGrouping = self.columnIndexToGroupBy()
+            else {return}
+        
+        let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
+        
+        
+        dvc.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup)
+        
     }
-    
-    override func groupToFile()
-    {
-        if self.extractedDataMatrixUsingPredicatesIntoArray()
-        {
-            super.groupToFile()
-        }
-    }
+*/
     // MARK: - TableView overrides
     
     
@@ -318,8 +318,8 @@ class ExtractWithPredicatesViewController: GroupParametersViewController {
         case "tvPredicates":
             self.buttonRemovePredicate.enabled = tableView.selectedRow != -1
 
-        case "tvGroupHeadersSecondaryExtract":
-            self.updateButtonsForGrouping()
+        //case "tvGroupHeadersSecondaryExtract":
+            //self.updateButtonsForGrouping()
 
         default:
             break;

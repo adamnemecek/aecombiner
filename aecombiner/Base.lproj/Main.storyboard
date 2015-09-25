@@ -2440,13 +2440,13 @@
                         <outlet property="tv2colParameters1" destination="7ws-wK-8gc" id="Y8k-ce-zyS"/>
                         <outlet property="tv2colParameters2" destination="gET-Du-UrD" id="RmK-OR-uPF"/>
                         <outlet property="tvExtractedParameters" destination="E09-4y-x2l" id="huO-GZ-Cmw"/>
-                        <outlet property="tvGroupHeadersSecondary" destination="2P2-Gn-AJI" id="wol-zz-Zig"/>
+                        <outlet property="tvGroupHeadersSecondaryExtract" destination="2P2-Gn-AJI" id="1Ux-je-SCD"/>
                         <outlet property="tvPredicates" destination="BU0-nV-9hz" id="UW8-x8-T6h"/>
                     </connections>
                 </viewController>
                 <customObject id="xLa-yc-fWl" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-349.5" y="1928"/>
+            <point key="canvasLocation" x="-338.5" y="2051"/>
         </scene>
         <!--Group Parameters View Controller-->
         <scene sceneID="NVO-2B-fsj">
@@ -2630,19 +2630,6 @@
                                     <rect key="frame" x="1" y="1" width="295" height="37"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="OMN-ax-1EU">
-                                            <rect key="frame" x="210" y="2" width="32" height="32"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="32" id="jyd-jo-aS2"/>
-                                            </constraints>
-                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="csv32" imagePosition="only" alignment="center" enabled="NO" imageScaling="proportionallyUpOrDown" inset="2" id="FRP-ub-PwP">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="groupToFileTapped:" target="zx1-6t-86A" id="Gm2-34-zzm"/>
-                                            </connections>
-                                        </button>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9fb-s2-Z8x">
                                             <rect key="frame" x="6" y="5" width="199" height="26"/>
                                             <popUpButtonCell key="cell" type="push" title="Log Sum" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="ukp-kY-i0J" id="Z73-aC-RBk">
@@ -2693,6 +2680,19 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="groupAndChartTapped:" target="zx1-6t-86A" id="AmM-a6-GVY"/>
+                                            </connections>
+                                        </button>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="OMN-ax-1EU">
+                                            <rect key="frame" x="210" y="2" width="32" height="32"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="32" id="jyd-jo-aS2"/>
+                                            </constraints>
+                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="csv32" imagePosition="only" alignment="center" enabled="NO" imageScaling="proportionallyUpOrDown" inset="2" id="FRP-ub-PwP">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="groupToFileUsingOneMethodTapped:" target="zx1-6t-86A" id="NM4-aw-Xa0"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -2845,6 +2845,6 @@
         <image name="textfile32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="MuR-6W-Djl"/>
+        <segue reference="hQc-2D-YN3"/>
     </inferredMetricsTieBreakers>
 </document>

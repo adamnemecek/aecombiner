@@ -514,6 +514,15 @@ class CSVdataDocument: NSDocument {
     
     func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow )
     {
+        // check OK to group
+        guard
+            columnIndexForGrouping >= 0 &&
+            columnIndexForGrouping < self.numberOfColumnsInData() &&
+            columnIndexesToGroup.count > 0 &&
+            arrayOfParamatersInGroup.count > 0
+        else {return}
+        
+        
         //extract the rows and present
         let stats = self.allStatsForCombinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup)
         
@@ -760,29 +769,15 @@ class CSVdataDocument: NSDocument {
         }
     }
     
-    func setOfParametersFromColumn(fromColumn columnIndex:Int)->Set<String>?
+    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->DataMatrix?
     {
-        var set = Set<String>()
-        for parameter in self.csvDataModel.csvData
-        {
-            // parameter is a [string] array of row columns
-            set.insert(parameter[columnIndex])
-        }
-        return set.count == 0 ? nil : set
+        return self.csvDataModel.dataMatrixOfParametersFromColumn(fromColumn: columnIndex)
     }
     
+
     func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->Set<String>?
     {
-        var set = Set<String>()
-        for parameter in self.csvDataModel.csvData
-        {
-            // parameter is a [string] array of row columns
-            if parameter[matchColumn] == matchString
-            {
-                set.insert(parameter[fromColumn])
-            }
-        }
-        return set.count == 0 ? nil : set
+        return self.csvDataModel.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn: fromColumn, matchString: matchString, matchColumn: matchColumn)
     }
     
     // MARK: - Headers

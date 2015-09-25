@@ -71,9 +71,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.associatedCSVdataDocument.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
     
-    func setOfParametersFromColumn(fromColumn columnIndex:Int)->Set<String>?
+    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->DataMatrix?
     {
-        return self.associatedCSVdataDocument.setOfParametersFromColumn(fromColumn: columnIndex)
+        return self.associatedCSVdataDocument.dataMatrixOfParametersFromColumn(fromColumn: columnIndex)
     }
     
     func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->Set<String>?
