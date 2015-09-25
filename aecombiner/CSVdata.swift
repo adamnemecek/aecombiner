@@ -168,5 +168,52 @@ class CSVdata {
         return extractedRows
     }
 
+    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->DataMatrix?
+    {
+        guard  columnIndex < self.headers.count else {return nil}
+        
+        var set = Set<String>()
+        for parameter in self.csvData
+        {
+            // parameter is a [string] array of row columns
+            set.insert(parameter[columnIndex])
+        }
+        return set.count == 0 ? nil : CSVdata.dataMatrixWithNoBlanksFromSet(set: set)
+    }
+    
+    class func dataMatrixWithNoBlanksFromSet(set set:Set<String>)->DataMatrix
+    {
+        var subArray = Array(set)
+        // replace blanks with string
+        for var c=0;c < subArray.count; ++c
+        {
+            if subArray[c].isEmpty
+            {
+                subArray[c] = kStringEmpty
+            }
+        }
+        
+        var matrix = DataMatrix()
+        for var row = 0; row<subArray.count; ++row
+        {
+            matrix.append([subArray[row],""])
+        }
+        
+        return matrix
+    }
+    
+    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->Set<String>?
+    {
+        var set = Set<String>()
+        for parameter in self.csvData
+        {
+            // parameter is a [string] array of row columns
+            if parameter[matchColumn] == matchString
+            {
+                set.insert(parameter[fromColumn])
+            }
+        }
+        return set.count == 0 ? nil : set
+    }
 
 }

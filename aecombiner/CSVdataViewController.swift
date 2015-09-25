@@ -56,9 +56,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.tvCSVdata.reloadData()
     }
     
-    func extractedDataMatrixForChartWithPredicates(predicates predicates:ExtractingPredicatesArray)->DataMatrix
+    func extractDataMatrixUsingPredicates(predicates predicates:ExtractingPredicatesArray)->DataMatrix
     {
-        return self.associatedCSVdataDocument.extractedDataMatrixWithPredicates(predicates: predicates)
+        return self.associatedCSVdataDocument.extractDataMatrixUsingPredicates(predicates: predicates)
     }
     
     func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
@@ -71,9 +71,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.associatedCSVdataDocument.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
     
-    func setOfParametersFromColumn(fromColumn columnIndex:Int)->Set<String>?
+    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->DataMatrix?
     {
-        return self.associatedCSVdataDocument.setOfParametersFromColumn(fromColumn: columnIndex)
+        return self.associatedCSVdataDocument.dataMatrixOfParametersFromColumn(fromColumn: columnIndex)
     }
     
     func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->Set<String>?
