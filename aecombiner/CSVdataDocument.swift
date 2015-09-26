@@ -49,7 +49,7 @@ struct AggregatedStats {
 
 
 
-func generic_SortArrayOfColumnsAsTextOrValues(inout arrayToSort arrayToSort:DataMatrix, columnIndexToSort:Int, textOrvalue:Int, direction: Bool)
+func generic_SortArrayOfColumnsAsTextOrValues(inout arrayToSort arrayToSort:MulticolumnStringsArray, columnIndexToSort:Int, textOrvalue:Int, direction: Bool)
 {
     switch (direction, textOrvalue)
     {
@@ -198,7 +198,7 @@ class CSVdataDocument: NSDocument {
     }
     
     
-    func combinedColumnForMeansAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:DataMatrix, nameOfColumn:String)
+    func combinedColumnForMeansAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:MulticolumnStringsArray, nameOfColumn:String)
     {
         let groupStartValue = self.groupStartValueForString(groupMethod)
         //create a dict with the keys the params we extracted for grouping
@@ -290,7 +290,7 @@ class CSVdataDocument: NSDocument {
         let nameOfNewColumn = self.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: groupMethod)
         
         //createTheCSVdata
-        var csvDataData = DataMatrix()
+        var csvDataData = MulticolumnStringsArray()
         for (parameter,value) in processedDict
         {
             csvDataData.append([parameter, String(value)])
@@ -304,7 +304,7 @@ class CSVdataDocument: NSDocument {
     {
         //join col names to make a mega name for the combination
         //make an array first
-        var namesOfCombinedColumn = HeadersMatrix()
+        var namesOfCombinedColumn = SingleColumnStringsArray()
         for columnIndex in columnIndexesToGroup
         {
             namesOfCombinedColumn.append(self.csvDataModel.headers[columnIndex])
@@ -342,7 +342,7 @@ class CSVdataDocument: NSDocument {
     }
     
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:DataMatrix, nameOfColumn:String)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:MulticolumnStringsArray, nameOfColumn:String)
     {
         
         //trap others
@@ -418,7 +418,7 @@ class CSVdataDocument: NSDocument {
         let nameOfNewColumn = self.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: groupMethod)
         
         //createTheCSVdata
-        var csvDataData = DataMatrix()
+        var csvDataData = MulticolumnStringsArray()
         switch groupMethod
         {
         case kGroupAddition, kGroupLogSum, kGroupMultiplication, kGroupMin, kGroupMax:
@@ -440,15 +440,16 @@ class CSVdataDocument: NSDocument {
     }
     
     
-    func allStatsForCombinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow )->CSVdata//(cvsdata:CSVdata, name:String)
+    func allStatsForCombinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet)->CSVdata//(cvsdata:CSVdata, name:String)
     {
-        
+        guard let arrayOfParamatersInColumnToGroupBy = self.csvDataModel.singleColumnStringsArrayOfParametersFromColumn(fromColumn: columnIndexForGrouping, replaceBlank: true)
+            else {return CSVdata()}
         
         //create a dict with the keys the params we extracted for grouping
         //make a blank array to hold the values associated with the grouping for each member of the group
         //Doubles for adding and multiplying, Ints for counting - to avoud decimal places in counts string
         var statsForGroup = [String : AggregatedStats]()
-        for parameter in arrayOfParamatersInGroup
+        for parameter in arrayOfParamatersInColumnToGroupBy
         {
             statsForGroup[parameter] = AggregatedStats()
         }
@@ -476,10 +477,10 @@ class CSVdataDocument: NSDocument {
             }
         }
         let nameOfColumn:String = self.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: kGroupAllStats)
-        let headers:HeadersMatrix = [self.headerStringForColumnIndex(columnIndexForGrouping),"Count("+nameOfColumn+")","Sum("+nameOfColumn+")","Log Sum("+nameOfColumn+")","Product("+nameOfColumn+")","Max("+nameOfColumn+")","Min("+nameOfColumn+")","Range("+nameOfColumn+")","Log Range("+nameOfColumn+")","Mean("+nameOfColumn+")","GeoMean("+nameOfColumn+")","Skipped Values("+nameOfColumn+")","Skipped Logs("+nameOfColumn+")"]
+        let headers:SingleColumnStringsArray = [self.headerStringForColumnIndex(columnIndexForGrouping),"Count("+nameOfColumn+")","Sum("+nameOfColumn+")","Log Sum("+nameOfColumn+")","Product("+nameOfColumn+")","Max("+nameOfColumn+")","Min("+nameOfColumn+")","Range("+nameOfColumn+")","Log Range("+nameOfColumn+")","Mean("+nameOfColumn+")","GeoMean("+nameOfColumn+")","Skipped Values("+nameOfColumn+")","Skipped Logs("+nameOfColumn+")"]
         
         //createTheCSVdata
-        var csvDataData = DataMatrix()
+        var csvDataData = MulticolumnStringsArray()
         for (parameter,stats) in statsForGroup
         {
             var row = [String]()
@@ -512,26 +513,26 @@ class CSVdataDocument: NSDocument {
     }
     
     
-    func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow )
+    func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet)
     {
         // check OK to group
         guard
             columnIndexForGrouping >= 0 &&
             columnIndexForGrouping < self.numberOfColumnsInData() &&
-            columnIndexesToGroup.count > 0 &&
-            arrayOfParamatersInGroup.count > 0
+            columnIndexesToGroup.count > 0
+
         else {return}
         
         
         //extract the rows and present
-        let stats = self.allStatsForCombinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup)
+        let stats = self.allStatsForCombinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup)
         
         self.createNewDocumentFromCVSDataAndColumnName(cvsData: stats, name: "All Stats("+stats.name+") by "+self.headerStringForColumnIndex(columnIndexForGrouping))
     }
     
     
     
-    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow , groupMethod:String)
+    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray , groupMethod:String)
     {
         //extract the rows and present
         let combinedDataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
@@ -573,7 +574,7 @@ class CSVdataDocument: NSDocument {
         return true
     }
 
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:DataMatrix)
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray)
     {
         //make a temporary dictionary
         var paramsDict = [String : String]()
@@ -655,9 +656,9 @@ class CSVdataDocument: NSDocument {
     }
 
     
-    func extractDataMatrixUsingPredicates(predicates predicates:ExtractingPredicatesArray)->DataMatrix
+    func extractDataMatrixUsingPredicates(predicates predicates:ExtractingPredicatesArray)->MulticolumnStringsArray
     {
-        var extractedRows = DataMatrix()
+        var extractedRows = MulticolumnStringsArray()
         let predicatesSplitByBoolean = self.splitPredicatesByBoolean(predicatesToSplit: predicates)
         for rowOfColumns in self.csvDataModel.csvData
         {
@@ -738,7 +739,7 @@ class CSVdataDocument: NSDocument {
         self.createNewDocumentFromCVSDataAndColumnName(cvsData: self.csvDataModel.extractTheseRowsFromSelfAsCSVdata(rows: rows), name: docName)
     }
     
-    func createNewDocumentFromExtractedRows(cvsData extractedRows:DataMatrix, headers:HeadersMatrix?, name: String?)
+    func createNewDocumentFromExtractedRows(cvsData extractedRows:MulticolumnStringsArray, headers:SingleColumnStringsArray?, name: String?)
     {
         do {
             let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
@@ -769,13 +770,13 @@ class CSVdataDocument: NSDocument {
         }
     }
     
-    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->DataMatrix?
+    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->MulticolumnStringsArray?
     {
         return self.csvDataModel.dataMatrixOfParametersFromColumn(fromColumn: columnIndex)
     }
     
 
-    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->Set<String>?
+    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->SetOfStrings?
     {
         return self.csvDataModel.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn: fromColumn, matchString: matchString, matchColumn: matchColumn)
     }

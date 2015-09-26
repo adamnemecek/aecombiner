@@ -56,7 +56,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.tvCSVdata.reloadData()
     }
     
-    func extractDataMatrixUsingPredicates(predicates predicates:ExtractingPredicatesArray)->DataMatrix
+    func extractDataMatrixUsingPredicates(predicates predicates:ExtractingPredicatesArray)->MulticolumnStringsArray
     {
         return self.associatedCSVdataDocument.extractDataMatrixUsingPredicates(predicates: predicates)
     }
@@ -66,41 +66,41 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.associatedCSVdataDocument.chartDataSetFromColumnIndex(columnIndex: columnIndex)
     }
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:DataMatrix, nameOfColumn:String)
+    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:MulticolumnStringsArray, nameOfColumn:String)
     {
         return self.associatedCSVdataDocument.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
     }
     
-    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->DataMatrix?
+    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->MulticolumnStringsArray?
     {
         return self.associatedCSVdataDocument.dataMatrixOfParametersFromColumn(fromColumn: columnIndex)
     }
     
-    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->Set<String>?
+    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->SetOfStrings?
     {
         return self.associatedCSVdataDocument.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn: fromColumn, matchString: matchString, matchColumn: matchColumn)
     }
     
-    func dataMatrixFromAssociatedCSVdataDocument()->DataMatrix?
+    func dataMatrixFromAssociatedCSVdataDocument()->MulticolumnStringsArray?
     {
         return self.associatedCSVdataDocument.csvDataModel.csvData
     }
     
     // MARK: -  creating docs
-   func createNewDocumentFromExtractedRows(cvsData extractedRows:DataMatrix, headers:HeadersMatrix?, name: String?)
+   func createNewDocumentFromExtractedRows(cvsData extractedRows:MulticolumnStringsArray, headers:SingleColumnStringsArray?, name: String?)
     {
         self.associatedCSVdataDocument.createNewDocumentFromExtractedRows(cvsData: extractedRows, headers: headers, name: name)
     }
     
-    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow , groupMethod:String)
+    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray , groupMethod:String)
     {
         self.associatedCSVdataDocument.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
         
     }
     
-   func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:ArrayOfStringOneRow )
+   func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray )
     {
-        self.associatedCSVdataDocument.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup)
+        self.associatedCSVdataDocument.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup)
     }
     
 
@@ -148,7 +148,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
 
     
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:DataMatrix)
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray)
     {
         self.associatedCSVdataDocument.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray)
         

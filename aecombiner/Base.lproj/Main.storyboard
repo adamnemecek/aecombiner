@@ -652,7 +652,7 @@
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="aecombiner" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="67.5" y="-133"/>
+            <point key="canvasLocation" x="-645" y="-142"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="rZB-Z3-fpx">
@@ -710,7 +710,7 @@
                 </windowController>
                 <customObject id="9cc-Tx-fpQ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-463" y="151"/>
+            <point key="canvasLocation" x="-638" y="155"/>
         </scene>
         <!--CSVdataViewController-->
         <scene sceneID="OfL-Ym-VdP">
@@ -843,7 +843,7 @@
                 </viewController>
                 <customObject id="6J4-3I-SRC" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="356.5" y="113"/>
+            <point key="canvasLocation" x="11.5" y="120"/>
         </scene>
         <!--Headings View Controller-->
         <scene sceneID="6L5-16-sX7">
@@ -1017,7 +1017,7 @@
                 </viewController>
                 <customObject id="L6x-yv-hse" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-76.5" y="556.5"/>
+            <point key="canvasLocation" x="-637.5" y="590.5"/>
         </scene>
         <!--Chart View Controller-->
         <scene sceneID="KTY-9i-jXS">
@@ -2446,7 +2446,7 @@
                 </viewController>
                 <customObject id="xLa-yc-fWl" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-338.5" y="2051"/>
+            <point key="canvasLocation" x="-326.5" y="2048"/>
         </scene>
         <!--Group Parameters View Controller-->
         <scene sceneID="NVO-2B-fsj">
@@ -2817,7 +2817,7 @@
                 </viewController>
                 <customObject id="q8g-yv-gYn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-499" y="1465.5"/>
+            <point key="canvasLocation" x="-476" y="1465.5"/>
         </scene>
     </scenes>
     <resources>
@@ -2845,6 +2845,6 @@
         <image name="textfile32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="hQc-2D-YN3"/>
+        <segue reference="Gc9-6m-SID"/>
     </inferredMetricsTieBreakers>
 </document>

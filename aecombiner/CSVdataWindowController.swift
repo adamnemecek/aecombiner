@@ -32,7 +32,7 @@ class CSVdataWindowController: NSWindowController {
         let title = ((self.window!.title as NSString).stringByDeletingPathExtension as NSString).stringByAppendingPathExtension(fileExtension)
         panel.nameFieldStringValue = title!
     
-        var types = ArrayOfStringOneRow()
+        var types = SingleColumnStringsArray()
         types.append("txt")
         panel.allowedFileTypes = types
         panel.beginSheetModalForWindow(self.window!) { (result) -> Void in

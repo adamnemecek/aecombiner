@@ -13,8 +13,8 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     
     
     // MARK: - class vars
-    var arrayCol1Params = DataMatrix()
-    var arrayCol2Params = DataMatrix()
+    var arrayCol1Params = MulticolumnStringsArray()
+    var arrayCol2Params = MulticolumnStringsArray()
     var arrayPredicates = ExtractingPredicatesArray()
     
     
@@ -151,7 +151,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
             
         case "popup2colHeaders1":
             self.resetCol1ExtractedParameters()
-            self.extractCol1ParametersIntoSetFromColumn()
+            self.extractCol1ParametersIntoSetFromSelectedColumn()
             self.popup2colHeaders2?.selectItemAtIndex(-1)
             self.popup2colHeaders2.enabled = false
         case "popup2colHeaders2":
@@ -332,9 +332,13 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     func extract1ColParametersIntoSet(colIndex colIndex:Int)
     {
         //called from Process menu
-        guard let csvdo = self.associatedCSVdataViewController, let columnIndex = self.requestedColumnIndexIsOK(colIndex), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
+        self.arrayExtractedParameters = MulticolumnStringsArray()
+       guard
+            let datamodel = self.associatedCSVmodel,
+            let newArray = datamodel.dataMatrixOfParametersFromColumn(fromColumn: colIndex)
+            else { return }
         
-        self.arrayExtractedParameters = self.dataMatrixWithNoBlanksFromSet(set: set)
+        self.arrayExtractedParameters = newArray
         self.tvExtractedParameters.reloadData()
         
     }
@@ -342,23 +346,26 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     
     func resetCol1ExtractedParameters()
     {
-        self.arrayCol1Params = DataMatrix()
-        self.arrayCol2Params = DataMatrix()
+        self.arrayCol1Params = MulticolumnStringsArray()
+        self.arrayCol2Params = MulticolumnStringsArray()
         self.tv2colParameters1?.reloadData()
         self.tv2colParameters2?.reloadData()
     }
     
     func resetCol2ExtractedParameters()
     {
-        self.arrayCol2Params = DataMatrix()
+        self.arrayCol2Params = MulticolumnStringsArray()
         self.tv2colParameters2?.reloadData()
    }
     
-    func extractCol1ParametersIntoSetFromColumn()
+    func extractCol1ParametersIntoSetFromSelectedColumn()
     {
-        guard let csvdo = self.associatedCSVdataViewController, let columnIndex = self.requestedColumnIndexIsOK(self.popup2colHeaders1.indexOfSelectedItem), let set = csvdo.setOfParametersFromColumn(fromColumn: columnIndex) else { return }
+        self.arrayCol1Params = MulticolumnStringsArray()
+        guard let datamodel = self.associatedCSVmodel,
+        let newArray = datamodel.dataMatrixOfParametersFromColumn(fromColumn: self.popup2colHeaders1.indexOfSelectedItem)
+        else { return }
         
-        self.arrayCol1Params = dataMatrixWithNoBlanksFromSet(set: set)
+        self.arrayCol1Params = newArray
         self.tv2colParameters1.reloadData()
         
     }
@@ -383,7 +390,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         guard
             let set = csvdo.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn:columnToExtractIndex, matchString:matchStr, matchColumn:columnToMatchIndex)
         else { return }
-        self.arrayCol2Params = dataMatrixWithNoBlanksFromSet(set: set)
+        self.arrayCol2Params = CSVdata.dataMatrixWithNoBlanksFromSet(set: set)
         self.tv2colParameters2.reloadData()
 
         
@@ -410,7 +417,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         guard let csvdo = self.associatedCSVdataViewController else {return}
         let columnIndex: Int
         let parameterRows: NSIndexSet
-        let arrayParamsToUse: DataMatrix
+        let arrayParamsToUse: MulticolumnStringsArray
         
         switch arrayIdentifier
         {
@@ -429,7 +436,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         default:
             columnIndex = -1
             parameterRows = NSIndexSet()
-            arrayParamsToUse = DataMatrix()
+            arrayParamsToUse = MulticolumnStringsArray()
         }
 
         

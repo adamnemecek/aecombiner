@@ -13,9 +13,9 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     
     
     // MARK: - Var
-    var extractedDataMatrixUsingPredicates = DataMatrix()//used in some subclasses
+    var extractedDataMatrixUsingPredicates = MulticolumnStringsArray()//used in some subclasses
     var associatedCSVdataViewController: CSVdataViewController?
-
+    var associatedCSVmodel:CSVdata?
     
     // MARK: - @IBOutlet
     
@@ -86,10 +86,10 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
         // over ridden in subclasses
         guard let csvdatavc = self.associatedCSVdataViewController,
-                let datamatrix = csvdatavc.dataMatrixFromAssociatedCSVdataDocument()
+                let MulticolumnStringsArray = csvdatavc.dataMatrixFromAssociatedCSVdataDocument()
         else {return}
         // we use self.extractedDataMatrixUsingPredicates
-        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: datamatrix)
+        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: MulticolumnStringsArray)
         csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
 
     }
@@ -102,7 +102,7 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     }
     
 
-    func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn, inout arrayToSort:DataMatrix, textOrValue:Int)
+    func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn, inout arrayToSort:MulticolumnStringsArray, textOrValue:Int)
     {
         guard tableView.columnWithIdentifier(tableColumn.identifier) >= 0 else {return}
         if tableColumn.sortDescriptorPrototype == nil
@@ -118,6 +118,9 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
 
     
     // MARK: - Columns
+    
+    
+    
     func selectedColumnFromHeadersTableView(tableview: NSTableView) -> Int?
     {
         return self.requestedColumnIndexIsOK(tableview.selectedRow)
@@ -149,6 +152,8 @@ class HeadingsViewController: NSViewController, NSTableViewDataSource, NSTableVi
     override func viewWillAppear() {
         super.viewWillAppear()
         self.associatedCSVdataViewController = (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
+        self.associatedCSVmodel = self.associatedCSVdataViewController?.associatedCSVdataDocument.csvDataModel
+
         self.tvHeaders?.reloadData()
 
     }

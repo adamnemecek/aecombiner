@@ -19,7 +19,7 @@ class RecodeColumnViewController: HeadingsViewController {
     
 
     // MARK: - class vars
-    var arrayExtractedParameters = DataMatrix()
+    var arrayExtractedParameters = MulticolumnStringsArray()
 
     // MARK: - class constants
     
@@ -181,7 +181,7 @@ class RecodeColumnViewController: HeadingsViewController {
     
     func resetExtractedParameters()
     {
-        self.arrayExtractedParameters = DataMatrix()
+        self.arrayExtractedParameters = MulticolumnStringsArray()
         self.tvExtractedParameters?.reloadData()
         self.textFieldColumnRecodedName?.stringValue = ""
         self.labelNumberOfParameterOrGroupingItems?.stringValue = ""

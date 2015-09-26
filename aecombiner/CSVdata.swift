@@ -15,20 +15,22 @@ let commaDelimiter = ","
 let carriageReturn = "\n"
 let tabDelimiter = "\t"
 
-typealias DataMatrix = [[String]]
-typealias ArrayOfStringOneRow = [String]
-typealias HeadersMatrix = ArrayOfStringOneRow
+typealias SetOfStrings = Set<String>
+typealias MulticolumnStringsArray = [[String]]
+typealias SingleColumnStringsArray = [String]
+
+
 
 struct NamedDataMatrix
 {
-    var matrixOfData: DataMatrix
+    var matrixOfData: MulticolumnStringsArray
     var nameOfData: String
     init ()
     {
-        matrixOfData = DataMatrix()
+        matrixOfData = MulticolumnStringsArray()
         nameOfData = ""
     }
-    init (matrix:DataMatrix, name:String)
+    init (matrix:MulticolumnStringsArray, name:String)
     {
         matrixOfData = matrix
         nameOfData = name
@@ -38,20 +40,20 @@ struct NamedDataMatrix
 
 class CSVdata {
 
-    var headers:HeadersMatrix// = HeadersMatrix()
-    var csvData:DataMatrix// = DataMatrix()
+    var headers:SingleColumnStringsArray// = SingleColumnStringsArray()
+    var csvData:MulticolumnStringsArray// = MulticolumnStringsArray()
     var processedDataOK:Bool// = false
     var name:String// = ""
     
     init()
     {
-        self.headers = HeadersMatrix()
-        self.csvData = DataMatrix()
+        self.headers = SingleColumnStringsArray()
+        self.csvData = MulticolumnStringsArray()
         self.processedDataOK = false
         self.name = ""
     }
     
-    convenience init (headers:HeadersMatrix, csvdata:DataMatrix, name:String)
+    convenience init (headers:SingleColumnStringsArray, csvdata:MulticolumnStringsArray, name:String)
     {
         self.init()
         self.headers = headers
@@ -82,7 +84,7 @@ class CSVdata {
     
     func importCSVstring(dataAsString dataAsString:NSString, name:String)
     {
-        var arrayOfRowArrays = DataMatrix()
+        var arrayOfRowArrays = MulticolumnStringsArray()
         dataAsString.enumerateLinesUsingBlock({ (line, okay) -> Void in
             //check for "" and replace , inside them
             if line.rangeOfString(quotationMarks) != nil
@@ -116,7 +118,7 @@ class CSVdata {
     
     func importTABstring(dataAsString dataAsString:NSString, name:String)
     {
-        var arrayOfRowArrays = DataMatrix()
+        var arrayOfRowArrays = MulticolumnStringsArray()
         dataAsString.enumerateLinesUsingBlock({ (line, okay) -> Void in
             // we dont check for tabs inside quotes
             arrayOfRowArrays.append(line.componentsSeparatedByString(tabDelimiter))
@@ -133,7 +135,7 @@ class CSVdata {
 
     func processCSVtoData(delimiter delimiter:String) -> NSData?
     {
-        var tempArray = HeadersMatrix()
+        var tempArray = SingleColumnStringsArray()
         for var row = 0; row<self.csvData.count; row++
         {
             let rowString = self.csvData[row].joinWithSeparator(delimiter)
@@ -146,7 +148,7 @@ class CSVdata {
 
     func extractTheseRowsFromSelfAsCSVdata(rows rows:NSIndexSet)->CSVdata
     {
-        var extractedRows = DataMatrix()
+        var extractedRows = MulticolumnStringsArray()
         let numRows = self.csvData.count
         for rowIndex in rows
         {
@@ -156,9 +158,9 @@ class CSVdata {
         return CSVdata(headers: self.headers, csvdata: extractedRows, name:"")
     }
         
-    class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:DataMatrix)->DataMatrix
+    class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:MulticolumnStringsArray)->MulticolumnStringsArray
     {
-        var extractedRows = DataMatrix()
+        var extractedRows = MulticolumnStringsArray()
         let numRows = datamatrix.count
         for rowIndex in rows
         {
@@ -168,20 +170,51 @@ class CSVdata {
         return extractedRows
     }
 
-    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->DataMatrix?
+    func validatedColumnIndex(columnIndex:Int)->Int?
     {
-        guard  columnIndex < self.headers.count else {return nil}
-        
-        var set = Set<String>()
-        for parameter in self.csvData
+        guard
+            self.csvData.count>0 &&
+            columnIndex >= 0 &&
+            columnIndex < self.csvData[0].count
+            else {return nil}
+        return columnIndex
+    }
+    
+    func singleColumnStringsArrayOfParametersFromColumn(fromColumn columnIndex:Int, replaceBlank:Bool)->SingleColumnStringsArray?
+    {
+        guard
+            let validCI = self.validatedColumnIndex(columnIndex)
+            else {return nil}
+        var set = SetOfStrings()
+        for row in self.csvData
         {
             // parameter is a [string] array of row columns
-            set.insert(parameter[columnIndex])
+            set.insert(row[validCI])
+        }
+        if replaceBlank == true
+        {
+            if set.remove("") != nil
+            {
+                set.insert(kStringEmpty)
+            }
+        }
+        return Array(set)
+    }
+    
+    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->MulticolumnStringsArray?
+    {
+        guard  let validCI = self.validatedColumnIndex(columnIndex) else {return nil}
+        
+        var set = SetOfStrings()
+        for row in self.csvData
+        {
+            // parameter is a [string] array of row columns
+            set.insert(row[validCI])
         }
         return set.count == 0 ? nil : CSVdata.dataMatrixWithNoBlanksFromSet(set: set)
     }
     
-    class func dataMatrixWithNoBlanksFromSet(set set:Set<String>)->DataMatrix
+    class func dataMatrixWithNoBlanksFromSet(set set:SetOfStrings)->MulticolumnStringsArray
     {
         var subArray = Array(set)
         // replace blanks with string
@@ -193,7 +226,7 @@ class CSVdata {
             }
         }
         
-        var matrix = DataMatrix()
+        var matrix = MulticolumnStringsArray()
         for var row = 0; row<subArray.count; ++row
         {
             matrix.append([subArray[row],""])
@@ -202,15 +235,18 @@ class CSVdata {
         return matrix
     }
     
-    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->Set<String>?
+    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->SetOfStrings?
     {
-        var set = Set<String>()
+        guard  let validFromC = self.validatedColumnIndex(fromColumn),
+                let validMatchC = self.validatedColumnIndex(matchColumn)
+            else {return nil}
+        var set = SetOfStrings()
         for parameter in self.csvData
         {
             // parameter is a [string] array of row columns
-            if parameter[matchColumn] == matchString
+            if parameter[validMatchC] == matchString
             {
-                set.insert(parameter[fromColumn])
+                set.insert(parameter[validFromC])
             }
         }
         return set.count == 0 ? nil : set
