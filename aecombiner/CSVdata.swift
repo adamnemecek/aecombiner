@@ -170,16 +170,6 @@ class CSVdata {
         return extractedRows
     }
 
-    func validatedColumnIndex(columnIndex:Int)->Int?
-    {
-        guard
-            self.csvData.count>0 &&
-            columnIndex >= 0 &&
-            columnIndex < self.csvData[0].count
-            else {return nil}
-        return columnIndex
-    }
-    
     func singleColumnStringsArrayOfParametersFromColumn(fromColumn columnIndex:Int, replaceBlank:Bool)->SingleColumnStringsArray?
     {
         guard
@@ -250,6 +240,57 @@ class CSVdata {
             }
         }
         return set.count == 0 ? nil : set
+    }
+
+    // MARK: - Headers
+    func validatedColumnIndex(columnIndex:Int)->Int?
+    {
+        guard
+            self.csvData.count>0 &&
+                columnIndex >= 0 &&
+                columnIndex < self.csvData[0].count
+            else {return nil}
+        return columnIndex
+    }
+    
+
+    func numberOfColumnsInData()->Int{
+        return self.headers.count
+    }
+
+    func headerStringsForAllColumns()->[String]
+    {
+        return self.headers
+    }
+    
+    func headerStringForColumnIndex(columnIndex:Int) -> String
+    {
+        guard let index = self.validatedColumnIndex(columnIndex) else {return "???"}
+        return (self.headers[index])
+    }
+    
+    func columnIndexForHeaderString(headerString:String)->Int?
+    {
+        return self.headers.indexOf(headerString)
+    }
+    
+    func checkedExtractingPredicatesArray(arrayToCheck:ArrayOfPredicatesForExtracting)->ArrayOfPredicatesForExtracting
+    {
+        var checkedArray = ArrayOfPredicatesForExtracting()
+        for var predicate in arrayToCheck
+        {
+            guard (self.headers.indexOf(predicate.columnNameToMatch) == nil) else {checkedArray.append(predicate); continue}
+            predicate.columnNameToMatch = "⚠️ "+predicate.columnNameToMatch
+            checkedArray.append(predicate)
+        }
+        return checkedArray
+    }
+
+    func cellForHeadersTable(tableView tableView: NSTableView, row: Int) ->NSTableCellView
+    {
+        let cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
+        cellView.textField!.stringValue = self.headerStringForColumnIndex(row)
+        return cellView
     }
 
 }

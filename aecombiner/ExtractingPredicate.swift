@@ -1,5 +1,5 @@
 //
-//  ExtractingPredicate.swift
+//  PredicateForExtracting.swift
 //  aecombiner
 //
 //  Created by David Lewis on 21/09/2015.
@@ -16,7 +16,7 @@ class ExtractingPredicateTableCellView: NSTableCellView {
 }
 
 
-struct ExtractingPredicate: Comparable
+struct PredicateForExtracting: Comparable
 {
     var columnNameToMatch:String
     var stringToMatch:String
@@ -27,7 +27,7 @@ struct ExtractingPredicate: Comparable
         stringToMatch = string
         columnNameToMatch = columnName
     }
-    static func extractNSArrayFromExtractingPredicatesArray(predicatesarray predicatesarray:ExtractingPredicatesArray)->NSMutableArray
+    static func extractNSArrayFromExtractingPredicatesArray(predicatesarray predicatesarray:ArrayOfPredicatesForExtracting)->NSMutableArray
     {
         let newarray = NSMutableArray()
         for predicate in predicatesarray
@@ -37,26 +37,26 @@ struct ExtractingPredicate: Comparable
         }
         return newarray
     }
-    static func extractExtractingPredicatesArrayFromNSArray(array:NSArray)->ExtractingPredicatesArray
+    static func extractExtractingPredicatesArrayFromNSArray(array:NSArray)->ArrayOfPredicatesForExtracting
     {
         
-        var newarray = ExtractingPredicatesArray()
+        var newarray = ArrayOfPredicatesForExtracting()
         for predicate in array
         {
             let predA = predicate as! NSArray
-            let newP = ExtractingPredicate(columnName: predA.objectAtIndex(2) as! String, string: predA.objectAtIndex(1) as! String, boolean: predA.objectAtIndex(0) as! String)
+            let newP = PredicateForExtracting(columnName: predA.objectAtIndex(2) as! String, string: predA.objectAtIndex(1) as! String, boolean: predA.objectAtIndex(0) as! String)
             newarray.append(newP)
         }
         return newarray
     }
     
-    static func saveExtractingPredicatesArrayToURL(url url:NSURL, predicatesarray:ExtractingPredicatesArray)
+    static func saveExtractingPredicatesArrayToURL(url url:NSURL, predicatesarray:ArrayOfPredicatesForExtracting)
     {
         let nsarray = self.extractNSArrayFromExtractingPredicatesArray(predicatesarray: predicatesarray)
         nsarray.writeToURL(url, atomically: true)
     }
     
-    static func loadExtractingPredicatesArrayFromURL(url url:NSURL)-> ExtractingPredicatesArray?
+    static func loadExtractingPredicatesArrayFromURL(url url:NSURL)-> ArrayOfPredicatesForExtracting?
     {
         guard let array = NSArray(contentsOfURL: url) where array.count > 0 else {return nil}
         return self.extractExtractingPredicatesArrayFromNSArray(array)
@@ -65,12 +65,12 @@ struct ExtractingPredicate: Comparable
     
 }
 //you implement == type at GLOBAL level not within the body of the struct!!!
-func ==(lhs: ExtractingPredicate, rhs: ExtractingPredicate) -> Bool {
+func ==(lhs: PredicateForExtracting, rhs: PredicateForExtracting) -> Bool {
     return  //(lhs.booleanOperator == rhs.booleanOperator)  && we ignore bool as u cant use the same search term in more than one bool type
         (lhs.columnNameToMatch == rhs.columnNameToMatch) &&
             (lhs.stringToMatch == rhs.stringToMatch)
 }
-func < (lhs: ExtractingPredicate, rhs: ExtractingPredicate) -> Bool {
+func < (lhs: PredicateForExtracting, rhs: PredicateForExtracting) -> Bool {
     //phased approach. We test in precedence and ignore any unequalness below if the upper level is discordant
     // so it may be > at a lower level
     // we do this to ensure the ANDs cluster apart from ORs, COLUMNs from each other and so on
@@ -81,11 +81,11 @@ func < (lhs: ExtractingPredicate, rhs: ExtractingPredicate) -> Bool {
     return lhs.stringToMatch < rhs.stringToMatch
 }
 
-typealias ExtractingPredicatesArray = [ExtractingPredicate]
+typealias ArrayOfPredicatesForExtracting = [PredicateForExtracting]
 
 struct PredicatesByBoolean {
-    var ANDpredicates = ExtractingPredicatesArray()
-    var ORpredicates = ExtractingPredicatesArray()
-    var NOTpredicates = ExtractingPredicatesArray()
+    var ANDpredicates = ArrayOfPredicatesForExtracting()
+    var ORpredicates = ArrayOfPredicatesForExtracting()
+    var NOTpredicates = ArrayOfPredicatesForExtracting()
     
 }

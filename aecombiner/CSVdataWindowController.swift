@@ -53,8 +53,8 @@ class CSVdataWindowController: NSWindowController {
         
         switch segue.identifier!
         {
-        case "HeadingsViewController":
-            _ = (segue.destinationController as! HeadingsViewController)
+        case "ColumnSortingChartingViewController":
+            _ = (segue.destinationController as! ColumnSortingChartingViewController)
             //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
         case "RecodeColumnViewController":
             _ = (segue.destinationController as! RecodeColumnViewController)

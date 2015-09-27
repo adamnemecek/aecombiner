@@ -50,13 +50,13 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     // MARK: - extracting CSV data table
 
-    func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:ExtractingPredicatesArray)
+    func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:ArrayOfPredicatesForExtracting)
     {
         self.associatedCSVdataDocument.extractRowsBasedOnPredicatesIntoNewFile(predicates: predicates)
         self.tvCSVdata.reloadData()
     }
     
-    func extractDataMatrixUsingPredicates(predicates predicates:ExtractingPredicatesArray)->MulticolumnStringsArray
+    func extractDataMatrixUsingPredicates(predicates predicates:ArrayOfPredicatesForExtracting)->MulticolumnStringsArray
     {
         return self.associatedCSVdataDocument.extractDataMatrixUsingPredicates(predicates: predicates)
     }
@@ -120,7 +120,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return self.associatedCSVdataDocument.headerStringForColumnIndex(columnIndex)
     }
     
-    func checkedExtractingPredicatesArray(arrayToCheck:ExtractingPredicatesArray)->ExtractingPredicatesArray
+    func checkedExtractingPredicatesArray(arrayToCheck:ArrayOfPredicatesForExtracting)->ArrayOfPredicatesForExtracting
     {
         return self.associatedCSVdataDocument.checkedExtractingPredicatesArray(arrayToCheck)
     }

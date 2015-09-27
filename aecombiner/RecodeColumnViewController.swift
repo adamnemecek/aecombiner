@@ -15,7 +15,7 @@ let kSelectedParametersArrayParameterIndex = 1
 let kStringEmpty = "- Empty -"
 let kStringRecodedColumnNameSuffix = "_#_"
 
-class RecodeColumnViewController: HeadingsViewController {
+class RecodeColumnViewController: ColumnSortingChartingViewController {
     
 
     // MARK: - class vars
@@ -28,9 +28,8 @@ class RecodeColumnViewController: HeadingsViewController {
 
     @IBOutlet weak var tvExtractedParameters: NSTableView!
     @IBOutlet weak var labelNumberOfParameterOrGroupingItems: NSTextField!
+    @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
 
-    @IBOutlet weak var segmentedSortAsTextOrNumbers: NSSegmentedControl!
-    //@IBOutlet weak var segmentedSortParameterOrValue: NSSegmentedControl!
     
     @IBOutlet weak var popupHeaders: NSPopUpButton!
  
@@ -65,9 +64,9 @@ class RecodeColumnViewController: HeadingsViewController {
     // MARK: - header Popups
     func populateHeaderPopups()
     {
-        guard let csvdo = self.associatedCSVdataViewController else { return}
+        guard let csvdm = self.associatedCSVmodel else { return}
         self.popupHeaders.removeAllItems()
-        self.popupHeaders.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popupHeaders.addItemsWithTitles(csvdm.headerStringsForAllColumns())
         self.popupHeaders.selectItemAtIndex(-1)
     }
     
@@ -76,9 +75,12 @@ class RecodeColumnViewController: HeadingsViewController {
         switch popup
         {
         case self.popupHeaders:
+            guard
+                let csvdatamodel = self.associatedCSVmodel
+            else {return}
             self.resetExtractedParameters()
             self.extractParametersIntoSetFromColumn()
-            self.textFieldColumnRecodedName?.stringValue = self.headerStringForColumnIndex(popup.indexOfSelectedItem)
+            self.textFieldColumnRecodedName?.stringValue = csvdatamodel.headerStringForColumnIndex(popup.indexOfSelectedItem)
         default:
             break
         }
@@ -107,7 +109,7 @@ class RecodeColumnViewController: HeadingsViewController {
     }
     
 
-    override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         switch tableView
         {
         case self.tvExtractedParameters:
@@ -118,7 +120,7 @@ class RecodeColumnViewController: HeadingsViewController {
         }
     }
     
-    override func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
@@ -148,7 +150,7 @@ class RecodeColumnViewController: HeadingsViewController {
     }
     
     
-    override func tableViewSelectionDidChange(notification: NSNotification) {
+    func tableViewSelectionDidChange(notification: NSNotification) {
         guard let tableView = (notification.object as? NSTableView) else {return}
         switch tableView
         {
@@ -175,7 +177,11 @@ class RecodeColumnViewController: HeadingsViewController {
     // MARK: - Column parameters
     func stringForRecodedColumn(columnIndex:Int) -> String
     {
-        return self.headerStringForColumnIndex(columnIndex)+kStringRecodedColumnNameSuffix
+        guard
+            let csvdatamodel = self.associatedCSVmodel
+            else {return "????"}
+
+        return csvdatamodel.headerStringForColumnIndex(columnIndex)+kStringRecodedColumnNameSuffix
     }
     
     
@@ -193,7 +199,7 @@ class RecodeColumnViewController: HeadingsViewController {
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        guard   let csvdo = self.associatedCSVdataViewController,
+        guard   let csvdo = self.associatedCSVmodel,
                 let dmOfParams = csvdo.dataMatrixOfParametersFromColumn(fromColumn: self.popupHeaders.indexOfSelectedItem)
             else { return }
         
@@ -205,14 +211,15 @@ class RecodeColumnViewController: HeadingsViewController {
     func doTheRecodeParametersAndAddNewColumn()
     {
         guard self.arrayExtractedParameters.count > 0  else {return}
-        guard   let csvVC = self.associatedCSVdataViewController,
-                let columnIndex = self.requestedColumnIndexIsOK(self.popupHeaders.indexOfSelectedItem)
+        guard   let csvdo = self.associatedCSVmodel,
+                let csvdVC = self.associatedCSVdataViewController,
+                let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
                 else {return}
         //give a name if none
         let colTitle = self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(columnIndex) : self.textFieldColumnRecodedName!.stringValue
 
         //pass it over
-        csvVC.addRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters)
+        csvdVC.addRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters)
         
         //reload etc
         self.resetExtractedParameters()

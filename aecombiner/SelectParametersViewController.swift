@@ -9,24 +9,25 @@
 import Cocoa
 
 
-class ExtractWithPredicatesViewController: RecodeColumnViewController {
+class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     
     
     // MARK: - class vars
-    var arrayCol1Params = MulticolumnStringsArray()
-    var arrayCol2Params = MulticolumnStringsArray()
-    var arrayPredicates = ExtractingPredicatesArray()
-    
+    var arrayColParams1 = MulticolumnStringsArray()
+    var array2ColParams2 = MulticolumnStringsArray()
+    var array1ColParams = MulticolumnStringsArray()
+    var arrayPredicates = ArrayOfPredicatesForExtracting()
+    var extractedDataMatrixUsingPredicatesForCharting = MulticolumnStringsArray()//used in some subclasses
+   
     
     // MARK: - @IBOutlet
     
-    @IBOutlet weak var tabv1Col2Col: NSTabView!
     
+    @IBOutlet weak var tv1colParameters: NSTableView!
     @IBOutlet weak var tv2colParameters2: NSTableView!
     @IBOutlet weak var tv2colParameters1: NSTableView!
     @IBOutlet weak var tvPredicates: NSTableView!
-    @IBOutlet weak var tvGroupHeadersSecondaryExtract: NSTableView!
-    
+    @IBOutlet weak var buttonModelByPredicates: NSButton!
     @IBOutlet weak var buttonRemovePredicate: NSButton!
     @IBOutlet weak var buttonChartExtractedRows: NSButton!
 
@@ -35,7 +36,9 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     @IBOutlet weak var popup2colHeaders1: NSPopUpButton!
     @IBOutlet weak var popup2colHeaders2: NSPopUpButton!
 
-    
+    @IBOutlet weak var tvGroupHeadersSecondaryExtract: NSTableView!
+    @IBOutlet weak var buttonModelByGrouping: NSButton!
+
     /* MARK: - Represented Object
     override func updateRepresentedObjectToCSVData(csvdata:CSVdata)
     {
@@ -44,7 +47,10 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
 */
     // MARK: - @IBAction
     
-    
+    @IBAction func popupHeadersButtonSelected(sender: NSPopUpButton) {
+        self.popupChangedSelection(sender)
+    }
+
     @IBAction func addSelectedParameter(sender: NSButton) {
         self.addColumnAndSelectedParameter(sender.identifier!)
     }
@@ -65,10 +71,10 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     }
     
     @IBAction func extractRowsBasedOnPredicatesIntoModelForChart(sender: NSButton) {
-        guard self.extractedDataMatrixUsingPredicatesIntoArray() == true else {return}
+        guard self.extractDataMatrixUsingPredicatesIntoArray() == true else {return}
         
         
-        self.buttonChartExtractedRows.enabled = self.extractedDataMatrixUsingPredicates.count>0
+        self.buttonChartExtractedRows.enabled = self.extractedDataMatrixUsingPredicatesForCharting.count>0
         self.chartExtractedRows(sender)
     }
     
@@ -80,7 +86,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         if sp.runModal() == NSFileHandlingPanelOKButton
         {
             guard  let targetURL = sp.URL else {return}
-            ExtractingPredicate.saveExtractingPredicatesArrayToURL(url: targetURL, predicatesarray: self.arrayPredicates)
+            PredicateForExtracting.saveExtractingPredicatesArrayToURL(url: targetURL, predicatesarray: self.arrayPredicates)
         }
     }
     
@@ -93,7 +99,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         if sp.runModal() == NSFileHandlingPanelOKButton
         {
             guard  sp.URLs.count>0 else {return}
-            guard  let newgpa = ExtractingPredicate.loadExtractingPredicatesArrayFromURL(url: sp.URLs[0]) else {return}
+            guard  let newgpa = PredicateForExtracting.loadExtractingPredicatesArrayFromURL(url: sp.URLs[0]) else {return}
             self.arrayPredicates = csvdatavc.checkedExtractingPredicatesArray(newgpa)
             self.updateTableViewSelectedColumnAndParameters()
         }
@@ -108,8 +114,8 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     }
     override func viewWillAppear() {
         super.viewWillAppear()
-        
-        self.tvExtractedParameters?.reloadData()
+        self.populateHeaderPopups()
+        self.tv1colParameters?.reloadData()
     }
     
     override func viewDidAppear() {
@@ -118,12 +124,11 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     }
     
     // MARK: - header Popups
-    override func populateHeaderPopups()
+    func populateHeaderPopups()
     {
-        super.populateHeaderPopups()
-        
         guard let csvdo = self.associatedCSVdataViewController else { return}
-       self.popupParameterToChart.removeAllItems()
+        
+        self.popupParameterToChart.removeAllItems()
         self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
         
         self.popup1ColHeaders.removeAllItems()
@@ -140,13 +145,13 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         
     }
     
-    override func popupChangedSelection(popup: NSPopUpButton)
+    func popupChangedSelection(popup: NSPopUpButton)
     {
         guard let id = popup.identifier else {return}
         switch id
         {
         case "popup1ColHeaders":
-            self.resetExtractedParameters()
+            self.reset1ColExtractedParameters()
             self.extract1ColParametersIntoSet(colIndex: popup.indexOfSelectedItem)
             
         case "popup2colHeaders1":
@@ -163,23 +168,29 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         
     }
 
+    func reset1ColExtractedParameters()
+    {
+        self.array1ColParams = MulticolumnStringsArray()
+        self.tv1colParameters?.reloadData()
+    }
+
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
         guard let csvdatavc = self.associatedCSVdataViewController else {return}
-        // we use self.extractedDataMatrixUsingPredicates
-        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixUsingPredicates)
+        // we use self.extractedDataMatrixUsingPredicatesForCharting
+        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixUsingPredicatesForCharting)
         csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
     }
 
     func chartExtractedRows(sender: NSButton) {
         guard
             let chartviewC = self.chartViewController,
-            let colIndex = self.requestedColumnIndexIsOK(self.popupParameterToChart.indexOfSelectedItem)
+            let csvdm = self.associatedCSVmodel,
+            let colIndex = csvdm.validatedColumnIndex(self.popupParameterToChart.indexOfSelectedItem)
             else {return}
-        let dataset = ChartDataSet(data: self.extractedDataMatrixUsingPredicates, forColumnIndex: colIndex)
-        chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: self.headerStringForColumnIndex(colIndex))
-
+        let dataset = ChartDataSet(data: self.extractedDataMatrixUsingPredicatesForCharting, forColumnIndex: colIndex)
+        chartviewC.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: csvdm.headerStringForColumnIndex(colIndex))
     }
     
 
@@ -190,13 +201,13 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         switch tvidentifier
         {
         case "tv1colParameters":
-            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayExtractedParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.array1ColParams, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
             tableView.reloadData()
         case "tv2colParameters1":
-            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayCol1Params, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayColParams1, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
             tableView.reloadData()
         case "tv2colParameters2":
-            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayCol2Params, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.array2ColParams2, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
             tableView.reloadData()
             
         default:
@@ -206,14 +217,6 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     }
 
     // MARK: - Grouping
-    func columnIndexToGroupBy()->Int? // override in subclasses to substitute popup
-    {
-        return self.popupHeaders.indexOfSelectedItem == -1 ? nil : self.popupHeaders.indexOfSelectedItem
-    }
-    func columnsToGroupTogether()->NSIndexSet // override in subclasses to substitute popup
-    {
-        return self.tvGroupHeadersSecondaryExtract.selectedRowIndexes
-    }
     
 /*
     func groupAllStatsToFile()
@@ -233,7 +236,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     // MARK: - TableView overrides
     
     
-    override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         guard let tvidentifier = tableView.identifier,
             let csvdo = self.associatedCSVdataViewController
             else {return 0}
@@ -241,11 +244,11 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         switch tvidentifier
         {
         case "tv1colParameters":
-            return self.arrayExtractedParameters.count
+            return self.array1ColParams.count
         case "tv2colParameters1":
-            return self.arrayCol1Params.count
+            return self.arrayColParams1.count
         case "tv2colParameters2":
-            return self.arrayCol2Params.count
+            return self.array2ColParams2.count
         case "tvPredicates":
             return self.arrayPredicates.count
         case "tvGroupHeadersSecondaryExtract":
@@ -255,7 +258,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         }
     }
     
-    override func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+     func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
@@ -269,10 +272,10 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
             {
             case "parameter":
                 cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArrayParametersIndex]
+                cellView.textField!.stringValue = self.array1ColParams[row][kParametersArrayParametersIndex]
             case "value"://parameters
                 cellView = tableView.makeViewWithIdentifier("parametersValueCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArrayParametersValueIndex]
+                cellView.textField!.stringValue = self.array1ColParams[row][kParametersArrayParametersValueIndex]
                 cellView.textField!.tag = row
             default:
                 break
@@ -280,10 +283,10 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
             
         case "tv2colParameters1":
             cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
-            cellView.textField!.stringValue = self.arrayCol1Params[row][kParametersArrayParametersIndex]
+            cellView.textField!.stringValue = self.arrayColParams1[row][kParametersArrayParametersIndex]
         case "tv2colParameters2":
             cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
-            cellView.textField!.stringValue = self.arrayCol2Params[row][kParametersArrayParametersIndex]
+            cellView.textField!.stringValue = self.array2ColParams2[row][kParametersArrayParametersIndex]
             
         case "tvPredicates":
             let predcellView = tableView.makeViewWithIdentifier("parameterImageCell", owner: self) as! ExtractingPredicateTableCellView
@@ -293,7 +296,8 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
             return predcellView
 
         case "tvGroupHeadersSecondaryExtract":
-            cellView = self.cellForHeadersTable(tableView: tableView, row: row)
+            guard let csvdm = self.associatedCSVmodel else { return cellView}
+            cellView = csvdm.cellForHeadersTable(tableView: tableView, row: row)
 
         default:
             break;
@@ -305,7 +309,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     }
     
     
-    override func tableViewSelectionDidChange(notification: NSNotification) {
+     func tableViewSelectionDidChange(notification: NSNotification) {
         let tableView = notification.object as! NSTableView
         switch tableView.identifier!
         {
@@ -332,40 +336,40 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     func extract1ColParametersIntoSet(colIndex colIndex:Int)
     {
         //called from Process menu
-        self.arrayExtractedParameters = MulticolumnStringsArray()
+        self.array1ColParams = MulticolumnStringsArray()
        guard
             let datamodel = self.associatedCSVmodel,
             let newArray = datamodel.dataMatrixOfParametersFromColumn(fromColumn: colIndex)
             else { return }
         
-        self.arrayExtractedParameters = newArray
-        self.tvExtractedParameters.reloadData()
+        self.array1ColParams = newArray
+        self.tv1colParameters.reloadData()
         
     }
 
     
     func resetCol1ExtractedParameters()
     {
-        self.arrayCol1Params = MulticolumnStringsArray()
-        self.arrayCol2Params = MulticolumnStringsArray()
+        self.arrayColParams1 = MulticolumnStringsArray()
+        self.array2ColParams2 = MulticolumnStringsArray()
         self.tv2colParameters1?.reloadData()
         self.tv2colParameters2?.reloadData()
     }
     
     func resetCol2ExtractedParameters()
     {
-        self.arrayCol2Params = MulticolumnStringsArray()
+        self.array2ColParams2 = MulticolumnStringsArray()
         self.tv2colParameters2?.reloadData()
    }
     
     func extractCol1ParametersIntoSetFromSelectedColumn()
     {
-        self.arrayCol1Params = MulticolumnStringsArray()
+        self.arrayColParams1 = MulticolumnStringsArray()
         guard let datamodel = self.associatedCSVmodel,
         let newArray = datamodel.dataMatrixOfParametersFromColumn(fromColumn: self.popup2colHeaders1.indexOfSelectedItem)
         else { return }
         
-        self.arrayCol1Params = newArray
+        self.arrayColParams1 = newArray
         self.tv2colParameters1.reloadData()
         
     }
@@ -373,24 +377,24 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     func param1SelectedIndex()->Int?
     {
         let index = self.tv2colParameters1.selectedRow
-        return  index >= 0 && index < self.arrayCol1Params.count ? index : nil
+        return  index >= 0 && index < self.arrayColParams1.count ? index : nil
     }
 
     
     func extractCol2ParametersIntoSetFromHeaders2()
     {
         guard
-            let csvdo = self.associatedCSVdataViewController,
-            let columnToMatchIndex = self.requestedColumnIndexIsOK(self.popup2colHeaders1.indexOfSelectedItem),
-            let columnToExtractIndex = self.requestedColumnIndexIsOK(self.popup2colHeaders2.indexOfSelectedItem),
+            let csvdm = self.associatedCSVmodel,
+            let columnToMatchIndex = csvdm.validatedColumnIndex(self.popup2colHeaders1.indexOfSelectedItem),
+            let columnToExtractIndex = csvdm.validatedColumnIndex(self.popup2colHeaders2.indexOfSelectedItem),
             let safeParam1Index = self.param1SelectedIndex()
         else { return }
 
-        let matchStr = self.arrayCol1Params[safeParam1Index][kParametersArrayParametersIndex]
+        let matchStr = self.arrayColParams1[safeParam1Index][kParametersArrayParametersIndex]
         guard
-            let set = csvdo.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn:columnToExtractIndex, matchString:matchStr, matchColumn:columnToMatchIndex)
+            let set = csvdm.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn:columnToExtractIndex, matchString:matchStr, matchColumn:columnToMatchIndex)
         else { return }
-        self.arrayCol2Params = CSVdata.dataMatrixWithNoBlanksFromSet(set: set)
+        self.array2ColParams2 = CSVdata.dataMatrixWithNoBlanksFromSet(set: set)
         self.tv2colParameters2.reloadData()
 
         
@@ -398,11 +402,11 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
 
     
     // MARK: - AND OR tables
-    func extractedDataMatrixUsingPredicatesIntoArray()->Bool
+    func extractDataMatrixUsingPredicatesIntoArray()->Bool
     {
         guard let cdvc = self.associatedCSVdataViewController
             else {return false}
-        self.extractedDataMatrixUsingPredicates = cdvc.extractDataMatrixUsingPredicates(predicates: self.arrayPredicates)
+        self.extractedDataMatrixUsingPredicatesForCharting = cdvc.extractDataMatrixUsingPredicates(predicates: self.arrayPredicates)
         return true
     }
 
@@ -423,16 +427,16 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
         {
         case "addANDarray","addORarray","addNOTarray":
             columnIndex = self.popup1ColHeaders.indexOfSelectedItem
-            parameterRows = self.tvExtractedParameters.selectedRowIndexes
-            arrayParamsToUse = self.arrayExtractedParameters
+            parameterRows = self.tv1colParameters.selectedRowIndexes
+            arrayParamsToUse = self.array1ColParams
         case "addANDarrayCol1","addORarrayCol1","addNOTarrayCol1":
             columnIndex = self.popup2colHeaders1.indexOfSelectedItem
             parameterRows = self.tv2colParameters1.selectedRowIndexes
-            arrayParamsToUse = self.arrayCol1Params
+            arrayParamsToUse = self.arrayColParams1
         case "addANDarrayCol2","addORarrayCol2","addNOTarrayCol2":
             columnIndex = self.popup2colHeaders2.indexOfSelectedItem
             parameterRows = self.tv2colParameters2.selectedRowIndexes
-            arrayParamsToUse = self.arrayCol2Params
+            arrayParamsToUse = self.array2ColParams2
         default:
             columnIndex = -1
             parameterRows = NSIndexSet()
@@ -474,7 +478,7 @@ class ExtractWithPredicatesViewController: RecodeColumnViewController {
     
     func appendPredicateToArray(columnIndexToSearch columnName: String, matchString: String, booleanString: String)
     {
-        let predicate = ExtractingPredicate(columnName: columnName, string: matchString, boolean: booleanString)
+        let predicate = PredicateForExtracting(columnName: columnName, string: matchString, boolean: booleanString)
         guard self.arrayPredicates.indexOf(predicate) == nil
             else
         {

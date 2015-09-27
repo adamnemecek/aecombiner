@@ -635,7 +635,7 @@ class CSVdataDocument: NSDocument {
     }
 
     
-    func splitPredicatesByBoolean(predicatesToSplit predicatesToSplit:ExtractingPredicatesArray)->PredicatesByBoolean
+    func splitPredicatesByBoolean(predicatesToSplit predicatesToSplit:ArrayOfPredicatesForExtracting)->PredicatesByBoolean
     {
         var splitpreds = PredicatesByBoolean()
         for predicate in predicatesToSplit
@@ -656,7 +656,7 @@ class CSVdataDocument: NSDocument {
     }
 
     
-    func extractDataMatrixUsingPredicates(predicates predicates:ExtractingPredicatesArray)->MulticolumnStringsArray
+    func extractDataMatrixUsingPredicates(predicates predicates:ArrayOfPredicatesForExtracting)->MulticolumnStringsArray
     {
         var extractedRows = MulticolumnStringsArray()
         let predicatesSplitByBoolean = self.splitPredicatesByBoolean(predicatesToSplit: predicates)
@@ -724,7 +724,7 @@ class CSVdataDocument: NSDocument {
         return extractedRows
     }
     
-    func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:ExtractingPredicatesArray)
+    func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:ArrayOfPredicatesForExtracting)
     {
         let extractedData = self.extractDataMatrixUsingPredicates(predicates: predicates)
         if extractedData.count>0
@@ -799,9 +799,9 @@ class CSVdataDocument: NSDocument {
         return self.csvDataModel.headers.indexOf(headerString)
     }
 
-    func checkedExtractingPredicatesArray(arrayToCheck:ExtractingPredicatesArray)->ExtractingPredicatesArray
+    func checkedExtractingPredicatesArray(arrayToCheck:ArrayOfPredicatesForExtracting)->ArrayOfPredicatesForExtracting
     {
-        var checkedArray = ExtractingPredicatesArray()
+        var checkedArray = ArrayOfPredicatesForExtracting()
         for var predicate in arrayToCheck
         {
             guard (self.csvDataModel.headers.indexOf(predicate.columnNameToMatch) == nil) else {checkedArray.append(predicate); continue}
