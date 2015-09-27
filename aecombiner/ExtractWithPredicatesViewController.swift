@@ -36,8 +36,6 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     @IBOutlet weak var popup2colHeaders1: NSPopUpButton!
     @IBOutlet weak var popup2colHeaders2: NSPopUpButton!
 
-    @IBOutlet weak var tvGroupHeadersSecondaryExtract: NSTableView!
-    @IBOutlet weak var buttonModelByGrouping: NSButton!
 
     /* MARK: - Represented Object
     override func updateRepresentedObjectToCSVData(csvdata:CSVdata)
@@ -216,29 +214,11 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
 
     }
 
-    // MARK: - Grouping
-    
-/*
-    func groupAllStatsToFile()
-    {
-        guard
-            let dvc = self.associatedCSVdataViewController,
-            let columnIndexForGrouping = self.columnIndexToGroupBy()
-            else {return}
-        
-        let arrayOfExtractedParametersInGroup = self.arrayOfExtractedParametersInGroup()
-        
-        
-        dvc.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersInGroup)
-        
-    }
-*/
     // MARK: - TableView overrides
     
     
      func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier,
-            let csvdo = self.associatedCSVdataViewController
+        guard let tvidentifier = tableView.identifier
             else {return 0}
         
         switch tvidentifier
@@ -251,8 +231,6 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
             return self.array2ColParams2.count
         case "tvPredicates":
             return self.arrayPredicates.count
-        case "tvGroupHeadersSecondaryExtract":
-            return csvdo.numberOfColumnsInData()
         default:
             return 0
         }
@@ -294,10 +272,6 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
             predcellView.textFieldLower!.stringValue = self.arrayPredicates[row].stringToMatch
             predcellView.imageView!.image = NSImage(named: self.arrayPredicates[row].booleanOperator)
             return predcellView
-
-        case "tvGroupHeadersSecondaryExtract":
-            guard let csvdm = self.associatedCSVmodel else { return cellView}
-            cellView = csvdm.cellForHeadersTable(tableView: tableView, row: row)
 
         default:
             break;
