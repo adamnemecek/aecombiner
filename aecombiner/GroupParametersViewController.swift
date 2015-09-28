@@ -32,10 +32,11 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
 
     @IBAction func groupToFileUsingOneMethodTapped(sender: NSButton) {
         guard
-            let groupMethod = self.popupGroupMethod.titleOfSelectedItem
+            let groupMethod = self.popupGroupMethod.titleOfSelectedItem,
+            let csdo = self.associatedCSVdataDocument
             else {return}
         
-        self.associatedCSVdataViewController?.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: self.arrayOfExtractedParametersToGroupBy(), groupMethod: groupMethod)
+        csdo.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: self.arrayOfExtractedParametersToGroupBy(), groupMethod: groupMethod)
     }
     
     @IBAction func groupAndChartTapped(sender: NSButton) {
@@ -44,8 +45,12 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     }
     
     @IBAction func groupAllStatsToFileTapped(sender: AnyObject) {
-        let arrayOfExtractedParametersToGroupBy = self.arrayOfExtractedParametersToGroupBy()
-        self.associatedCSVdataViewController?.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersToGroupBy)
+        guard
+            let csdo = self.associatedCSVdataDocument
+            else {return}
+
+        //let arrayOfExtractedParametersToGroupBy = self.arrayOfExtractedParametersToGroupBy()
+        csdo.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: columnsToGroupTogether())
     }
     
     @IBAction func popupGroupByButtonSelected(sender: NSPopUpButton) {
@@ -100,7 +105,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     // MARK: - header Popups
     func populateHeaderPopups()
     {
-        guard let csvdo = self.associatedCSVdataViewController else { return}
+        guard let csvdo = self.associatedCSVdataDocument else { return}
         self.popupGroupBy.removeAllItems()
         self.popupGroupBy.addItemsWithTitles(csvdo.headerStringsForAllColumns())
         self.popupGroupBy.selectItemAtIndex(-1)
@@ -132,8 +137,9 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        guard   let csvdo = self.associatedCSVdataViewController,
-            let dmOfParams = csvdo.dataMatrixOfParametersFromColumn(fromColumn: self.popupGroupBy.indexOfSelectedItem)
+        guard
+            let datamodel = self.associatedCSVmodel,
+            let dmOfParams = datamodel.dataMatrixOfParametersFromColumn(fromColumn: self.popupGroupBy.indexOfSelectedItem)
             else { return }
         
         self.arrayColumnsToGroupTogether = dmOfParams
@@ -144,9 +150,9 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
-        guard let csvdatavc = self.associatedCSVdataViewController else {return}
+        guard let csvdata = self.associatedCSVdataDocument else {return}
         let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.groupedDataAfterCombiningToUseForCharting)
-        csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: self.headersExtractedDataModelForChart, name: nameOfDataSet)
+        csvdata.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: self.headersExtractedDataModelForChart, name: nameOfDataSet)
     }
     
     
@@ -155,14 +161,14 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
         guard
             let groupMethod = self.popupGroupMethod.titleOfSelectedItem,
             let cvc = self.chartViewController,
-            let dvc = self.associatedCSVdataViewController,
+            let csvdo = self.associatedCSVdataDocument,
             let columnIndexForGrouping = self.columnIndexToGroupBy()
             else {return}
         
         let arrayOfExtractedParametersToGroupBy = self.arrayOfExtractedParametersToGroupBy()
-        let dataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersToGroupBy, groupMethod: groupMethod)
+        let dataAndName = csvdo.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersToGroupBy, groupMethod: groupMethod)
         self.groupedDataAfterCombiningToUseForCharting = dataAndName.matrixOfData
-        self.headersExtractedDataModelForChart = [dvc.headerStringForColumnIndex(columnIndexForGrouping),dataAndName.nameOfData]
+        self.headersExtractedDataModelForChart = [csvdo.headerStringForColumnIndex(columnIndexForGrouping),dataAndName.nameOfData]
         let dataset = ChartDataSet(data: dataAndName.matrixOfData, forColumnIndex: kCsvDataData_column_value)
         cvc.plotNewChartDataSet(dataSet: dataset, nameOfChartDataSet: dataAndName.nameOfData)
     }
@@ -182,11 +188,6 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     
     // MARK: - Columns
     
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:MulticolumnStringsArray, nameOfColumn:String)
-    {
-        guard let csvdo = self.associatedCSVdataViewController else {return NamedDataMatrix(matrix:MulticolumnStringsArray(),name: "")}
-        return csvdo.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-    }
     
     
     class func createArrayFromExtractedParametersToGroup(params params:MulticolumnStringsArray)->SingleColumnStringsArray
@@ -212,10 +213,11 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     func groupToFileUsingOneMethod()
     {
         guard
+            let csdo = self.associatedCSVdataDocument,
             let groupMethod = self.popupGroupMethod.titleOfSelectedItem
             else {return}
         
-        self.associatedCSVdataViewController?.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: self.arrayOfExtractedParametersToGroupBy(), groupMethod: groupMethod)
+        csdo.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: self.arrayOfExtractedParametersToGroupBy(), groupMethod: groupMethod)
         
     }
     
@@ -225,7 +227,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         guard   let tvidentifier = tableView.identifier,
-                let csvdo = self.associatedCSVdataViewController
+                let csvdo = self.associatedCSVdataDocument
             else {return 0}
         switch tvidentifier
         {

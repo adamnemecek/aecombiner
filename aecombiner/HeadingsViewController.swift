@@ -17,9 +17,14 @@ class ColumnsViewController: ColumnSortingChartingViewController {
     @IBOutlet weak var tvHeaders: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     @IBOutlet weak var buttonModel: NSButton!
+    @IBOutlet weak var buttonTrash: NSButton!
 
     // MARK: - @IBAction
     @IBAction func renameColumn(sender: AnyObject) {
+        guard
+            let csdo = self.associatedCSVdataViewController
+            else {return}
+        
         guard !self.textFieldColumnRecodedName.stringValue.isEmpty else
         {
             let alert = NSAlert()
@@ -28,12 +33,13 @@ class ColumnsViewController: ColumnSortingChartingViewController {
             alert.runModal()
             return
         }
-        self.associatedCSVdataViewController?.renameColumnAtIndex(self.tvHeaders.selectedRow, newName: self.textFieldColumnRecodedName.stringValue)
+        csdo.renameColumnAtIndex(self.tvHeaders.selectedRow, newName: self.textFieldColumnRecodedName.stringValue)
     }
     
     @IBAction func deleteHeading(sender: AnyObject) {
         
         guard
+        let csdo = self.associatedCSVdataViewController,
             let csvdatamodel = self.associatedCSVmodel
         else {return}
         
@@ -46,7 +52,7 @@ class ColumnsViewController: ColumnSortingChartingViewController {
         alert.beginSheetModalForWindow(self.view.window!) { (response) -> Void in
             if response == NSAlertFirstButtonReturn
             {
-                self.associatedCSVdataViewController?.deleteColumnAtIndex(self.tvHeaders.selectedRow)
+                csdo.deleteColumnAtIndex(self.tvHeaders.selectedRow)
                 self.tvHeaders.reloadData()
             }
         }
@@ -65,7 +71,7 @@ class ColumnsViewController: ColumnSortingChartingViewController {
         guard
             let chartviewC = self.chartViewController,
             let csvdatamodel = self.associatedCSVmodel,
-            let dataSet = self.associatedCSVdataViewController?.chartDataSetFromColumnIndex(columnIndex: self.tvHeaders.selectedRow)
+            let dataSet = self.associatedCSVdataDocument?.chartDataSetFromColumnIndex(columnIndex: self.tvHeaders.selectedRow)
         else {return}
         chartviewC.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: csvdatamodel.headerStringForColumnIndex(self.tvHeaders.selectedRow))
     }
@@ -132,6 +138,7 @@ class ColumnsViewController: ColumnSortingChartingViewController {
     func enableButtons(enabled enabled:Bool)
     {
         self.buttonModel?.enabled = enabled
+        self.buttonTrash?.enabled = enabled
         
     }
 

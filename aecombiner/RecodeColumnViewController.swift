@@ -15,7 +15,7 @@ let kSelectedParametersArrayParameterIndex = 1
 let kStringEmpty = "- Empty -"
 let kStringRecodedColumnNameSuffix = "_#_"
 
-class RecodeColumnViewController: ColumnSortingChartingViewController {
+class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabViewDelegate {
     
 
     // MARK: - class vars
@@ -26,16 +26,23 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
     
     // MARK: - @IBOutlet
 
-    @IBOutlet weak var tvExtractedParameters: NSTableView!
+    @IBOutlet weak var tvExtractedParametersSingle: NSTableView!
+    @IBOutlet weak var tvExtractedParametersMultiple: NSTableView!
     @IBOutlet weak var labelNumberOfParameterOrGroupingItems: NSTextField!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
 
+    @IBOutlet weak var tabbedVrecoding: NSTabView!
     
     @IBOutlet weak var popupHeaders: NSPopUpButton!
  
+    @IBOutlet weak var buttonSetValue: NSButton!
+    @IBOutlet weak var textFieldSetValue: NSTextField!
     
     // MARK: - @IBAction
 
+    @IBAction func setValueTapped(sender: NSButton) {
+        self.setValueForSelectedRows()
+    }
 
     @IBAction func recodeParametersAndAddNewColumn(sender: AnyObject) {
         self.doTheRecodeParametersAndAddNewColumn()
@@ -58,8 +65,9 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
         super.viewWillAppear()
         // Do any additional setup after loading the view.
         self.populateHeaderPopups()
-        self.tvExtractedParameters?.reloadData()
-    }
+        self.tvExtractedParametersSingle?.reloadData()
+        self.tvExtractedParametersMultiple?.reloadData()
+   }
 
     // MARK: - header Popups
     func populateHeaderPopups()
@@ -78,7 +86,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
             guard
                 let csvdatamodel = self.associatedCSVmodel
             else {return}
-            self.resetExtractedParameters()
+            self.resetExtractedParameters(andPopupHeaders: false)
             self.extractParametersIntoSetFromColumn()
             self.textFieldColumnRecodedName?.stringValue = csvdatamodel.headerStringForColumnIndex(popup.indexOfSelectedItem)
         default:
@@ -87,7 +95,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
     }
     
 
-    // MARK: - TableView overrides
+    // MARK: - TableView Control
 
     func control(control: NSControl, textShouldEndEditing fieldEditor: NSText) -> Bool {
         guard let ident = control.identifier else {
@@ -101,18 +109,28 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
             {
                 break
             }
-            self.arrayExtractedParameters[control.tag][1] = str
+            self.arrayExtractedParameters[control.tag][kParametersArrayParametersValueIndex] = str
         default:
             break
         }
         return true
     }
     
+    func setValueForSelectedRows()
+    {
+        let valueS = self.textFieldSetValue.stringValue
+        for index in self.tvExtractedParametersMultiple.selectedRowIndexes
+        {
+            self.arrayExtractedParameters[index][kParametersArrayParametersValueIndex] = valueS
+        }
+        self.tvExtractedParametersMultiple.reloadData()
+    }
 
+    // MARK: - TableView overrides
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         switch tableView
         {
-        case self.tvExtractedParameters:
+        case self.tvExtractedParametersSingle, tvExtractedParametersMultiple:
             self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) parameters"
             return self.arrayExtractedParameters.count
         default:
@@ -126,7 +144,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
         var cellView = NSTableCellView()
         switch tableView
         {
-        case self.tvExtractedParameters:
+        case self.tvExtractedParametersSingle, tvExtractedParametersMultiple:
                 switch tableColumn!.identifier
                 {
                 case "parameter":
@@ -154,10 +172,19 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
         guard let tableView = (notification.object as? NSTableView) else {return}
         switch tableView
         {
-      default:
-            break;
+            case self.tvExtractedParametersMultiple:
+                self.enableSetValueControls(tableView.selectedRowIndexes.count>0)
+            default:
+                break;
         }
         
+    }
+    
+    func enableSetValueControls(enabled:Bool)
+    {
+        self.buttonSetValue.enabled = enabled
+        self.textFieldSetValue.enabled = enabled
+        self.textFieldSetValue.stringValue = ""
     }
     
     // MARK: - Sorting Tables on header click
@@ -165,14 +192,20 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
         // inheriteds override
         switch tableView
         {
-        case self.tvExtractedParameters:
-            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayExtractedParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
-            self.tvExtractedParameters.reloadData()
+        case self.tvExtractedParametersSingle, tvExtractedParametersMultiple:
+            tableView.sortParametersOrValuesInTableViewColumn(tableColumn: tableColumn, arrayToSort: &self.arrayExtractedParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            self.tvExtractedParametersSingle.reloadData()
+            self.tvExtractedParametersMultiple.reloadData()
         default: break
         }
         
     }
 
+    // MARK: - Tabbed View
+
+    func tabView(tabView: NSTabView, didSelectTabViewItem tabViewItem: NSTabViewItem?) {
+        self.resetExtractedParameters(andPopupHeaders: true)
+    }
     
     // MARK: - Column parameters
     func stringForRecodedColumn(columnIndex:Int) -> String
@@ -185,12 +218,19 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
     }
     
     
-    func resetExtractedParameters()
+    func resetExtractedParameters(andPopupHeaders andPopupHeaders:Bool)
     {
         self.arrayExtractedParameters = MulticolumnStringsArray()
-        self.tvExtractedParameters?.reloadData()
+        self.tvExtractedParametersSingle?.reloadData()
+        self.tvExtractedParametersMultiple?.reloadData()
         self.textFieldColumnRecodedName?.stringValue = ""
         self.labelNumberOfParameterOrGroupingItems?.stringValue = ""
+        self.enableSetValueControls(false)
+        if andPopupHeaders
+        {
+            self.popupHeaders.selectItemAtIndex(-1)
+        }
+        
     }
     
     
@@ -199,13 +239,14 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
-        guard   let csvdo = self.associatedCSVmodel,
-                let dmOfParams = csvdo.dataMatrixOfParametersFromColumn(fromColumn: self.popupHeaders.indexOfSelectedItem)
+        guard   let datamodel = self.associatedCSVmodel,
+                let dmOfParams = datamodel.dataMatrixOfParametersFromColumn(fromColumn: self.popupHeaders.indexOfSelectedItem)
             else { return }
         
         self.arrayExtractedParameters = dmOfParams
-        self.tvExtractedParameters.reloadData()
-        
+        self.tvExtractedParametersSingle.reloadData()
+        self.tvExtractedParametersMultiple.reloadData()
+
     }
     
     func doTheRecodeParametersAndAddNewColumn()
@@ -222,8 +263,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController {
         csvdVC.addRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters)
         
         //reload etc
-        self.resetExtractedParameters()
-        self.popupHeaders.selectItemAtIndex(-1)
+        self.resetExtractedParameters(andPopupHeaders: true)
         
     }
 

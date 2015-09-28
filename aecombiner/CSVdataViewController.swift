@@ -36,14 +36,12 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        //NSNotificationCenter.defaultCenter().addObserver(self, selector: "addColumnWithIdentifier:", name: "addColumnWithIdentifier", object: nil)
 
     }
     
     // MARK: - document
     func documentMakeDirty()
     {
-        //CSVdataDocument.makeDocumentDirtyForView(self.view)
         self.associatedCSVdataDocument.updateChangeCount(.ChangeDone)
     }
 
@@ -56,81 +54,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.tvCSVdata.reloadData()
     }
     
-    func extractDataMatrixUsingPredicates(predicates predicates:ArrayOfPredicatesForExtracting)->MulticolumnStringsArray
-    {
-        return self.associatedCSVdataDocument.extractDataMatrixUsingPredicates(predicates: predicates)
-    }
-    
-    func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
-    {
-        return self.associatedCSVdataDocument.chartDataSetFromColumnIndex(columnIndex: columnIndex)
-    }
-    
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:MulticolumnStringsArray, nameOfColumn:String)
-    {
-        return self.associatedCSVdataDocument.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-    }
-    
-    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->MulticolumnStringsArray?
-    {
-        return self.associatedCSVdataDocument.dataMatrixOfParametersFromColumn(fromColumn: columnIndex)
-    }
-    
-    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->SetOfStrings?
-    {
-        return self.associatedCSVdataDocument.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn: fromColumn, matchString: matchString, matchColumn: matchColumn)
-    }
-    
-    func dataMatrixFromAssociatedCSVdataDocument()->MulticolumnStringsArray?
-    {
-        return self.associatedCSVdataDocument.csvDataModel.csvData
-    }
-    
-    // MARK: -  creating docs
-   func createNewDocumentFromExtractedRows(cvsData extractedRows:MulticolumnStringsArray, headers:SingleColumnStringsArray?, name: String?)
-    {
-        self.associatedCSVdataDocument.createNewDocumentFromExtractedRows(cvsData: extractedRows, headers: headers, name: name)
-    }
-    
-    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray , groupMethod:String)
-    {
-        self.associatedCSVdataDocument.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-        
-    }
-    
-   func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:SingleColumnStringsArray )
-    {
-        self.associatedCSVdataDocument.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup)
-    }
-    
 
     // MARK: - Columns
-    
-    func numberOfColumnsInData()->Int{
-        return self.associatedCSVdataDocument.numberOfColumnsInData()
-    }
-    
-    func headerStringsForAllColumns()->[String]
-    {
-        return self.associatedCSVdataDocument.headerStringsForAllColumns()
-    }
-
-    func headerStringForColumnIndex(columnIndex:Int?) -> String
-    {
-        return self.associatedCSVdataDocument.headerStringForColumnIndex(columnIndex)
-    }
-    
-    func checkedExtractingPredicatesArray(arrayToCheck:ArrayOfPredicatesForExtracting)->ArrayOfPredicatesForExtracting
-    {
-        return self.associatedCSVdataDocument.checkedExtractingPredicatesArray(arrayToCheck)
-    }
-    
-    func requestedColumnIndexIsOK(columnIndex:Int) -> Int?
-    {
-        return self.associatedCSVdataDocument.requestedColumnIndexIsOK(columnIndex)
-    }
-    
-
 
     
    func columnsClearAndRebuild(){
@@ -182,16 +107,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     // MARK: - TableView overrides
     func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
-        let columnIndex = tableView.columnWithIdentifier(tableColumn.identifier)
-        guard columnIndex >= 0 else {return}
-        if tableColumn.sortDescriptorPrototype == nil
-        {
-            tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)
-        }
-
-        let sortdirection = tableColumn.sortDescriptorPrototype!.ascending
-        self.associatedCSVdataDocument.sortCSVrowsInColumnAsTextOrValues(columnIndexToSort: columnIndex, textOrvalue: self.segmentSortTextOrValue.selectedSegment, direction:sortdirection)
-        tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !sortdirection)
+        tableView.sortParametersOrValuesInTableViewColumn(tableColumn: tableColumn, arrayToSort: &self.associatedCSVdataDocument.csvDataModel.csvData, textOrValue: self.segmentSortTextOrValue.selectedSegment)
+        
         self.tvCSVdata.reloadData()
 
     }

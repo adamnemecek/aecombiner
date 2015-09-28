@@ -49,23 +49,6 @@ struct AggregatedStats {
 
 
 
-func generic_SortArrayOfColumnsAsTextOrValues(inout arrayToSort arrayToSort:MulticolumnStringsArray, columnIndexToSort:Int, textOrvalue:Int, direction: Bool)
-{
-    switch (direction, textOrvalue)
-    {
-    case (kAscending,kSortAsValue):
-        arrayToSort.sortInPlace {Double($0[columnIndexToSort])>Double($1[columnIndexToSort])}
-    case (kDescending,kSortAsValue):
-        arrayToSort.sortInPlace {Double($0[columnIndexToSort])<Double($1[columnIndexToSort])}
-    case (kAscending,kSortAsText):
-        arrayToSort.sortInPlace {($0[columnIndexToSort] as NSString).localizedCaseInsensitiveCompare($1[columnIndexToSort]) == .OrderedAscending}
-    case (kDescending,kSortAsText):
-        arrayToSort.sortInPlace {($0[columnIndexToSort] as NSString).localizedCaseInsensitiveCompare($1[columnIndexToSort]) == .OrderedDescending}
-    default:
-        return
-    }
-}
-
 
 
 class CSVdataDocument: NSDocument {
@@ -80,6 +63,11 @@ class CSVdataDocument: NSDocument {
         view.window?.windowController?.document?.updateChangeCount(.ChangeDone)
     }
     
+    func documentMakeDirty()
+    {
+        self.updateChangeCount(.ChangeDone)
+    }
+
     override init() {
         super.init()
         // Add your subclass-specific initialization here.
@@ -583,6 +571,14 @@ class CSVdataDocument: NSDocument {
             paramsDict[paramNameAndValueArray[0]] = paramNameAndValueArray[1]
         }
         
+        //need to strip out kStringEmpty
+        let blankval = paramsDict.removeValueForKey(kStringEmpty)
+        if blankval != nil
+        {
+            paramsDict[""] = blankval
+        }
+        
+        
         // must add the column to Array BEFORE adding column to table
         for var r = 0; r<self.csvDataModel.csvData.count; r++
         {
@@ -627,11 +623,6 @@ class CSVdataDocument: NSDocument {
     func requestedColumnIndexIsOK(columnIndex:Int) -> Int?
     {
         return columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() ? columnIndex : nil
-    }
-
-    func sortCSVrowsInColumnAsTextOrValues(columnIndexToSort columnIndexToSort:Int, textOrvalue:Int, direction: Bool)
-    {
-        generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &self.csvDataModel.csvData, columnIndexToSort: columnIndexToSort, textOrvalue: textOrvalue, direction: direction)
     }
 
     
@@ -770,16 +761,6 @@ class CSVdataDocument: NSDocument {
         }
     }
     
-    func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->MulticolumnStringsArray?
-    {
-        return self.csvDataModel.dataMatrixOfParametersFromColumn(fromColumn: columnIndex)
-    }
-    
-
-    func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->SetOfStrings?
-    {
-        return self.csvDataModel.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn: fromColumn, matchString: matchString, matchColumn: matchColumn)
-    }
     
     // MARK: - Headers
     

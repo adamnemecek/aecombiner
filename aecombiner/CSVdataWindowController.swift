@@ -45,29 +45,4 @@ class CSVdataWindowController: NSWindowController {
     }
 
     
-    // MARK: - segue
-    override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
-        guard segue.identifier != nil else {
-            return
-        }
-        
-        switch segue.identifier!
-        {
-        case "ColumnSortingChartingViewController":
-            _ = (segue.destinationController as! ColumnSortingChartingViewController)
-            //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
-        case "RecodeColumnViewController":
-            _ = (segue.destinationController as! RecodeColumnViewController)
-            //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
-        case "ExtractWithPredicatesViewController":
-            _ = (segue.destinationController as! ExtractWithPredicatesViewController)
-            //recoder.updateRepresentedObjectToCSVData(self.representedObject as! CSVdata)
-            
-            
-        default:
-            break
-        }
-    }
-    
-
 }

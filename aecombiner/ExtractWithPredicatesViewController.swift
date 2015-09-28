@@ -89,7 +89,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     }
     
     @IBAction func loadPredicates(sender: NSButton) {
-        guard let csvdatavc = self.associatedCSVdataViewController else {return}
+        guard let csvdatavc = self.associatedCSVdataDocument else {return}
         let sp = NSOpenPanel()
         sp.allowsMultipleSelection = false
         sp.canChooseDirectories = false
@@ -124,7 +124,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     // MARK: - header Popups
     func populateHeaderPopups()
     {
-        guard let csvdo = self.associatedCSVdataViewController else { return}
+        guard let csvdo = self.associatedCSVdataDocument else { return}
         
         self.popupParameterToChart.removeAllItems()
         self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
@@ -175,7 +175,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
-        guard let csvdatavc = self.associatedCSVdataViewController else {return}
+        guard let csvdatavc = self.associatedCSVdataDocument else {return}
         // we use self.extractedDataMatrixUsingPredicatesForCharting
         let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixUsingPredicatesForCharting)
         csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
@@ -199,13 +199,13 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
         switch tvidentifier
         {
         case "tv1colParameters":
-            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.array1ColParams, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            tableView.sortParametersOrValuesInTableViewColumn(tableColumn: tableColumn, arrayToSort: &self.array1ColParams, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
             tableView.reloadData()
         case "tv2colParameters1":
-            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.arrayColParams1, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            tableView.sortParametersOrValuesInTableViewColumn(tableColumn: tableColumn, arrayToSort: &self.arrayColParams1, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
             tableView.reloadData()
         case "tv2colParameters2":
-            self.sortParametersOrValuesInTableViewColumn(tableView: tableView, tableColumn: tableColumn, arrayToSort: &self.array2ColParams2, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            tableView.sortParametersOrValuesInTableViewColumn(tableColumn: tableColumn, arrayToSort: &self.array2ColParams2, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
             tableView.reloadData()
             
         default:
@@ -378,9 +378,9 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     // MARK: - AND OR tables
     func extractDataMatrixUsingPredicatesIntoArray()->Bool
     {
-        guard let cdvc = self.associatedCSVdataViewController
+        guard let csvdo = self.associatedCSVdataDocument
             else {return false}
-        self.extractedDataMatrixUsingPredicatesForCharting = cdvc.extractDataMatrixUsingPredicates(predicates: self.arrayPredicates)
+        self.extractedDataMatrixUsingPredicatesForCharting = csvdo.extractDataMatrixUsingPredicates(predicates: self.arrayPredicates)
         return true
     }
 
@@ -392,7 +392,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     
     func addColumnAndSelectedParameter(arrayIdentifier: String)
     {
-        guard let csvdo = self.associatedCSVdataViewController else {return}
+        guard let csvdo = self.associatedCSVdataDocument else {return}
         let columnIndex: Int
         let parameterRows: NSIndexSet
         let arrayParamsToUse: MulticolumnStringsArray

@@ -9,11 +9,49 @@
 import Cocoa
 import SpriteKit
 
+
+extension NSTableView
+{
+    func sortParametersOrValuesInTableViewColumn(tableColumn tableColumn: NSTableColumn, inout arrayToSort:MulticolumnStringsArray, textOrValue:Int)
+    {
+        guard arrayToSort.count > 0 else {return}
+        let columnIndexToSort = self.columnWithIdentifier(tableColumn.identifier)
+        guard
+            columnIndexToSort >= 0 && columnIndexToSort < arrayToSort[0].count
+            else {return}
+        
+        if tableColumn.sortDescriptorPrototype == nil
+        {
+            tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)
+        }
+        
+        let sortdirection = tableColumn.sortDescriptorPrototype!.ascending
+        
+        switch (sortdirection, textOrValue)
+        {
+        case (kAscending,kSortAsValue):
+            arrayToSort.sortInPlace {Double($0[columnIndexToSort])>Double($1[columnIndexToSort])}
+        case (kDescending,kSortAsValue):
+            arrayToSort.sortInPlace {Double($0[columnIndexToSort])<Double($1[columnIndexToSort])}
+        case (kAscending,kSortAsText):
+            arrayToSort.sortInPlace {($0[columnIndexToSort] as NSString).localizedCaseInsensitiveCompare($1[columnIndexToSort]) == .OrderedAscending}
+        case (kDescending,kSortAsText):
+            arrayToSort.sortInPlace {($0[columnIndexToSort] as NSString).localizedCaseInsensitiveCompare($1[columnIndexToSort]) == .OrderedDescending}
+        default:
+            return
+        }
+        
+        tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !sortdirection)
+    }
+}
+
+
 class ColumnSortingChartingViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate, ChartViewControllerDelegate {
     
     
     // MARK: - Var
     var associatedCSVdataViewController: CSVdataViewController?
+    var associatedCSVdataDocument: CSVdataDocument?
     var associatedCSVmodel:CSVdata?
     weak var chartViewController: ChartViewController! // this is useful
    
@@ -33,14 +71,6 @@ class ColumnSortingChartingViewController: NSViewController, NSTableViewDataSour
     func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
         // over ridden in subclasses
         assertionFailure("ColumnSortingChartingViewController : extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet")
-        /*
-        guard let csvdatavc = self.associatedCSVdataViewController,
-            let MulticolumnStringsArray = csvdatavc.dataMatrixFromAssociatedCSVdataDocument()
-            else {return}
-        // we use self.extractedDataMatrixUsingPredicates
-        let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: MulticolumnStringsArray)
-        csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
-        */
     }
     
     
@@ -48,21 +78,6 @@ class ColumnSortingChartingViewController: NSViewController, NSTableViewDataSour
     func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
         // inheriteds override
         
-    }
-    
-    
-    func sortParametersOrValuesInTableViewColumn(tableView tableView: NSTableView, tableColumn: NSTableColumn, inout arrayToSort:MulticolumnStringsArray, textOrValue:Int)
-    {
-        guard tableView.columnWithIdentifier(tableColumn.identifier) >= 0 else {return}
-        if tableColumn.sortDescriptorPrototype == nil
-        {
-            tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)
-        }
-        
-        let columnIndex = tableView.columnWithIdentifier(tableColumn.identifier)
-        let sortdirection = tableColumn.sortDescriptorPrototype!.ascending
-        generic_SortArrayOfColumnsAsTextOrValues(arrayToSort: &arrayToSort, columnIndexToSort: columnIndex, textOrvalue: textOrValue, direction: sortdirection)
-        tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !sortdirection)
     }
     
     
@@ -75,10 +90,10 @@ class ColumnSortingChartingViewController: NSViewController, NSTableViewDataSour
     
     override func viewWillAppear() {
         super.viewWillAppear()
-        self.associatedCSVdataViewController = (self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController
-        self.associatedCSVmodel = self.associatedCSVdataViewController?.associatedCSVdataDocument.csvDataModel
-        
-        
+        self.associatedCSVdataViewController = ((self.view.window?.sheetParent?.windowController as? CSVdataWindowController)?.contentViewController as? CSVdataViewController)
+        self.associatedCSVdataDocument = associatedCSVdataViewController?.associatedCSVdataDocument
+        self.associatedCSVmodel = self.associatedCSVdataDocument?.csvDataModel
+
     }
     
     override func viewDidAppear() {
@@ -104,7 +119,7 @@ class ColumnSortingChartingViewController: NSViewController, NSTableViewDataSour
     
     func documentMakeDirty()
     {
-        self.associatedCSVdataViewController?.documentMakeDirty()
+        self.associatedCSVdataDocument?.documentMakeDirty()
     }
     
     
