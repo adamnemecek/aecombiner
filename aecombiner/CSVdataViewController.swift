@@ -72,10 +72,16 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.tvCSVdata.reloadData()
     }
 
-    
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray)
+    func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray, copyUnmatchedValues:Bool)
     {
-        self.associatedCSVdataDocument.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray)
+        self.associatedCSVdataDocument.recodeColumnInSitu(columnToRecode: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
+        self.tvCSVdata.reloadData()
+        self.tvCSVdata.scrollColumnToVisible(columnIndex)
+    }
+    
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray, copyUnmatchedValues:Bool)
+    {
+        self.associatedCSVdataDocument.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
         
         //Safe to add column to table now
         self.tvCSVdata.addTableColumn(self.associatedCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))

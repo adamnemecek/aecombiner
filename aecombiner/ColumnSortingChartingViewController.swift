@@ -43,6 +43,8 @@ extension NSTableView
         
         tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !sortdirection)
     }
+    
+    
 }
 
 

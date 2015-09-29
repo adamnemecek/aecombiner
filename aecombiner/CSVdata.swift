@@ -18,7 +18,7 @@ let tabDelimiter = "\t"
 typealias SetOfStrings = Set<String>
 typealias MulticolumnStringsArray = [[String]]
 typealias SingleColumnStringsArray = [String]
-
+typealias ParamsDictionary = [String : String]
 
 
 struct NamedDataMatrix
@@ -191,6 +191,7 @@ class CSVdata {
         return Array(set)
     }
     
+
     func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->MulticolumnStringsArray?
     {
         guard  let validCI = self.validatedColumnIndex(columnIndex) else {return nil}
@@ -219,10 +220,15 @@ class CSVdata {
         var matrix = MulticolumnStringsArray()
         for var row = 0; row<subArray.count; ++row
         {
-            matrix.append([subArray[row],""])
+            matrix.append(CSVdata.makeParamValueBool(param: subArray[row]))
         }
         
         return matrix
+    }
+    
+    class func makeParamValueBool(param param: String)->SingleColumnStringsArray
+    {
+        return [param,"","true"]
     }
     
     func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->SetOfStrings?
@@ -241,6 +247,25 @@ class CSVdata {
         }
         return set.count == 0 ? nil : set
     }
+
+    class func createParamsDictFromParamsArray(paramsArray:MulticolumnStringsArray)->ParamsDictionary
+    {
+        //make a temporary dictionary
+        var paramsDict = ParamsDictionary()
+        for paramNameAndValueArray in paramsArray
+        {
+            paramsDict[paramNameAndValueArray[kParametersArray_ParametersIndex]] = paramNameAndValueArray[kParametersArray_ValueIndex]
+        }
+        
+        //need to strip out kStringEmpty
+        let blankval = paramsDict.removeValueForKey(kStringEmpty)
+        if blankval != nil
+        {
+            paramsDict[""] = blankval
+        }
+        return paramsDict
+    }
+    
 
     // MARK: - Headers
     func validatedColumnIndex(columnIndex:Int)->Int?

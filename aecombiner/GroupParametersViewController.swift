@@ -196,7 +196,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
         var arrayOfExtractedParametersToGroupBy = SingleColumnStringsArray()
         for parameter in params
         {
-            arrayOfExtractedParametersToGroupBy.append(parameter[kParametersArrayParametersIndex])
+            arrayOfExtractedParametersToGroupBy.append(parameter[kParametersArray_ParametersIndex])
         }
         return arrayOfExtractedParametersToGroupBy
 
@@ -258,7 +258,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
             {
             case "parameter":
                 cellView = tableView.makeViewWithIdentifier("dataSetCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.arrayColumnsToGroupTogether[row][kParametersArrayParametersIndex]
+                cellView.textField!.stringValue = self.arrayColumnsToGroupTogether[row][kParametersArray_ParametersIndex]
             default:
                 break
             }

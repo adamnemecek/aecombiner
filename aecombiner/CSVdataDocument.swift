@@ -562,37 +562,40 @@ class CSVdataDocument: NSDocument {
         return true
     }
 
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray)
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray, copyUnmatchedValues:Bool)
     {
         //make a temporary dictionary
-        var paramsDict = [String : String]()
-        for paramNameAndValueArray in paramsArray
-        {
-            paramsDict[paramNameAndValueArray[0]] = paramNameAndValueArray[1]
-        }
-        
-        //need to strip out kStringEmpty
-        let blankval = paramsDict.removeValueForKey(kStringEmpty)
-        if blankval != nil
-        {
-            paramsDict[""] = blankval
-        }
-        
+        var paramsDict = CSVdata.createParamsDictFromParamsArray(paramsArray)
         
         // must add the column to Array BEFORE adding column to table
-        for var r = 0; r<self.csvDataModel.csvData.count; r++
+        for r in 0..<self.csvDataModel.csvData.count//var r = 0; r<self.csvDataModel.csvData.count; r++
         {
-            var rowArray = self.csvDataModel.csvData[r]
             //ADD CORRECT PARAMETER AFTER LOOKUP
-            let valueToRecode = rowArray[columnIndex]
-            let recodedValue = (paramsDict[valueToRecode] ?? "")
-            rowArray.append(recodedValue)
-            self.csvDataModel.csvData[r] = rowArray
+            let existingValue = self.csvDataModel.csvData[r][columnIndex]
+            // use ?? to ask if lookup gives nil use alternative or if not nil use the lookup. if nil ask if clear or keep existing based on copyUnmatchedValues
+            let recodedValue = paramsDict[existingValue] ?? (copyUnmatchedValues == true ? existingValue : "")
+            self.csvDataModel.csvData[r].append(recodedValue)
         }
         //add name to headers array
         self.csvDataModel.headers.append(title)
     }
+    
+    func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray, copyUnmatchedValues:Bool)
+    {
+        //make a temporary dictionary
+        var paramsDict = CSVdata.createParamsDictFromParamsArray(paramsArray)
+        
+        for r in 0..<self.csvDataModel.csvData.count//var r = 0; r<self.csvDataModel.csvData.count; r++
+        {
+            //ovewrite CORRECT PARAMETER AFTER LOOKUP or skip
+            let existingValue = self.csvDataModel.csvData[r][columnIndex]
+            // use ?? to ask if lookup gives nil use alternative or if not nil use the lookup. if nil ask if clear or keep existing based on copyUnmatchedValues
+            self.csvDataModel.csvData[r][columnIndex] = paramsDict[existingValue] ?? (copyUnmatchedValues == true ? existingValue : "")
 
+        }
+        
+    }
+    
     func columnWithUniqueIdentifierAndTitle(title:String)->NSTableColumn
     {
         let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
