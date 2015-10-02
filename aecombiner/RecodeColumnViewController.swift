@@ -70,6 +70,20 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBAction func checkboxRecodeTapped(sender: NSButton) {
         self.doCheckBoxRecodeTapped(sender: sender)
     }
+    
+    @IBAction func checkBoxToggleRecodeStatusTapped(sender: NSButton) {
+        self.toggleExtractedParametersArrayrecodeStatus(sender.state)
+    }
+    
+    func toggleExtractedParametersArrayrecodeStatus(state:NSCellStateValue)
+    {
+        for row in 0..<self.arrayExtractedParameters.count
+        {
+            self.arrayExtractedParameters[row][kParametersArray_BooleanIndex] = String(state)
+        }
+        self.tvExtractedParametersSingle.reloadData()
+    }
+    
     // MARK: - overrides
 
     override func viewDidLoad() {
