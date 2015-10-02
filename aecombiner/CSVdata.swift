@@ -228,7 +228,7 @@ class CSVdata {
     
     class func makeParamValueBool(param param: String)->SingleColumnStringsArray
     {
-        return [param,"","true"]
+        return [param,"",String(NSOnState)]
     }
     
     func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->SetOfStrings?
@@ -248,13 +248,17 @@ class CSVdata {
         return set.count == 0 ? nil : set
     }
 
+    class func doRecodeThisParam(param param:SingleColumnStringsArray)->Bool{
+        return NSCellStateValue(param[kParametersArray_BooleanIndex]) == NSOnState
+    }
+    
     class func createParamsDictFromParamsArray(paramsArray:MulticolumnStringsArray)->ParamsDictionary
     {
         //make a temporary dictionary
         var paramsDict = ParamsDictionary()
-        for paramNameAndValueArray in paramsArray
+        for paramNameValueBool in paramsArray where self.doRecodeThisParam(param: paramNameValueBool)
         {
-            paramsDict[paramNameAndValueArray[kParametersArray_ParametersIndex]] = paramNameAndValueArray[kParametersArray_ValueIndex]
+            paramsDict[paramNameValueBool[kParametersArray_ParametersIndex]] = paramNameValueBool[kParametersArray_ValueIndex]
         }
         
         //need to strip out kStringEmpty

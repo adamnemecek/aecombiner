@@ -67,6 +67,9 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.popupChangedSelection(sender)
     }
 
+    @IBAction func checkboxRecodeTapped(sender: NSButton) {
+        self.doCheckBoxRecodeTapped(sender: sender)
+    }
     // MARK: - overrides
 
     override func viewDidLoad() {
@@ -116,8 +119,20 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         }
     }
     
-
     // MARK: - TableView Control
+    func doCheckBoxRecodeTapped(sender sender: NSButton)
+    {
+        guard let ident = sender.identifier else {return}
+        switch ident
+        {
+        case "checkBoxRecode":
+            guard sender.tag < self.arrayExtractedParameters.count else {break}
+            self.arrayExtractedParameters[sender.tag][kParametersArray_BooleanIndex] = String(sender.state)
+        default:
+            break
+        }
+    }
+    
 
     func control(control: NSControl, textShouldEndEditing fieldEditor: NSText) -> Bool {
         guard let ident = control.identifier else {
@@ -180,9 +195,12 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
                     cellView = tableView.makeViewWithIdentifier("parametersBoolCell", owner: self) as! NSTableCellView
                     for subview in cellView.subviews
                     {
-                        guard let box = (subview as? NSButton) else {continue}
+                        guard
+                        let box = (subview as? NSButton),
+                        let value = NSCellStateValue(self.arrayExtractedParameters[row][kParametersArray_BooleanIndex])
+                        else {continue}
                         box.tag = row
-                        box.state = self.arrayExtractedParameters[row][kParametersArray_BooleanIndex] == "true" ? NSOnState : NSOffState
+                        box.state =  value//== "true" ? NSOnState : NSOffState
                     }
                 default:
                     break
@@ -217,6 +235,8 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.textFieldSetValue.stringValue = ""
         self.textFieldSetValue.resignFirstResponder()
     }
+    
+    
     
     // MARK: - Sorting Tables on header click
     override func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
