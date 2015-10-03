@@ -60,9 +60,9 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
 
     @IBAction func buttonRecodeToTapped(sender: AnyObject) {
         
-        let predString = self.popupBooleans.titleOfSelectedItem
-        let valS = self.textFieldBooleanComparator.stringValue
-        let pred = NSPredicate(
+        //let predString = self.popupBooleans.titleOfSelectedItem
+        //let valS = self.textFieldBooleanComparator.stringValue
+        //let pred = NSPredicate(
         
     }
     
