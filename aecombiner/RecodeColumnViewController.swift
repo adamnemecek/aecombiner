@@ -44,6 +44,9 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
  
     @IBOutlet weak var buttonOverwite: NSButton!
     @IBOutlet weak var buttonSetValue: NSButton!
+    @IBOutlet weak var buttonRecodeTo: NSButton!
+    
+    
     @IBOutlet weak var progressSetValue: NSProgressIndicator!
     
     @IBOutlet weak var checkboxCopyUnmatchedValues: NSButton!
@@ -55,6 +58,14 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.enableSetValueControls(false)
     }
 
+    @IBAction func buttonRecodeToTapped(sender: AnyObject) {
+        
+        let predString = self.popupBooleans.titleOfSelectedItem
+        let valS = self.textFieldBooleanComparator.stringValue
+        let pred = NSPredicate(
+        
+    }
+    
     @IBAction func recodeParametersAndAddNewColumn(sender: AnyObject) {
         self.doTheRecodeParametersAndAddNewColumn()
     }

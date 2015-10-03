@@ -878,7 +878,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView identifier="tvHeaders" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="nxT-l4-6wV" userLabel="Table View Headers">
-                                            <rect key="frame" x="0.0" y="0.0" width="221" height="244"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="221" height="0.0"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <animations/>
                                             <size key="intercellSpacing" width="3" height="2"/>
@@ -1815,12 +1815,12 @@
                                                         <constraint firstAttribute="width" constant="94" id="oPX-ts-9gI"/>
                                                     </constraints>
                                                     <animations/>
-                                                    <buttonCell key="cell" type="push" title="Recode To" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fDE-1U-MgB">
+                                                    <buttonCell key="cell" type="push" title="Recode To" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fDE-1U-MgB">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
                                                     <connections>
-                                                        <action selector="setValueTapped:" target="5gI-5U-AMq" id="QYt-c6-Tqg"/>
+                                                        <action selector="buttonRecodeToTapped:" target="5gI-5U-AMq" id="FOc-ku-W4C"/>
                                                     </connections>
                                                 </button>
                                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="05O-0u-g7I">
@@ -1928,6 +1928,7 @@
                     </view>
                     <connections>
                         <outlet property="buttonOverwite" destination="oSv-YT-pc7" id="zr7-sp-0PQ"/>
+                        <outlet property="buttonRecodeTo" destination="71R-2w-Zj3" id="tfr-ph-fC7"/>
                         <outlet property="buttonSetValue" destination="fC8-uH-IDK" id="4fy-is-IlC"/>
                         <outlet property="checkboxCopyUnmatchedValues" destination="e0U-wn-BM4" id="4xW-np-L4o"/>
                         <outlet property="labelNumberOfParameterOrGroupingItems" destination="z3H-G4-Ueu" id="v7U-2R-3bG"/>
@@ -2525,7 +2526,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView identifier="tvPredicates" appearanceType="vibrantLight" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="46" viewBased="YES" id="BU0-nV-9hz" userLabel="tvPredicates">
-                                                        <rect key="frame" x="0.0" y="0.0" width="567" height="155"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="567" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <animations/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
