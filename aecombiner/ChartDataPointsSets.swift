@@ -43,7 +43,7 @@ class ChartDataSet {
     var dataPoints = ChartDataPointsArray()
     var nameOfDataSet:String = kDataSetDefaultName
     
-    convenience init(data: MulticolumnStringsArray, forColumnIndex columnIndex:Int)
+    convenience init(data: StringsMatrix2D, forColumnIndex columnIndex:Int)
     {
         self.init()
         guard data.count > 0 else {

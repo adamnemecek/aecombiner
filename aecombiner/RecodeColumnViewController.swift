@@ -21,7 +21,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     
 
     // MARK: - class vars
-    var arrayExtractedParameters =  MulticolumnStringsArray()
+    var arrayExtractedParameters =  StringsMatrix2D()
 
     // MARK: - class constants
     
@@ -295,7 +295,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     
     func resetExtractedParameters(andPopupHeaders andPopupHeaders:Bool)
     {
-        self.arrayExtractedParameters = MulticolumnStringsArray()
+        self.arrayExtractedParameters = StringsMatrix2D()
         self.reloadTables()
         self.textFieldColumnRecodedName?.stringValue = ""
         self.labelNumberOfParameterOrGroupingItems?.stringValue = ""

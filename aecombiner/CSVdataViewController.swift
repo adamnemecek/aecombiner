@@ -67,24 +67,24 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     func renameColumnAtIndex(columnIndex: Int, newName:String)
     {
         guard columnIndex >= 0 && !newName.isEmpty else {return}
-        self.associatedCSVdataDocument.csvDataModel.headers[columnIndex] = newName
+        self.associatedCSVdataDocument.csvDataModel.renameColumnAtIndex(columnIndex: columnIndex, newName:newName)
         self.tvCSVdata.tableColumns[columnIndex].title = newName
         self.tvCSVdata.reloadData()
     }
 
-    func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray, copyUnmatchedValues:Bool)
+    func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
     {
         self.associatedCSVdataDocument.recodeColumnInSitu(columnToRecode: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
         self.tvCSVdata.reloadData()
         self.tvCSVdata.scrollColumnToVisible(columnIndex)
     }
     
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:MulticolumnStringsArray, copyUnmatchedValues:Bool)
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
     {
         self.associatedCSVdataDocument.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
         
         //Safe to add column to table now
-        self.tvCSVdata.addTableColumn(self.associatedCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
+        self.tvCSVdata.addTableColumn(CSVdata.columnWithUniqueIdentifierAndTitle(title))
         self.tvCSVdata.reloadData()
         self.tvCSVdata.scrollColumnToVisible(self.tvCSVdata.numberOfColumns-1)
         self.documentMakeDirty()
@@ -105,7 +105,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     func addColumnWithIdentifier(notification: NSNotification)
     {
         guard let title = notification.object as? String else {return}
-        self.tvCSVdata.addTableColumn(self.associatedCSVdataDocument.columnWithUniqueIdentifierAndTitle(title))
+        self.tvCSVdata.addTableColumn(CSVdata.columnWithUniqueIdentifierAndTitle(title))
         self.tvCSVdata.reloadData()
         self.tvCSVdata.scrollColumnToVisible(self.tvCSVdata.numberOfColumns-1)
     }
@@ -146,7 +146,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
             // Set the stringValue of the cell's text field to the nameArray value at row
             let colIndex = tableView.columnWithIdentifier((tableColumn?.identifier)!)
-            cellView.textField!.stringValue = self.associatedCSVdataDocument.csvDataModel.csvData[row][colIndex]
+            cellView.textField!.stringValue = self.associatedCSVdataDocument.csvDataModel.stringValueForCell(fromColumn: colIndex, atRow: row)
             
         default:
             break;

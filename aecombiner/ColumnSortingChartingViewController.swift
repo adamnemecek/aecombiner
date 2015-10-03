@@ -12,7 +12,7 @@ import SpriteKit
 
 extension NSTableView
 {
-    func sortParametersOrValuesInTableViewColumn(tableColumn tableColumn: NSTableColumn, inout arrayToSort:MulticolumnStringsArray, textOrValue:Int)
+    func sortParametersOrValuesInTableViewColumn(tableColumn tableColumn: NSTableColumn, inout arrayToSort:StringsMatrix2D, textOrValue:Int)
     {
         guard arrayToSort.count > 0 else {return}
         let columnIndexToSort = self.columnWithIdentifier(tableColumn.identifier)
