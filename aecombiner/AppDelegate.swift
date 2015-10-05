@@ -25,7 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func importFile(sender: NSToolbarItem)
     {
         let panel = NSOpenPanel()
-        var types = SingleColumnStringsArray()
+        var types = StringsArray1D()
         types.append("txt")
         panel.allowedFileTypes = types
         if panel.runModal() == NSFileHandlingPanelOKButton

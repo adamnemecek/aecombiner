@@ -10,11 +10,11 @@ import Cocoa
 
 class GroupParametersViewController: ColumnSortingChartingViewController {
     // MARK: - class vars
-    var arrayColumnsToGroupTogether = MulticolumnStringsArray()
-    var arrayHeadersSecondarySelected = MulticolumnStringsArray()
+    var arrayColumnsToGroupTogether = StringsMatrix2D()
+    var arrayHeadersSecondarySelected = StringsMatrix2D()
     var arrayButtonsForGrouping = [NSButton]()
-    var headersExtractedDataModelForChart = SingleColumnStringsArray()
-    var groupedDataAfterCombiningToUseForCharting = MulticolumnStringsArray()//used in some subclasses
+    var headersExtractedDataModelForChart = StringsArray1D()
+    var groupedDataAfterCombiningToUseForCharting = StringsMatrix2D()//used in some subclasses
     
     
     // MARK: - @IBOutlet
@@ -126,7 +126,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     
     func resetExtractedParameters()
     {
-        self.arrayColumnsToGroupTogether = MulticolumnStringsArray()
+        self.arrayColumnsToGroupTogether = StringsMatrix2D()
         self.tvExtractedParametersToGroupBy?.reloadData()
         self.labelNumberOfParameterOrGroupingItems?.stringValue = ""
     }
@@ -190,10 +190,10 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     
     
     
-    class func createArrayFromExtractedParametersToGroup(params params:MulticolumnStringsArray)->SingleColumnStringsArray
+    class func createArrayFromExtractedParametersToGroup(params params:StringsMatrix2D)->StringsArray1D
     {
         //create an array with the keys the params we extracted for grouping
-        var arrayOfExtractedParametersToGroupBy = SingleColumnStringsArray()
+        var arrayOfExtractedParametersToGroupBy = StringsArray1D()
         for parameter in params
         {
             arrayOfExtractedParametersToGroupBy.append(parameter[kParametersArray_ParametersIndex])
@@ -202,7 +202,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
 
     }
     
-    func arrayOfExtractedParametersToGroupBy()->SingleColumnStringsArray
+    func arrayOfExtractedParametersToGroupBy()->StringsArray1D
     {
         return GroupParametersViewController.createArrayFromExtractedParametersToGroup(params:self.arrayColumnsToGroupTogether)
     }

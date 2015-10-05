@@ -13,11 +13,11 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     
     
     // MARK: - class vars
-    var arrayColParams1 = MulticolumnStringsArray()
-    var array2ColParams2 = MulticolumnStringsArray()
-    var array1ColParams = MulticolumnStringsArray()
+    var arrayColParams1 = StringsMatrix2D()
+    var array2ColParams2 = StringsMatrix2D()
+    var array1ColParams = StringsMatrix2D()
     var arrayPredicates = ArrayOfPredicatesForExtracting()
-    var extractedDataMatrixUsingPredicatesForCharting = MulticolumnStringsArray()//used in some subclasses
+    var extractedDataMatrixUsingPredicatesForCharting = StringsMatrix2D()//used in some subclasses
    
     
     // MARK: - @IBOutlet
@@ -168,7 +168,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
 
     func reset1ColExtractedParameters()
     {
-        self.array1ColParams = MulticolumnStringsArray()
+        self.array1ColParams = StringsMatrix2D()
         self.tv1colParameters?.reloadData()
     }
 
@@ -310,7 +310,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     func extract1ColParametersIntoSet(colIndex colIndex:Int)
     {
         //called from Process menu
-        self.array1ColParams = MulticolumnStringsArray()
+        self.array1ColParams = StringsMatrix2D()
        guard
             let datamodel = self.associatedCSVmodel,
             let newArray = datamodel.dataMatrixOfParametersFromColumn(fromColumn: colIndex)
@@ -324,21 +324,21 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     
     func resetCol1ExtractedParameters()
     {
-        self.arrayColParams1 = MulticolumnStringsArray()
-        self.array2ColParams2 = MulticolumnStringsArray()
+        self.arrayColParams1 = StringsMatrix2D()
+        self.array2ColParams2 = StringsMatrix2D()
         self.tv2colParameters1?.reloadData()
         self.tv2colParameters2?.reloadData()
     }
     
     func resetCol2ExtractedParameters()
     {
-        self.array2ColParams2 = MulticolumnStringsArray()
+        self.array2ColParams2 = StringsMatrix2D()
         self.tv2colParameters2?.reloadData()
    }
     
     func extractCol1ParametersIntoSetFromSelectedColumn()
     {
-        self.arrayColParams1 = MulticolumnStringsArray()
+        self.arrayColParams1 = StringsMatrix2D()
         guard let datamodel = self.associatedCSVmodel,
         let newArray = datamodel.dataMatrixOfParametersFromColumn(fromColumn: self.popup2colHeaders1.indexOfSelectedItem)
         else { return }
@@ -395,7 +395,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
         guard let csvdo = self.associatedCSVdataDocument else {return}
         let columnIndex: Int
         let parameterRows: NSIndexSet
-        let arrayParamsToUse: MulticolumnStringsArray
+        let arrayParamsToUse: StringsMatrix2D
         
         switch arrayIdentifier
         {
@@ -414,7 +414,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
         default:
             columnIndex = -1
             parameterRows = NSIndexSet()
-            arrayParamsToUse = MulticolumnStringsArray()
+            arrayParamsToUse = StringsMatrix2D()
         }
 
         
