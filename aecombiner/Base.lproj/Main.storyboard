@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="9046" systemVersion="15A284" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="9052" systemVersion="15A284" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9046"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9052"/>
         <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="box content view" minToolsVersion="7.0"/>
@@ -878,7 +878,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView identifier="tvHeaders" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="nxT-l4-6wV" userLabel="Table View Headers">
-                                            <rect key="frame" x="0.0" y="0.0" width="221" height="244"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="221" height="0.0"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <animations/>
                                             <size key="intercellSpacing" width="3" height="2"/>
@@ -2164,11 +2164,11 @@
                                         </view>
                                     </tabViewItem>
                                     <tabViewItem label="Two Levels" identifier="2" id="sCn-MX-kWk">
-                                        <view key="view" id="3OW-rJ-ZmU">
+                                        <view key="view" misplaced="YES" id="3OW-rJ-ZmU">
                                             <rect key="frame" x="10" y="33" width="613" height="275"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FOb-Jc-rzi">
+                                                <scrollView misplaced="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FOb-Jc-rzi">
                                                     <rect key="frame" x="0.0" y="3" width="571" height="113"/>
                                                     <clipView key="contentView" id="yIF-Bm-zY9">
                                                         <rect key="frame" x="1" y="0.0" width="569" height="112"/>
@@ -2248,7 +2248,7 @@
                                                         <animations/>
                                                     </tableHeaderView>
                                                 </scrollView>
-                                                <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YNF-Wc-hDu" userLabel="Bordered Scroll View - Table parameters">
+                                                <scrollView misplaced="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YNF-Wc-hDu" userLabel="Bordered Scroll View - Table parameters">
                                                     <rect key="frame" x="0.0" y="150" width="571" height="100"/>
                                                     <clipView key="contentView" id="Bvh-zV-wH3">
                                                         <rect key="frame" x="1" y="0.0" width="569" height="99"/>
@@ -2328,7 +2328,7 @@
                                                         <animations/>
                                                     </tableHeaderView>
                                                 </scrollView>
-                                                <button identifier="addORarrayCol1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CTY-5g-5QA">
+                                                <button identifier="addORarrayCol1" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CTY-5g-5QA">
                                                     <rect key="frame" x="579" y="150" width="32" height="32"/>
                                                     <animations/>
                                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="3OR" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Thk-iZ-BXI">
@@ -2339,7 +2339,7 @@
                                                         <action selector="addSelectedParameter:" target="8yo-SX-OPZ" id="Oub-Hi-4QO"/>
                                                     </connections>
                                                 </button>
-                                                <button identifier="addANDarrayCol1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FQR-Mb-VmG">
+                                                <button identifier="addANDarrayCol1" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FQR-Mb-VmG">
                                                     <rect key="frame" x="579" y="184" width="32" height="32"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="32" id="ngH-DC-Ba2"/>
@@ -2353,7 +2353,7 @@
                                                         <action selector="addSelectedParameter:" target="8yo-SX-OPZ" id="rNK-24-giA"/>
                                                     </connections>
                                                 </button>
-                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4xh-lf-gTK">
+                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4xh-lf-gTK">
                                                     <rect key="frame" x="-2" y="256" width="127" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="123" id="vVe-IW-6lh"/>
@@ -2365,7 +2365,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <button identifier="addNOTarrayCol1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XZc-Fx-5P6">
+                                                <button identifier="addNOTarrayCol1" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XZc-Fx-5P6">
                                                     <rect key="frame" x="579" y="218" width="32" height="32"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="32" id="iQW-ha-DcK"/>
@@ -2379,7 +2379,7 @@
                                                         <action selector="addSelectedParameter:" target="8yo-SX-OPZ" id="Uv7-RL-dz7"/>
                                                     </connections>
                                                 </button>
-                                                <popUpButton identifier="popup2colHeaders1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AcL-TY-BmE">
+                                                <popUpButton identifier="popup2colHeaders1" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AcL-TY-BmE">
                                                     <rect key="frame" x="129" y="251" width="445" height="26"/>
                                                     <animations/>
                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="xFM-cu-Ugv">
@@ -2397,7 +2397,7 @@
                                                         <action selector="popupHeadersButtonSelected:" target="8yo-SX-OPZ" id="m3C-gf-ZjW"/>
                                                     </connections>
                                                 </popUpButton>
-                                                <popUpButton identifier="popup2colHeaders2" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="t9d-m2-hnV">
+                                                <popUpButton identifier="popup2colHeaders2" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t9d-m2-hnV">
                                                     <rect key="frame" x="205" y="118" width="369" height="26"/>
                                                     <animations/>
                                                     <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="24G-SF-pSV" id="OSG-Cw-8oB">
@@ -2415,7 +2415,7 @@
                                                         <action selector="popupHeadersButtonSelected:" target="8yo-SX-OPZ" id="RVD-ew-Lo9"/>
                                                     </connections>
                                                 </popUpButton>
-                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Y2x-a9-hrd">
+                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y2x-a9-hrd">
                                                     <rect key="frame" x="-2" y="124" width="203" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="199" id="6af-WU-ldX"/>
@@ -2427,7 +2427,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <button identifier="addANDarrayCol2" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="F9U-tQ-a63">
+                                                <button identifier="addANDarrayCol2" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F9U-tQ-a63">
                                                     <rect key="frame" x="579" y="49" width="32" height="32"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="32" id="Boj-vx-rBC"/>
@@ -2441,7 +2441,7 @@
                                                         <action selector="addSelectedParameter:" target="8yo-SX-OPZ" id="4wv-7u-Stg"/>
                                                     </connections>
                                                 </button>
-                                                <button identifier="addORarrayCol2" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="c03-6r-UTT">
+                                                <button identifier="addORarrayCol2" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c03-6r-UTT">
                                                     <rect key="frame" x="579" y="14" width="32" height="32"/>
                                                     <animations/>
                                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="3OR" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pBo-Pm-sHh">
@@ -2452,7 +2452,7 @@
                                                         <action selector="addSelectedParameter:" target="8yo-SX-OPZ" id="kY1-zv-3F1"/>
                                                     </connections>
                                                 </button>
-                                                <button identifier="addNOTarrayCol2" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-I4-O05">
+                                                <button identifier="addNOTarrayCol2" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-I4-O05">
                                                     <rect key="frame" x="579" y="84" width="32" height="32"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="32" id="2gO-2H-NGo"/>
@@ -2525,7 +2525,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView identifier="tvPredicates" appearanceType="vibrantLight" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="46" viewBased="YES" id="BU0-nV-9hz" userLabel="tvPredicates">
-                                                        <rect key="frame" x="0.0" y="0.0" width="567" height="155"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="567" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <animations/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
