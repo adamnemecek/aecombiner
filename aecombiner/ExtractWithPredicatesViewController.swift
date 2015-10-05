@@ -378,7 +378,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     // MARK: - AND OR tables
     func extractDataMatrixUsingPredicatesIntoArray()->Bool
     {
-        guard let csvdo = self.associatedCSVdataDocument
+        guard let csvdo = self.associatedCSVdataDocument?.csvDataModel
             else {return false}
         self.extractedDataMatrixUsingPredicatesForCharting = csvdo.extractDataMatrixUsingPredicates(predicates: self.arrayPredicates)
         return true

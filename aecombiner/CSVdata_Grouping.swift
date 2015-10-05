@@ -36,7 +36,7 @@ extension CSVdata
         var namesOfCombinedColumn = StringsArray1D()
         for columnIndex in columnIndexesToGroup
         {
-            namesOfCombinedColumn.append(self.headers[columnIndex])
+            namesOfCombinedColumn.append(self.headersStringsArray1D[columnIndex])
         }
         //join the array members with the correct maths symbol
         var nameOfNewColumn:String = ""

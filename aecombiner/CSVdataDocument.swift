@@ -174,93 +174,15 @@ class CSVdataDocument: NSDocument {
         {
             tvCSVdata.removeTableColumn(tvCSVdata.tableColumns.last!)
         }
-        for var c = 0; c < self.csvDataModel.numberOfColumnsInData(); c++
+        for c in 0..<self.csvDataModel.numberOfColumnsInData()
         {
-            tvCSVdata.addTableColumn(CSVdata.columnWithUniqueIdentifierAndTitle(self.csvDataModel.headers[c]))
-            
+            tvCSVdata.addTableColumn(CSVdata.columnWithUniqueIdentifierAndTitle(self.csvDataModel.headerStringForColumnIndex(c)))
         }
         tvCSVdata.reloadData()
     }
 
     
-    func extractDataMatrixUsingPredicates(predicates predicates:ArrayOfPredicatesForExtracting)->StringsMatrix2D
-    {
-        var extractedRows = StringsMatrix2D()
-        let predicatesSplitByBoolean = PredicateForExtracting.splitPredicatesByBoolean(predicatesToSplit: predicates)
-        
-        for rowOfColumns in self.csvDataModel.csvData
-        {
-            //assume row is matched
-            var rowMatchedNOT = true
-            var rowMatchedAND = true
-            var rowMatchedOR = true
-            
-            // rowOfColumns is a [string] array of row columns
-            // the predicate is a [column#][query text] both strings
-            
-            
-            //do NOT first as if just one is matched then we reject the row
-            for predicateNOT in predicatesSplitByBoolean.NOTpredicates
-            {
-                guard let colIndex = self.csvDataModel.columnIndexForHeaderString(predicateNOT.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateNOT.columnNameToMatch) failed");continue}//should alert here
-                if rowOfColumns[colIndex] == predicateNOT.stringToMatch
-                {
-                    //we break this predicateNOT loop with rowMatched false, as we need to match only one NOT to reject row
-                    rowMatchedNOT = false
-                }
-            }
-            
-            // if we ended the NOT loop without setting row matched false, and have AND predicates to match
-            //do AND next as if just one is unmatched then we reject the row
-            if rowMatchedNOT == true && predicatesSplitByBoolean.ANDpredicates.count > 0
-            {
-                for predicateAND in predicatesSplitByBoolean.ANDpredicates
-                {
-                    guard let colIndex = self.csvDataModel.columnIndexForHeaderString(predicateAND.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateAND.columnNameToMatch) failed");continue}//should alert here
-                    if rowOfColumns[colIndex] != predicateAND.stringToMatch
-                    {
-                        //we break this ANDpredicates loop with rowMatched false, as we need to fail only one AND to reject row
-                        rowMatchedAND = false
-                    }
-                }
-            }
-            
-            // if we ended the NOT & AND loops without setting row matched false, and have OR predicates to match
-            if rowMatchedNOT == true && rowMatchedAND == true && predicatesSplitByBoolean.ORpredicates.count > 0
-            {
-                //as we have OR predicates we must flip its value, so any OR can reset to true
-                rowMatchedOR = false
-                // check ORpredicates, just one true will exit and flip the rowMatched
-                for predicateOR in predicatesSplitByBoolean.ORpredicates
-                {
-                    guard let colIndex = self.csvDataModel.columnIndexForHeaderString(predicateOR.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateOR.columnNameToMatch) failed");continue}//should alert here
-                    if rowOfColumns[colIndex] == predicateOR.stringToMatch
-                    {
-                        //we break this ORpredicates loop and flip the rowMatchedOR. We only need one OR to accept row
-                        rowMatchedOR = true
-                        break
-                    }
-                }
-            }
-            
-            // if we ended the AND and OR loops without setting row matched false, add row
-            if rowMatchedNOT && rowMatchedOR && rowMatchedAND
-            {
-                extractedRows.append(rowOfColumns)
-            }
-        }
-        return extractedRows
-    }
     
-    func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:ArrayOfPredicatesForExtracting)
-    {
-        let extractedData = self.extractDataMatrixUsingPredicates(predicates: predicates)
-        if extractedData.count>0
-        {
-            self.csvDataModel.createNewDocumentFromExtractedRows(cvsData: extractedData, headers: nil, name:nil)
-        }
-        
-    }
     
     
 

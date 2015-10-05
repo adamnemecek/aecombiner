@@ -50,7 +50,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:ArrayOfPredicatesForExtracting)
     {
-        self.associatedCSVdataDocument.extractRowsBasedOnPredicatesIntoNewFile(predicates: predicates)
+        self.associatedCSVdataDocument.csvDataModel.extractRowsBasedOnPredicatesIntoNewFile(predicates: predicates)
         self.tvCSVdata.reloadData()
     }
     
@@ -113,7 +113,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     // MARK: - TableView overrides
     func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
-        tableView.sortParametersOrValuesInTableViewColumn(tableColumn: tableColumn, arrayToSort: &self.associatedCSVdataDocument.csvDataModel.csvData, textOrValue: self.segmentSortTextOrValue.selectedSegment)
+        tableView.sortParametersOrValuesInTableViewColumn(tableColumn: tableColumn, arrayToSort: &self.associatedCSVdataDocument.csvDataModel.dataStringsMatrix2D, textOrValue: self.segmentSortTextOrValue.selectedSegment)
         
         self.tvCSVdata.reloadData()
 
