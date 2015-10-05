@@ -114,7 +114,7 @@ class CSVdata {
     }
     
 
-    // MARK: - New Column
+    // MARK: - Column
     class func columnWithUniqueIdentifierAndTitle(title:String)->NSTableColumn
     {
         let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
@@ -124,28 +124,111 @@ class CSVdata {
         return col
     }
 
-    // MARK: - Data Matrix manipulation
-    class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:StringsMatrix2D)->StringsMatrix2D
-    {
-        guard datamatrix.count  > 0 else {return StringsMatrix2D()}
-        
-        let numCols = datamatrix.count
-        let numRows = datamatrix[0].count
-        var extractedRows = StringsMatrix2D()
-        for rowIndex in rows
-        {
-            guard rowIndex<numRows else {continue}
-            var tempRow = StringsArray1D()
-            for colIndex in 0..<numCols
-            {
-                tempRow.append(datamatrix[colIndex][rowIndex])
-            }
-            extractedRows.append(tempRow)
-        }
-        
-        return extractedRows
+    func numberOfColumnsInData()->Int{
+        return self.headers.count
     }
     
+    func validatedColumnIndex(columnIndex:Int)->Int?
+    {
+        guard
+            self.csvData.count>0 &&
+                columnIndex >= 0 &&
+                columnIndex < self.numberOfColumnsInData()
+            else {return nil}
+        return columnIndex
+    }
+    
+    func deletedColumnAtIndex(index:Int)->Bool
+    {
+        guard let validindex = self.validatedColumnIndex(index) else {return false}
+        self.csvData.removeAtIndex(validindex)
+        //remove from headers array
+        self.headers.removeAtIndex(validindex)
+        return true
+        
+    }
+
+    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
+    {
+        guard let validCI = self.validatedColumnIndex(columnIndex) else {return}
+        
+        //make a temporary dictionary
+        var paramsDict = CSVdata.paramsDictFromParamsArray(paramsArray)
+        var newColumn = StringsArray1D()
+        // must add the column to Array BEFORE adding column to table
+        for row in 0..<self.csvData[validCI].count
+        {
+            //ADD CORRECT PARAMETER AFTER LOOKUP
+            let existingValue = self.csvData[validCI][row]
+            // use ?? to ask if lookup gives nil use alternative or if not nil use the lookup. if nil ask if clear or keep existing based on copyUnmatchedValues
+            let recodedValue = paramsDict[existingValue] ?? (copyUnmatchedValues == true ? existingValue : "")
+            newColumn.append(recodedValue)
+        }
+        //add new column
+        self.csvData.append(newColumn)
+        //add name to headers array
+        self.headers.append(title)
+    }
+    
+    func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
+    {
+        guard let validCI = self.validatedColumnIndex(columnIndex) else {return}
+        //make a temporary dictionary
+        var paramsDict = CSVdata.paramsDictFromParamsArray(paramsArray)
+        
+        for row in 0..<self.csvData[validCI].count
+        {
+            //ovewrite CORRECT PARAMETER AFTER LOOKUP or skip
+            let existingValue = self.csvData[validCI][row]
+            // use ?? to ask if lookup gives nil use alternative or if not nil use the lookup. if nil ask if clear or keep existing based on copyUnmatchedValues
+            self.csvData[validCI][row] = paramsDict[existingValue] ?? (copyUnmatchedValues == true ? existingValue : "")
+            
+        }
+        
+    }
+    
+    // MARK: - Add to Column
+    func appendThisRowToCSVdata(inout arrayOfColumns arrayOfColumns:StringsMatrix2D, rowArray:StringsArray1D)
+    {
+        switch arrayOfColumns.count
+        {
+        case 0: //we have to initiate things.
+            self.headers = rowArray
+            for col in 0..<rowArray.count
+            {
+                arrayOfColumns.append([rowArray[col]])
+            }
+            
+        default:
+            for col in 0..<rowArray.count
+            {
+                arrayOfColumns[col].append(rowArray[col])
+            }
+        }
+        
+    }
+    
+    class func appendThisStringsArray1DToStringsMatrix2D(inout matrix2DToBeAppendedTo matrix2DToBeAppendedTo:StringsMatrix2D, array1DToAppend:StringsArray1D)
+    {
+        switch matrix2DToBeAppendedTo.count
+        {
+        case 0: //we have to initiate things.
+            for col in 0..<array1DToAppend.count
+            {
+                matrix2DToBeAppendedTo.append([array1DToAppend[col]])
+            }
+            
+        default:
+            for col in 0..<array1DToAppend.count
+            {
+                matrix2DToBeAppendedTo[col].append(array1DToAppend[col])
+            }
+        }
+        
+    }
+    
+
+    // MARK: - Data Matrix manipulation
 
     class func dataMatrixWithNoBlanksFromSet(var set set:SetOfStrings)->StringsMatrix2D
     {
@@ -258,6 +341,27 @@ class CSVdata {
     }
 
     // MARK: - Extract Rows
+    class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:StringsMatrix2D)->StringsMatrix2D
+    {
+        guard datamatrix.count  > 0 else {return StringsMatrix2D()}
+        
+        let numCols = datamatrix.count
+        let numRows = datamatrix[0].count
+        var extractedRows = StringsMatrix2D()
+        for rowIndex in rows
+        {
+            guard rowIndex<numRows else {continue}
+            var tempRow = StringsArray1D()
+            for colIndex in 0..<numCols
+            {
+                tempRow.append(datamatrix[colIndex][rowIndex])
+            }
+            extractedRows.append(tempRow)
+        }
+        
+        return extractedRows
+    }
+    
     func extractTheseRowsFromSelfAsCSVdata(rows rows:NSIndexSet)->CSVdata
     {
         guard self.numberOfColumnsInData() > 0 else {return CSVdata()}
@@ -324,57 +428,7 @@ class CSVdata {
         return set.count == 0 ? nil : set
     }
 
-    // MARK: - Add to Column
-    func appendThisRowToCSVdata(inout arrayOfColumns arrayOfColumns:StringsMatrix2D, rowArray:StringsArray1D)
-    {
-        switch arrayOfColumns.count
-        {
-        case 0: //we have to initiate things.
-            self.headers = rowArray
-            for col in 0..<rowArray.count
-            {
-                arrayOfColumns.append([rowArray[col]])
-            }
-            
-        default:
-            for col in 0..<rowArray.count
-            {
-                arrayOfColumns[col].append(rowArray[col])
-            }
-        }
-        
-    }
-    
-    class func appendThisStringsArray1DToStringsMatrix2D(inout matrix2DToBeAppendedTo matrix2DToBeAppendedTo:StringsMatrix2D, array1DToAppend:StringsArray1D)
-    {
-        switch matrix2DToBeAppendedTo.count
-        {
-        case 0: //we have to initiate things.
-            for col in 0..<array1DToAppend.count
-            {
-                matrix2DToBeAppendedTo.append([array1DToAppend[col]])
-            }
-            
-        default:
-            for col in 0..<array1DToAppend.count
-            {
-                matrix2DToBeAppendedTo[col].append(array1DToAppend[col])
-            }
-        }
-        
-    }
-
-    // MARK: - Column Statistics
-    func validatedColumnIndex(columnIndex:Int)->Int?
-    {
-        guard
-            self.csvData.count>0 &&
-                columnIndex >= 0 &&
-                columnIndex < self.numberOfColumnsInData()
-            else {return nil}
-        return columnIndex
-    }
-    
+    // MARK: - Rows
     func validatedRowIndex(rowIndex:Int)->Int?
     {
         guard
@@ -386,15 +440,12 @@ class CSVdata {
     }
     
 
-    func numberOfColumnsInData()->Int{
-        return self.headers.count
-    }
-    
     func numberOfRowsInData()->Int{
         guard self.csvData.count > 0 else {return 0}
         return self.csvData[0].count
         // just hope all cols same length
     }
+    
     
     // MARK: - Header Names
     func headerStringsForAllColumns()->[String]
@@ -452,6 +503,48 @@ class CSVdata {
         
     }
     
+    // MARK: - Document
+    class func createNewDocumentFromCVSDataAndColumnName(cvsData cvsData: CSVdata, name:String)
+    {
+        do {
+            let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
+            if doc is CSVdataDocument
+            {
+                doc.setDisplayName(name)
+                (doc as! CSVdataDocument).csvDataModel = cvsData
+                (doc as! CSVdataDocument).updateChangeCount(.ChangeDone)
+            }
+        } catch {
+            print("Error making new doc")
+        }
+    }
+    
+    func createNewDocumentFromRowsInIndexSet(rows rows:NSIndexSet, docName:String)
+    {
+        CSVdata.createNewDocumentFromCVSDataAndColumnName(cvsData: self.extractTheseRowsFromSelfAsCSVdata(rows: rows), name: docName)
+    }
+    
+    func createNewDocumentFromExtractedRows(cvsData extractedRows:StringsMatrix2D, headers:StringsArray1D?, name: String?)
+    {
+        do {
+            let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
+            if doc is CSVdataDocument
+            {
+                let headersOrMyHeaders = headers == nil ? self.headers : headers! // use my headers if none
+                (doc as! CSVdataDocument).csvDataModel = CSVdata(headers: headersOrMyHeaders, csvdata: extractedRows, name:name == nil ? "" : name!)
+                (doc as! CSVdataDocument).updateChangeCount(.ChangeDone)
+            }
+            doc.setDisplayName(name)//setDisplayName handles optionsals OK
+        } catch {
+            print("Error making new doc")
+        }
+    }
+    
+    // MARK: - ChartDataSet
+    func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
+    {
+        return ChartDataSet(data: self.csvData, forColumnIndex: columnIndex)
+    }
 
     
 }

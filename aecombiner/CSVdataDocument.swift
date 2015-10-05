@@ -167,102 +167,9 @@ class CSVdataDocument: NSDocument {
         return nil
     }
     
-    // MARK: - Grouping Combining
-   
-    
-    
-    
-    
-    func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet)
+    // MARK: - table View
+    func columnsClearAndRebuild(tvCSVdata:NSTableView)
     {
-        // check OK to group
-        guard
-            columnIndexForGrouping >= 0 &&
-            columnIndexForGrouping < self.csvDataModel.numberOfColumnsInData() &&
-            columnIndexesToGroup.count > 0
-
-        else {return}
-        
-        
-        //extract the rows and present
-        let stats = self.csvDataModel.combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup)
-        
-        self.createNewDocumentFromCVSDataAndColumnName(cvsData: stats, name: "All Stats("+stats.name+") by "+self.csvDataModel.headerStringForColumnIndex(columnIndexForGrouping))
-    }
-    
-    
-    
-    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:StringsArray1D , groupMethod:String)
-    {
-        //extract the rows and present
-        let combinedDataAndName = self.csvDataModel.combinedColumnsAndNewColumnName_UsingSingleMethod(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-        self.createNewDocumentFromExtractedRows(cvsData: combinedDataAndName.matrixOfData, headers: [self.csvDataModel.headerStringForColumnIndex(columnIndexForGrouping),combinedDataAndName.nameOfData], name: combinedDataAndName.nameOfData+" by "+self.csvDataModel.headerStringForColumnIndex(columnIndexForGrouping))
-    }
-    
-    
-   
-    // MARK: - Data
-    
-    func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
-    {
-        return ChartDataSet(data: self.csvDataModel.csvData, forColumnIndex: columnIndex)
-    }
-
-    
-    
-    func deletedColumnAtIndex(columnIndex: Int)->Bool
-    {
-        guard columnIndex >= 0 && columnIndex < self.csvDataModel.numberOfColumnsInData() else {return false}
-        
-        // must delete the column from Array BEFORE deleting  table
-        for var r = 0; r<self.csvDataModel.csvData.count; r++
-        {
-            var rowArray = self.csvDataModel.csvData[r]
-            rowArray.removeAtIndex(columnIndex)
-            self.csvDataModel.csvData[r] = rowArray
-        }
-        //remove from headers array
-        self.csvDataModel.headers.removeAtIndex(columnIndex)
-        return true
-    }
-
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
-    {
-        //make a temporary dictionary
-        var paramsDict = CSVdata.paramsDictFromParamsArray(paramsArray)
-        
-        // must add the column to Array BEFORE adding column to table
-        for r in 0..<self.csvDataModel.csvData.count//var r = 0; r<self.csvDataModel.csvData.count; r++
-        {
-            //ADD CORRECT PARAMETER AFTER LOOKUP
-            let existingValue = self.csvDataModel.csvData[r][columnIndex]
-            // use ?? to ask if lookup gives nil use alternative or if not nil use the lookup. if nil ask if clear or keep existing based on copyUnmatchedValues
-            let recodedValue = paramsDict[existingValue] ?? (copyUnmatchedValues == true ? existingValue : "")
-            self.csvDataModel.csvData[r].append(recodedValue)
-        }
-        //add name to headers array
-        self.csvDataModel.headers.append(title)
-    }
-    
-    func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
-    {
-        //make a temporary dictionary
-        var paramsDict = CSVdata.paramsDictFromParamsArray(paramsArray)
-        
-        for r in 0..<self.csvDataModel.csvData.count//var r = 0; r<self.csvDataModel.csvData.count; r++
-        {
-            //ovewrite CORRECT PARAMETER AFTER LOOKUP or skip
-            let existingValue = self.csvDataModel.csvData[r][columnIndex]
-            // use ?? to ask if lookup gives nil use alternative or if not nil use the lookup. if nil ask if clear or keep existing based on copyUnmatchedValues
-            self.csvDataModel.csvData[r][columnIndex] = paramsDict[existingValue] ?? (copyUnmatchedValues == true ? existingValue : "")
-
-        }
-        
-    }
-    
-
-    func columnsClearAndRebuild(tvCSVdata:NSTableView){
-        
         while tvCSVdata.tableColumns.count > 0
         {
             tvCSVdata.removeTableColumn(tvCSVdata.tableColumns.last!)
@@ -275,41 +182,12 @@ class CSVdataDocument: NSDocument {
         tvCSVdata.reloadData()
     }
 
-    func updateCSVTableView()
-    {
-    }
-    
-    func requestedColumnIndexIsOK(columnIndex:Int) -> Int?
-    {
-        return columnIndex >= 0 && columnIndex < self.csvDataModel.numberOfColumnsInData() ? columnIndex : nil
-    }
-
-    
-    func splitPredicatesByBoolean(predicatesToSplit predicatesToSplit:ArrayOfPredicatesForExtracting)->PredicatesByBoolean
-    {
-        var splitpreds = PredicatesByBoolean()
-        for predicate in predicatesToSplit
-        {
-            switch predicate.booleanOperator
-            {
-            case kBooleanStringAND:
-                splitpreds.ANDpredicates.append(predicate)
-            case kBooleanStringOR:
-                splitpreds.ORpredicates.append(predicate)
-            case kBooleanStringNOT:
-                splitpreds.NOTpredicates.append(predicate)
-            default:
-                break
-            }
-        }
-        return splitpreds
-    }
-
     
     func extractDataMatrixUsingPredicates(predicates predicates:ArrayOfPredicatesForExtracting)->StringsMatrix2D
     {
         var extractedRows = StringsMatrix2D()
-        let predicatesSplitByBoolean = self.splitPredicatesByBoolean(predicatesToSplit: predicates)
+        let predicatesSplitByBoolean = PredicateForExtracting.splitPredicatesByBoolean(predicatesToSplit: predicates)
+        
         for rowOfColumns in self.csvDataModel.csvData
         {
             //assume row is matched
@@ -379,45 +257,9 @@ class CSVdataDocument: NSDocument {
         let extractedData = self.extractDataMatrixUsingPredicates(predicates: predicates)
         if extractedData.count>0
         {
-            self.createNewDocumentFromExtractedRows(cvsData: extractedData, headers: nil, name:nil)
+            self.csvDataModel.createNewDocumentFromExtractedRows(cvsData: extractedData, headers: nil, name:nil)
         }
         
-    }
-    
-    func createNewDocumentFromRowsInIndexSet(rows rows:NSIndexSet, docName:String)
-    {
-        self.createNewDocumentFromCVSDataAndColumnName(cvsData: self.csvDataModel.extractTheseRowsFromSelfAsCSVdata(rows: rows), name: docName)
-    }
-    
-    func createNewDocumentFromExtractedRows(cvsData extractedRows:StringsMatrix2D, headers:StringsArray1D?, name: String?)
-    {
-        do {
-            let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
-            if doc is CSVdataDocument
-            {
-                let headersOrMyHeaders = headers == nil ? self.csvDataModel.headers : headers! // use my headers if none
-                (doc as! CSVdataDocument).csvDataModel = CSVdata(headers: headersOrMyHeaders, csvdata: extractedRows, name:name == nil ? "" : name!)
-                (doc as! CSVdataDocument).updateChangeCount(.ChangeDone)
-            }
-            doc.setDisplayName(name)//setDisplayName handles optionsals OK
-        } catch {
-            print("Error making new doc")
-        }
-    }
-    
-    func createNewDocumentFromCVSDataAndColumnName(cvsData cvsData: CSVdata, name:String)
-    {
-        do {
-            let doc = try NSDocumentController.sharedDocumentController().openUntitledDocumentAndDisplay(true)
-            if doc is CSVdataDocument
-            {
-                doc.setDisplayName(name)
-                (doc as! CSVdataDocument).csvDataModel = cvsData
-                (doc as! CSVdataDocument).updateChangeCount(.ChangeDone)
-            }
-        } catch {
-            print("Error making new doc")
-        }
     }
     
     

@@ -70,7 +70,13 @@ extension CSVdata
         return nameOfNewColumn
     }
     
-    
+    func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:StringsArray1D , groupMethod:String)
+    {
+        //extract the rows and present
+        let combinedDataAndName = self.combinedColumnsAndNewColumnName_UsingSingleMethod(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
+        self.createNewDocumentFromExtractedRows(cvsData: combinedDataAndName.matrixOfData, headers: [self.headerStringForColumnIndex(columnIndexForGrouping),combinedDataAndName.nameOfData], name: combinedDataAndName.nameOfData+" by "+self.headerStringForColumnIndex(columnIndexForGrouping))
+    }
+
     
     func combinedColumnsAndNewColumnName_UsingSingleMethod(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:StringsArray1D , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:StringsMatrix2D, nameOfColumn:String)
     {
@@ -348,7 +354,23 @@ extension CSVdata
         return CSVdata(headers: headers, csvdata: finalDatamatrix, name: nameOfColumn)
     }
     
-    
+    func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet)
+    {
+        // check OK to group
+        guard
+            columnIndexForGrouping >= 0 &&
+                columnIndexForGrouping < self.numberOfColumnsInData() &&
+                columnIndexesToGroup.count > 0
+            
+            else {return}
+        
+        
+        //extract the rows and present
+        let stats = self.combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup)
+        
+        CSVdata.createNewDocumentFromCVSDataAndColumnName(cvsData: stats, name: "All Stats("+stats.name+") by "+self.headerStringForColumnIndex(columnIndexForGrouping))
+    }
+
 
 
 }

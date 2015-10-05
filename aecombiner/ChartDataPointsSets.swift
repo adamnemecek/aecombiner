@@ -46,23 +46,23 @@ class ChartDataSet {
     convenience init(data: StringsMatrix2D, forColumnIndex columnIndex:Int)
     {
         self.init()
-        guard data.count > 0 else {
+        guard data.count > 0 && data[0].count > 0 else {
             alertWithMessage("No data to chart",style: .WarningAlertStyle)
             return}
 
-        guard columnIndex>=0 && columnIndex<data[0].count else {
+        guard columnIndex>=0 && columnIndex < data.count else {
             alertWithMessage("The data does not have the column you want to chart",style: .WarningAlertStyle)
             return}
         
         var hadErrors = 0
-        for var r:Int = 0; r<data.count; r++
+        for rowN in 0..<data[columnIndex].count
         {
-            let row = data[r]
+            let valS = data[columnIndex][rowN]
             guard
-                row[columnIndex].characters.count>0,
-                let Yvalue = Double(row[columnIndex])
+                !valS.isEmpty,
+                let Yvalue = Double(valS)
                 else {hadErrors++ ; continue}
-            let Xvalue = Double(r)
+            let Xvalue = Double(rowN)
             self.minYvalue = fmin(self.minYvalue,Yvalue)
             self.maxYvalue = fmax(self.maxYvalue,Yvalue)
             self.minXvalue = fmin(self.minXvalue,Xvalue)

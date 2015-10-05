@@ -74,14 +74,14 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
     {
-        self.associatedCSVdataDocument.recodeColumnInSitu(columnToRecode: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
+        self.associatedCSVdataDocument.csvDataModel.recodeColumnInSitu(columnToRecode: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
         self.tvCSVdata.reloadData()
         self.tvCSVdata.scrollColumnToVisible(columnIndex)
     }
     
     func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
     {
-        self.associatedCSVdataDocument.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
+        self.associatedCSVdataDocument.csvDataModel.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
         
         //Safe to add column to table now
         self.tvCSVdata.addTableColumn(CSVdata.columnWithUniqueIdentifierAndTitle(title))
@@ -92,7 +92,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     func deleteColumnAtIndex(columnIndex: Int)
     {
-        guard self.associatedCSVdataDocument.deletedColumnAtIndex(columnIndex) else {return}
+        guard self.associatedCSVdataDocument.csvDataModel.deletedColumnAtIndex(columnIndex) else {return}
         
         //Safe to delete column to table now
         self.tvCSVdata.removeTableColumn(self.tvCSVdata.tableColumns[columnIndex])

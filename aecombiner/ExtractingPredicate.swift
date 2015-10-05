@@ -27,6 +27,28 @@ struct PredicateForExtracting: Comparable
         stringToMatch = string
         columnNameToMatch = columnName
     }
+    
+    static func splitPredicatesByBoolean(predicatesToSplit predicatesToSplit:ArrayOfPredicatesForExtracting)->PredicatesByBoolean
+    {
+        var splitpreds = PredicatesByBoolean()
+        for predicate in predicatesToSplit
+        {
+            switch predicate.booleanOperator
+            {
+            case kBooleanStringAND:
+                splitpreds.ANDpredicates.append(predicate)
+            case kBooleanStringOR:
+                splitpreds.ORpredicates.append(predicate)
+            case kBooleanStringNOT:
+                splitpreds.NOTpredicates.append(predicate)
+            default:
+                break
+            }
+        }
+        return splitpreds
+    }
+    
+
     static func extractNSArrayFromExtractingPredicatesArray(predicatesarray predicatesarray:ArrayOfPredicatesForExtracting)->NSMutableArray
     {
         let newarray = NSMutableArray()

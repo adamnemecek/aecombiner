@@ -67,12 +67,13 @@ class ColumnsViewController: ColumnSortingChartingViewController {
         chartviewC.reSortThisChartDataSet(dataSetName: csvdatamodel.headerStringForColumnIndex(self.tvHeaders.selectedRow),flipDirection:true)
     }
     
-    @IBAction func chartSelectedDataSet(sender: NSButton) {
+    @IBAction func chartSelectedDataSet(sender: NSButton)
+    {
         guard
             let chartviewC = self.chartViewController,
-            let csvdatamodel = self.associatedCSVmodel,
-            let dataSet = self.associatedCSVdataDocument?.chartDataSetFromColumnIndex(columnIndex: self.tvHeaders.selectedRow)
-        else {return}
+            let csvdatamodel = self.associatedCSVmodel
+            else {return}
+        let dataSet = csvdatamodel.chartDataSetFromColumnIndex(columnIndex: self.tvHeaders.selectedRow)
         chartviewC.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: csvdatamodel.headerStringForColumnIndex(self.tvHeaders.selectedRow))
     }
 

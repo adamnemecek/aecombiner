@@ -33,7 +33,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     @IBAction func groupToFileUsingOneMethodTapped(sender: NSButton) {
         guard
             let groupMethod = self.popupGroupMethod.titleOfSelectedItem,
-            let csdo = self.associatedCSVdataDocument
+            let csdo = self.associatedCSVdataDocument?.csvDataModel
             else {return}
         
         csdo.combineColumnsAndExtractToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: self.tvGroupHeadersSecondary.selectedRowIndexes, arrayOfParamatersInGroup: self.arrayOfExtractedParametersToGroupBy(), groupMethod: groupMethod)
@@ -46,7 +46,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     
     @IBAction func groupAllStatsToFileTapped(sender: AnyObject) {
         guard
-            let csdo = self.associatedCSVdataDocument
+            let csdo = self.associatedCSVdataDocument?.csvDataModel
             else {return}
 
         //let arrayOfExtractedParametersToGroupBy = self.arrayOfExtractedParametersToGroupBy()
@@ -150,7 +150,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
-        guard let csvdata = self.associatedCSVdataDocument else {return}
+        guard let csvdata = self.associatedCSVdataDocument?.csvDataModel else {return}
         let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.groupedDataAfterCombiningToUseForCharting)
         csvdata.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: self.headersExtractedDataModelForChart, name: nameOfDataSet)
     }
@@ -213,7 +213,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     func groupToFileUsingOneMethod()
     {
         guard
-            let csdo = self.associatedCSVdataDocument,
+            let csdo = self.associatedCSVdataDocument?.csvDataModel,
             let groupMethod = self.popupGroupMethod.titleOfSelectedItem
             else {return}
         

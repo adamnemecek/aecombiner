@@ -175,10 +175,10 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     // MARK: - ChartViewControllerDelegate
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
-        guard let csvdatavc = self.associatedCSVdataDocument else {return}
+        guard let csvdata = self.associatedCSVdataDocument?.csvDataModel else {return}
         // we use self.extractedDataMatrixUsingPredicatesForCharting
         let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.extractedDataMatrixUsingPredicatesForCharting)
-        csvdatavc.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
+        csvdata.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: nil, name: nameOfDataSet)
     }
 
     func chartExtractedRows(sender: NSButton) {
