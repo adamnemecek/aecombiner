@@ -105,7 +105,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     // MARK: - header Popups
     func populateHeaderPopups()
     {
-        guard let csvdo = self.associatedCSVdataDocument else { return}
+        guard let csvdo = self.associatedCSVdataDocument?.csvDataModel else { return}
         self.popupGroupBy.removeAllItems()
         self.popupGroupBy.addItemsWithTitles(csvdo.headerStringsForAllColumns())
         self.popupGroupBy.selectItemAtIndex(-1)
@@ -161,12 +161,12 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
         guard
             let groupMethod = self.popupGroupMethod.titleOfSelectedItem,
             let cvc = self.chartViewController,
-            let csvdo = self.associatedCSVdataDocument,
+            let csvdo = self.associatedCSVdataDocument?.csvDataModel,
             let columnIndexForGrouping = self.columnIndexToGroupBy()
             else {return}
         
         let arrayOfExtractedParametersToGroupBy = self.arrayOfExtractedParametersToGroupBy()
-        let dataAndName = csvdo.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersToGroupBy, groupMethod: groupMethod)
+        let dataAndName = csvdo.combinedColumnsAndNewColumnName_UsingSingleMethod(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnsToGroupTogether(), arrayOfParamatersInGroup: arrayOfExtractedParametersToGroupBy, groupMethod: groupMethod)
         self.groupedDataAfterCombiningToUseForCharting = dataAndName.matrixOfData
         self.headersExtractedDataModelForChart = [csvdo.headerStringForColumnIndex(columnIndexForGrouping),dataAndName.nameOfData]
         let dataset = ChartDataSet(data: dataAndName.matrixOfData, forColumnIndex: kCsvDataData_column_value)
@@ -227,7 +227,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         guard   let tvidentifier = tableView.identifier,
-                let csvdo = self.associatedCSVdataDocument
+                let csvdo = self.associatedCSVdataDocument?.csvDataModel
             else {return 0}
         switch tvidentifier
         {

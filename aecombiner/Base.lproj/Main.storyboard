@@ -1067,7 +1067,7 @@
                                 <rect key="frame" x="0.0" y="42" width="277" height="270"/>
                                 <animations/>
                             </customView>
-                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tro-bF-AhT">
+                            <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tro-bF-AhT">
                                 <rect key="frame" x="-2" y="-2" width="59" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="3tc-Kf-SoR"/>
@@ -1087,7 +1087,7 @@
                                     <action selector="segmentChartTypeTapped:" target="3ve-cH-Ehb" id="zMw-YV-9PF"/>
                                 </connections>
                             </segmentedControl>
-                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gyU-vu-SOY">
+                            <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gyU-vu-SOY">
                                 <rect key="frame" x="95" y="-2" width="137" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="137" id="BaH-Bl-Ykh"/>

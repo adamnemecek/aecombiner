@@ -170,181 +170,7 @@ class CSVdataDocument: NSDocument {
     // MARK: - Grouping Combining
    
     
-    func combinedColumnForMeansAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:StringsArray1D , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:StringsMatrix2D, nameOfColumn:String)
-    {
-        return self.csvDataModel.combinedColumnForMeansAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-    }
     
-    
-    func combinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:StringsArray1D , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:StringsMatrix2D, nameOfColumn:String)
-    {
-        
-        //trap others
-        switch groupMethod
-        {
-        case kGroupMean,kGroupGeoMean, kGroupRange, kGroupLogRange:
-            return self.combinedColumnForMeansAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-        default:
-            break
-        }
-        
-        let groupStartValue = CSVdata.groupStartValueForString(groupMethod)
-        //create a dict with the keys the params we extracted for grouping
-        //make a blank array to hold the values associated with the grouping for each member of the group
-        //Doubles for adding and multiplying, Ints for counting - to avoud decimal places in counts string
-        var valuesForGroup = [String : Double]()
-        var countsForGroup = [String : Int]()
-        switch groupMethod
-        {
-        case kGroupAddition, kGroupLogSum, kGroupMultiplication, kGroupMax, kGroupMin:
-            for parameter in arrayOfParamatersInGroup
-            {
-                valuesForGroup[parameter] = groupStartValue
-            }
-        case kGroupCount:
-            for parameter in arrayOfParamatersInGroup
-            {
-                countsForGroup[parameter] = Int(groupStartValue)
-            }
-        default:
-            break
-        }
-        
-        for row in self.csvDataModel.csvData
-        {
-            let paramID = row[columnIndexForGrouping]
-            for columnIndexInGroup in columnIndexesToGroup
-            {
-                switch groupMethod
-                {
-                case kGroupMin:
-                    guard let running = valuesForGroup[paramID],
-                        let value = Double(row[columnIndexInGroup]) else {continue}
-                    valuesForGroup[paramID] = fmin(running, value)
-                case kGroupMax:
-                    guard let running = valuesForGroup[paramID],
-                        let value = Double(row[columnIndexInGroup]) else {continue}
-                    valuesForGroup[paramID] = fmax(running, value)
-                case kGroupAddition:
-                    guard let running = valuesForGroup[paramID],
-                        let value = Double(row[columnIndexInGroup]) else {continue}
-                    valuesForGroup[paramID] = running + value
-                case kGroupLogSum:
-                    guard let running = valuesForGroup[paramID],
-                        let value = Double(row[columnIndexInGroup])
-                        where value > 0
-                        else {continue}
-                    valuesForGroup[paramID] = running + log(value)
-                case kGroupMultiplication:
-                    guard let running = valuesForGroup[paramID],
-                        let value = Double(row[columnIndexInGroup]) else {continue}
-                    valuesForGroup[paramID] = running * value
-                case kGroupCount:
-                    guard let running = countsForGroup[paramID],
-                        let _ = Double(row[columnIndexInGroup]) else {continue}
-                    countsForGroup[paramID] = running + 1
-                default:
-                    break
-                }
-            }
-        }
-        
-        let nameOfNewColumn = self.csvDataModel.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: groupMethod)
-        
-        //createTheCSVdata
-        var csvDataData = StringsMatrix2D()
-        switch groupMethod
-        {
-        case kGroupAddition, kGroupLogSum, kGroupMultiplication, kGroupMin, kGroupMax:
-            for (parameter,value) in valuesForGroup
-            {
-                csvDataData.append([parameter, String(value)])
-            }
-        case kGroupCount:
-            for (parameter,value) in countsForGroup
-            {
-                csvDataData.append([parameter, String(value)])
-            }
-        default:
-            break
-        }
-        
-        
-        return NamedDataMatrix(matrix:csvDataData, name:nameOfNewColumn)
-    }
-    
-    
-    func allStatsForCombinedColumnsAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet)->CSVdata//(cvsdata:CSVdata, name:String)
-    {
-        guard let arrayOfParamatersInColumnToGroupBy = self.csvDataModel.StringsArray1DOfParametersFromColumn(fromColumn: columnIndexForGrouping, replaceBlank: true)
-            else {return CSVdata()}
-        
-        //create a dict with the keys the params we extracted for grouping
-        //make a blank array to hold the values associated with the grouping for each member of the group
-        //Doubles for adding and multiplying, Ints for counting - to avoud decimal places in counts string
-        var statsForGroup = [String : AggregatedStats]()
-        for parameter in arrayOfParamatersInColumnToGroupBy
-        {
-            statsForGroup[parameter] = AggregatedStats()
-        }
-        
-        for row in self.csvDataModel.csvData
-        {
-            let paramID = row[columnIndexForGrouping]
-            for columnIndexInGroup in columnIndexesToGroup
-            {
-                guard var running = statsForGroup[paramID] else {continue}
-                guard let value = Double(row[columnIndexInGroup])
-                    else {running.skippedValues++; continue}
-                running.minm = fmin(running.minm, value)
-                running.maxm = fmax(running.maxm, value)
-                running.sum += value
-                running.product *= value
-                running.count += 1
-                if value > 0
-                {
-                    running.logSum += log(value)
-                    running.logCount += 1
-                }
-                else { running.skippedLogs++ }
-                statsForGroup[paramID] = running
-            }
-        }
-        let nameOfColumn:String = self.csvDataModel.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: kGroupAllStats)
-        let headers:StringsArray1D = [self.headerStringForColumnIndex(columnIndexForGrouping),"Count("+nameOfColumn+")","Sum("+nameOfColumn+")","Log Sum("+nameOfColumn+")","Product("+nameOfColumn+")","Max("+nameOfColumn+")","Min("+nameOfColumn+")","Range("+nameOfColumn+")","Log Range("+nameOfColumn+")","Mean("+nameOfColumn+")","GeoMean("+nameOfColumn+")","Skipped Values("+nameOfColumn+")","Skipped Logs("+nameOfColumn+")"]
-        
-        //createTheCSVdata
-        var csvDataData = StringsMatrix2D()
-        for (parameter,stats) in statsForGroup
-        {
-            var row = [String]()
-            
-            row.append(parameter)
-            row.append(String(stats.count))
-            row.append(String(stats.sum))
-            row.append(String(stats.logSum))
-            row.append(String(stats.product))
-            row.append(String(stats.maxm))
-            row.append(String(stats.minm))
-            row.append(String(stats.maxm-stats.minm))
-            if stats.maxm-stats.minm > 0
-            {
-                row.append(String(log(stats.maxm-stats.minm)))
-            }
-            else
-            {
-                row.append("max-min<=0")
-            }
-            row.append(String(stats.sum/Double(stats.count)))
-            row.append(String(exp(stats.logSum/Double(stats.logCount))))
-            row.append(String(stats.skippedValues))
-            row.append(String(stats.skippedLogs))
-            csvDataData.append(row)
-        }
-        
-        
-        return CSVdata(headers: headers, csvdata: csvDataData, name: nameOfColumn)
-    }
     
     
     func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet)
@@ -352,16 +178,16 @@ class CSVdataDocument: NSDocument {
         // check OK to group
         guard
             columnIndexForGrouping >= 0 &&
-            columnIndexForGrouping < self.numberOfColumnsInData() &&
+            columnIndexForGrouping < self.csvDataModel.numberOfColumnsInData() &&
             columnIndexesToGroup.count > 0
 
         else {return}
         
         
         //extract the rows and present
-        let stats = self.allStatsForCombinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup)
+        let stats = self.csvDataModel.combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup)
         
-        self.createNewDocumentFromCVSDataAndColumnName(cvsData: stats, name: "All Stats("+stats.name+") by "+self.headerStringForColumnIndex(columnIndexForGrouping))
+        self.createNewDocumentFromCVSDataAndColumnName(cvsData: stats, name: "All Stats("+stats.name+") by "+self.csvDataModel.headerStringForColumnIndex(columnIndexForGrouping))
     }
     
     
@@ -369,8 +195,8 @@ class CSVdataDocument: NSDocument {
     func combineColumnsAndExtractToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:StringsArray1D , groupMethod:String)
     {
         //extract the rows and present
-        let combinedDataAndName = self.combinedColumnsAndNewColumnName(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
-        self.createNewDocumentFromExtractedRows(cvsData: combinedDataAndName.matrixOfData, headers: [self.headerStringForColumnIndex(columnIndexForGrouping),combinedDataAndName.nameOfData], name: combinedDataAndName.nameOfData+" by "+self.headerStringForColumnIndex(columnIndexForGrouping))
+        let combinedDataAndName = self.csvDataModel.combinedColumnsAndNewColumnName_UsingSingleMethod(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, arrayOfParamatersInGroup: arrayOfParamatersInGroup, groupMethod: groupMethod)
+        self.createNewDocumentFromExtractedRows(cvsData: combinedDataAndName.matrixOfData, headers: [self.csvDataModel.headerStringForColumnIndex(columnIndexForGrouping),combinedDataAndName.nameOfData], name: combinedDataAndName.nameOfData+" by "+self.csvDataModel.headerStringForColumnIndex(columnIndexForGrouping))
     }
     
     
@@ -383,18 +209,10 @@ class CSVdataDocument: NSDocument {
     }
 
     
-    func numberOfRowsOfData()->Int
-    {
-        return self.csvDataModel.numberOfRowsInData()
-    }
-    
-    func numberOfColumnsInData()->Int{
-        return self.csvDataModel.numberOfColumnsInData()
-    }
     
     func deletedColumnAtIndex(columnIndex: Int)->Bool
     {
-        guard columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return false}
+        guard columnIndex >= 0 && columnIndex < self.csvDataModel.numberOfColumnsInData() else {return false}
         
         // must delete the column from Array BEFORE deleting  table
         for var r = 0; r<self.csvDataModel.csvData.count; r++
@@ -411,7 +229,7 @@ class CSVdataDocument: NSDocument {
     func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
     {
         //make a temporary dictionary
-        var paramsDict = CSVdata.createParamsDictFromParamsArray(paramsArray)
+        var paramsDict = CSVdata.paramsDictFromParamsArray(paramsArray)
         
         // must add the column to Array BEFORE adding column to table
         for r in 0..<self.csvDataModel.csvData.count//var r = 0; r<self.csvDataModel.csvData.count; r++
@@ -429,7 +247,7 @@ class CSVdataDocument: NSDocument {
     func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
     {
         //make a temporary dictionary
-        var paramsDict = CSVdata.createParamsDictFromParamsArray(paramsArray)
+        var paramsDict = CSVdata.paramsDictFromParamsArray(paramsArray)
         
         for r in 0..<self.csvDataModel.csvData.count//var r = 0; r<self.csvDataModel.csvData.count; r++
         {
@@ -449,7 +267,7 @@ class CSVdataDocument: NSDocument {
         {
             tvCSVdata.removeTableColumn(tvCSVdata.tableColumns.last!)
         }
-        for var c = 0; c < numberOfColumnsInData(); c++
+        for var c = 0; c < self.csvDataModel.numberOfColumnsInData(); c++
         {
             tvCSVdata.addTableColumn(CSVdata.columnWithUniqueIdentifierAndTitle(self.csvDataModel.headers[c]))
             
@@ -463,7 +281,7 @@ class CSVdataDocument: NSDocument {
     
     func requestedColumnIndexIsOK(columnIndex:Int) -> Int?
     {
-        return columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() ? columnIndex : nil
+        return columnIndex >= 0 && columnIndex < self.csvDataModel.numberOfColumnsInData() ? columnIndex : nil
     }
 
     
@@ -506,7 +324,7 @@ class CSVdataDocument: NSDocument {
             //do NOT first as if just one is matched then we reject the row
             for predicateNOT in predicatesSplitByBoolean.NOTpredicates
             {
-                guard let colIndex = self.columnIndexForHeaderString(predicateNOT.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateNOT.columnNameToMatch) failed");continue}//should alert here
+                guard let colIndex = self.csvDataModel.columnIndexForHeaderString(predicateNOT.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateNOT.columnNameToMatch) failed");continue}//should alert here
                 if rowOfColumns[colIndex] == predicateNOT.stringToMatch
                 {
                     //we break this predicateNOT loop with rowMatched false, as we need to match only one NOT to reject row
@@ -520,7 +338,7 @@ class CSVdataDocument: NSDocument {
             {
                 for predicateAND in predicatesSplitByBoolean.ANDpredicates
                 {
-                    guard let colIndex = self.columnIndexForHeaderString(predicateAND.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateAND.columnNameToMatch) failed");continue}//should alert here
+                    guard let colIndex = self.csvDataModel.columnIndexForHeaderString(predicateAND.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateAND.columnNameToMatch) failed");continue}//should alert here
                     if rowOfColumns[colIndex] != predicateAND.stringToMatch
                     {
                         //we break this ANDpredicates loop with rowMatched false, as we need to fail only one AND to reject row
@@ -537,7 +355,7 @@ class CSVdataDocument: NSDocument {
                 // check ORpredicates, just one true will exit and flip the rowMatched
                 for predicateOR in predicatesSplitByBoolean.ORpredicates
                 {
-                    guard let colIndex = self.columnIndexForHeaderString(predicateOR.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateOR.columnNameToMatch) failed");continue}//should alert here
+                    guard let colIndex = self.csvDataModel.columnIndexForHeaderString(predicateOR.columnNameToMatch) else {print("self.columnIndexForHeaderString(predicateOR.columnNameToMatch) failed");continue}//should alert here
                     if rowOfColumns[colIndex] == predicateOR.stringToMatch
                     {
                         //we break this ORpredicates loop and flip the rowMatchedOR. We only need one OR to accept row
@@ -603,35 +421,6 @@ class CSVdataDocument: NSDocument {
     }
     
     
-    // MARK: - Headers
-    
-    func headerStringsForAllColumns()->[String]
-    {
-        return self.csvDataModel.headers
-    }
-    
-    func headerStringForColumnIndex(columnIndex:Int?) -> String
-    {
-        guard let index = columnIndex where columnIndex >= 0 && columnIndex < self.numberOfColumnsInData() else {return "???"}
-        return (self.csvDataModel.headers[index])
-    }
-    
-    func columnIndexForHeaderString(headerString:String)->Int?
-    {
-        return self.csvDataModel.headers.indexOf(headerString)
-    }
 
-    func checkedExtractingPredicatesArray(arrayToCheck:ArrayOfPredicatesForExtracting)->ArrayOfPredicatesForExtracting
-    {
-        var checkedArray = ArrayOfPredicatesForExtracting()
-        for var predicate in arrayToCheck
-        {
-            guard (self.csvDataModel.headers.indexOf(predicate.columnNameToMatch) == nil) else {checkedArray.append(predicate); continue}
-            predicate.columnNameToMatch = "⚠️ "+predicate.columnNameToMatch
-            checkedArray.append(predicate)
-        }
-        return checkedArray
-    }
-    
 }
 

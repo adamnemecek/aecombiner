@@ -21,6 +21,7 @@
 		C5772F651B7A09DC00C80DF7 /* GroupParametersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */; };
 		C587D34D1B7B592B00FA3854 /* ChartScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C587D34C1B7B592B00FA3854 /* ChartScene.sks */; };
 		C587D34F1B7B5E9400FA3854 /* ChartScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C587D34E1B7B5E9400FA3854 /* ChartScene.swift */; };
+		C5AC0A5E1BC2A3BB002625D1 /* CSVdata_Grouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC0A5D1BC2A3BB002625D1 /* CSVdata_Grouping.swift */; };
 		C5AC44E91B7E3B3400A6B06D /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC44E81B7E3B3400A6B06D /* ChartView.swift */; };
 		C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */; };
 		C5CBBC3C1B3C0BFA008FB844 /* RecodeColumnViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */; };
@@ -55,6 +56,7 @@
 		C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GroupParametersViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		C587D34C1B7B592B00FA3854 /* ChartScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ChartScene.sks; sourceTree = "<group>"; };
 		C587D34E1B7B5E9400FA3854 /* ChartScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartScene.swift; sourceTree = "<group>"; };
+		C5AC0A5D1BC2A3BB002625D1 /* CSVdata_Grouping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVdata_Grouping.swift; sourceTree = "<group>"; };
 		C5AC44E81B7E3B3400A6B06D /* ChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		C5CBBC341B3C0BFA008FB844 /* aecombiner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aecombiner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5CBBC381B3C0BFA008FB844 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 				8E55A3D91BAF2C6700F6D41D /* GlobalFunctions.swift */,
 				C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */,
 				8E10726D1B40768D00E4E409 /* CSVdata.swift */,
+				C5AC0A5D1BC2A3BB002625D1 /* CSVdata_Grouping.swift */,
 				C587D34C1B7B592B00FA3854 /* ChartScene.sks */,
 				C5CBBC371B3C0BFA008FB844 /* Supporting Files */,
 			);
@@ -247,6 +250,7 @@
 				8E55A3DA1BAF2C6700F6D41D /* GlobalFunctions.swift in Sources */,
 				C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */,
 				8E2F39951BB708C900B69564 /* ColumnSortingChartingViewController.swift in Sources */,
+				C5AC0A5E1BC2A3BB002625D1 /* CSVdata_Grouping.swift in Sources */,
 				8E69F3111B67DA4100BDB720 /* CSVdataWindowController.swift in Sources */,
 				C587D34F1B7B5E9400FA3854 /* ChartScene.swift in Sources */,
 				8E77E8EC1B8B2DB800A0D46F /* ChartViewController.swift in Sources */,

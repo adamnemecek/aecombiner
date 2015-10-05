@@ -45,6 +45,7 @@ class CSVdata {
     var processedDataOK:Bool// = false
     var name:String// = ""
     
+    // MARK: - Init
     init()
     {
         self.headers = StringsArray1D()
@@ -82,29 +83,38 @@ class CSVdata {
         self.importTABstring(dataAsString: stringTAB, name:name)
     }
     
-    func appendThisRowToColumnsInArray(inout arrayOfColumns arrayOfColumns:StringsMatrix2D, rowArray:StringsArray1D)
+    // MARK: - CLASS
+    // MARK: - PVB Params
+    
+    class func newParamValueBool(param param: String)->StringsArray1D
     {
-        switch arrayOfColumns.count
-        {
-        case 0: //we have to initiate things. use the headers,  put in the array for now
-            self.headers = rowArray
-            for col in 0..<rowArray.count
-            {
-                arrayOfColumns.append([rowArray[col]])
-            }
-
-        default:
-            for col in 0..<rowArray.count
-            {
-                arrayOfColumns[col].append(rowArray[col])
-            }
-        }
-        
+        return [param,"",String(NSOnState)]
     }
     
+    class func booleanFromParamArray(param param:StringsArray1D)->Bool{
+        return NSCellStateValue(param[kParametersArray_BooleanIndex]) == NSOnState
+    }
     
+    class func paramsDictFromParamsArray(paramsArray:StringsMatrix2D)->ParamsDictionary
+    {
+        //make a temporary dictionary
+        var paramsDict = ParamsDictionary()
+        for paramNameValueBool in paramsArray where self.booleanFromParamArray(param: paramNameValueBool)
+        {
+            paramsDict[paramNameValueBool[kParametersArray_ParametersIndex]] = paramNameValueBool[kParametersArray_ValueIndex]
+        }
+        
+        //need to strip out kStringEmpty
+        let blankval = paramsDict.removeValueForKey(kStringEmpty)
+        if blankval != nil
+        {
+            paramsDict[""] = blankval
+        }
+        return paramsDict
+    }
     
-    
+
+    // MARK: - New Column
     class func columnWithUniqueIdentifierAndTitle(title:String)->NSTableColumn
     {
         let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
@@ -113,6 +123,48 @@ class CSVdata {
         
         return col
     }
+
+    // MARK: - Data Matrix manipulation
+    class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:StringsMatrix2D)->StringsMatrix2D
+    {
+        guard datamatrix.count  > 0 else {return StringsMatrix2D()}
+        
+        let numCols = datamatrix.count
+        let numRows = datamatrix[0].count
+        var extractedRows = StringsMatrix2D()
+        for rowIndex in rows
+        {
+            guard rowIndex<numRows else {continue}
+            var tempRow = StringsArray1D()
+            for colIndex in 0..<numCols
+            {
+                tempRow.append(datamatrix[colIndex][rowIndex])
+            }
+            extractedRows.append(tempRow)
+        }
+        
+        return extractedRows
+    }
+    
+
+    class func dataMatrixWithNoBlanksFromSet(var set set:SetOfStrings)->StringsMatrix2D
+    {
+        if set.remove("") != nil
+        {
+            set.insert(kStringEmpty)
+        }
+        
+        var subArray = Array(set)
+        
+        var matrix = StringsMatrix2D()
+        for row in 0..<subArray.count
+        {
+            matrix.append(CSVdata.newParamValueBool(param: subArray[row]))
+        }
+        
+        return matrix
+    }
+    
 
     
     class func removeHeadersFromColumnArray(inout arrayOfColumns arrayOfColumns:StringsMatrix2D)
@@ -124,6 +176,9 @@ class CSVdata {
 
     }
     
+    // MARK: - INSTANCE
+    // MARK: - Import Export
+
     func postProcessCSVdataMatrix(inout arrayOfColumns arrayOfColumns:StringsMatrix2D)
     {
         CSVdata.removeHeadersFromColumnArray(arrayOfColumns: &arrayOfColumns)
@@ -149,12 +204,12 @@ class CSVdata {
                     subStrings[substringIndex] = subStrings[substringIndex].stringByReplacingOccurrencesOfString(commaDelimiter, withString: commaReplacement)
                 }
                 let newRow = (subStrings.joinWithSeparator(quotationMarksReplacement).componentsSeparatedByString(commaDelimiter))
-                self.appendThisRowToColumnsInArray(arrayOfColumns: &arrayOfColumnArrays , rowArray: newRow)
+                self.appendThisRowToCSVdata(arrayOfColumns: &arrayOfColumnArrays , rowArray: newRow)
             }
             else
             {
                 let newRow = (line.componentsSeparatedByString(commaDelimiter))
-                self.appendThisRowToColumnsInArray(arrayOfColumns: &arrayOfColumnArrays , rowArray: newRow)
+                self.appendThisRowToCSVdata(arrayOfColumns: &arrayOfColumnArrays , rowArray: newRow)
           }
         })
         if arrayOfColumnArrays.count > 0
@@ -170,7 +225,7 @@ class CSVdata {
         dataAsString.enumerateLinesUsingBlock({ (line, okay) -> Void in
             // we dont check for tabs inside quotes
             let newRow = (line.componentsSeparatedByString(tabDelimiter))
-            self.appendThisRowToColumnsInArray(arrayOfColumns: &arrayOfColumnArrays , rowArray: newRow)
+            self.appendThisRowToCSVdata(arrayOfColumns: &arrayOfColumnArrays , rowArray: newRow)
         })
         if arrayOfColumnArrays.count > 0
         {
@@ -202,6 +257,7 @@ class CSVdata {
         return fileString.dataUsingEncoding(NSUTF8StringEncoding)
     }
 
+    // MARK: - Extract Rows
     func extractTheseRowsFromSelfAsCSVdata(rows rows:NSIndexSet)->CSVdata
     {
         guard self.numberOfColumnsInData() > 0 else {return CSVdata()}
@@ -210,28 +266,8 @@ class CSVdata {
         return CSVdata(headers: self.headers, csvdata: extractedRows, name:"")
     }
         
-    class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:StringsMatrix2D)->StringsMatrix2D
-    {
-        guard datamatrix.count  > 0 else {return StringsMatrix2D()}
-        
-        let numCols = datamatrix.count
-        let numRows = datamatrix[0].count
-        var extractedRows = StringsMatrix2D()
-        for rowIndex in rows
-        {
-            guard rowIndex<numRows else {continue}
-            var tempRow = StringsArray1D()
-            for colIndex in 0..<numCols
-            {
-                tempRow.append(datamatrix[colIndex][rowIndex])
-            }
-            extractedRows.append(tempRow)
-        }
-
-        return extractedRows
-    }
     
-    
+    // MARK: - Extract From Column
     func setOfParametersFromColumn(fromColumn columnIndex:Int, replaceBlank:Bool)->SetOfStrings?
     {
         guard let validCI = self.validatedColumnIndex(columnIndex) else {return nil}
@@ -267,28 +303,6 @@ class CSVdata {
         return set.count == 0 ? nil : CSVdata.dataMatrixWithNoBlanksFromSet(set: set)
     }
     
-    class func dataMatrixWithNoBlanksFromSet(var set set:SetOfStrings)->StringsMatrix2D
-    {
-        if set.remove("") != nil
-        {
-            set.insert(kStringEmpty)
-        }
-
-        var subArray = Array(set)
-        
-        var matrix = StringsMatrix2D()
-        for row in 0..<subArray.count
-        {
-            matrix.append(CSVdata.makeParamValueBool(param: subArray[row]))
-        }
-        
-        return matrix
-    }
-    
-    class func makeParamValueBool(param param: String)->StringsArray1D
-    {
-        return [param,"",String(NSOnState)]
-    }
     
     func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->SetOfStrings?
     {
@@ -310,30 +324,47 @@ class CSVdata {
         return set.count == 0 ? nil : set
     }
 
-    class func doRecodeThisParam(param param:StringsArray1D)->Bool{
-        return NSCellStateValue(param[kParametersArray_BooleanIndex]) == NSOnState
-    }
-    
-    class func createParamsDictFromParamsArray(paramsArray:StringsMatrix2D)->ParamsDictionary
+    // MARK: - Add to Column
+    func appendThisRowToCSVdata(inout arrayOfColumns arrayOfColumns:StringsMatrix2D, rowArray:StringsArray1D)
     {
-        //make a temporary dictionary
-        var paramsDict = ParamsDictionary()
-        for paramNameValueBool in paramsArray where self.doRecodeThisParam(param: paramNameValueBool)
+        switch arrayOfColumns.count
         {
-            paramsDict[paramNameValueBool[kParametersArray_ParametersIndex]] = paramNameValueBool[kParametersArray_ValueIndex]
+        case 0: //we have to initiate things.
+            self.headers = rowArray
+            for col in 0..<rowArray.count
+            {
+                arrayOfColumns.append([rowArray[col]])
+            }
+            
+        default:
+            for col in 0..<rowArray.count
+            {
+                arrayOfColumns[col].append(rowArray[col])
+            }
         }
         
-        //need to strip out kStringEmpty
-        let blankval = paramsDict.removeValueForKey(kStringEmpty)
-        if blankval != nil
-        {
-            paramsDict[""] = blankval
-        }
-        return paramsDict
     }
     
+    class func appendThisStringsArray1DToStringsMatrix2D(inout matrix2DToBeAppendedTo matrix2DToBeAppendedTo:StringsMatrix2D, array1DToAppend:StringsArray1D)
+    {
+        switch matrix2DToBeAppendedTo.count
+        {
+        case 0: //we have to initiate things.
+            for col in 0..<array1DToAppend.count
+            {
+                matrix2DToBeAppendedTo.append([array1DToAppend[col]])
+            }
+            
+        default:
+            for col in 0..<array1DToAppend.count
+            {
+                matrix2DToBeAppendedTo[col].append(array1DToAppend[col])
+            }
+        }
+        
+    }
 
-    // MARK: - Headers
+    // MARK: - Column Statistics
     func validatedColumnIndex(columnIndex:Int)->Int?
     {
         guard
@@ -365,6 +396,7 @@ class CSVdata {
         // just hope all cols same length
     }
     
+    // MARK: - Header Names
     func headerStringsForAllColumns()->[String]
     {
         return self.headers
@@ -388,7 +420,7 @@ class CSVdata {
         return self.headers.indexOf(headerString)
     }
     
-    func checkedExtractingPredicatesArray(arrayToCheck:ArrayOfPredicatesForExtracting)->ArrayOfPredicatesForExtracting
+    func extractedPredicatesArrayWithMissingColumnNamesHighlighted(arrayToCheck:ArrayOfPredicatesForExtracting)->ArrayOfPredicatesForExtracting
     {
         var checkedArray = ArrayOfPredicatesForExtracting()
         for var predicate in arrayToCheck
@@ -400,6 +432,7 @@ class CSVdata {
         return checkedArray
     }
 
+    // MARK: - Table View
     func cellForHeadersTable(tableView tableView: NSTableView, row: Int) ->NSTableCellView
     {
         let cellView = tableView.makeViewWithIdentifier("headersCell", owner: self) as! NSTableCellView
@@ -407,6 +440,7 @@ class CSVdata {
         return cellView
     }
 
+    // MARK: - Data Access
     func stringValueForCell(fromColumn fromColumn:Int, atRow:Int)->String
     {
         guard
@@ -419,167 +453,5 @@ class CSVdata {
     }
     
 
-    // MARK: - Grouping Combining
-    class func groupStartValueForString(groupMethod:String) -> Double
-    {
-        switch groupMethod
-        {
-        case kGroupAddition, kGroupLogSum, kGroupCount, kGroupMean, kGroupGeoMean, kGroupMax:
-            return 0.0
-        case kGroupMin:
-            return Double(Int.max)
-        case kGroupMultiplication:
-            return 1.0
-        default:
-            return 0.0
-        }
-        
-    }
-    
-    func nameForColumnsUsingGroupMethod(columnIndexesToGroup columnIndexesToGroup: NSIndexSet, groupMethod:String)->String
-    {
-        //join col names to make a mega name for the combination
-        //make an array first
-        var namesOfCombinedColumn = StringsArray1D()
-        for columnIndex in columnIndexesToGroup
-        {
-            namesOfCombinedColumn.append(self.headers[columnIndex])
-        }
-        //join the array members with the correct maths symbol
-        var nameOfNewColumn:String = ""
-        switch groupMethod
-        {
-        case kGroupAddition:
-            nameOfNewColumn = "Sum("+namesOfCombinedColumn.joinWithSeparator("+")+")"
-        case kGroupLogSum:
-            nameOfNewColumn = "Log Sum("+namesOfCombinedColumn.joinWithSeparator("+")+")"
-        case kGroupMultiplication:
-            nameOfNewColumn = "Product("+namesOfCombinedColumn.joinWithSeparator("*")+")"
-        case kGroupCount:
-            nameOfNewColumn = "Count("+namesOfCombinedColumn.joinWithSeparator("_")+")"
-        case kGroupMean:
-            nameOfNewColumn = "Mean("+namesOfCombinedColumn.joinWithSeparator("+")+")"
-        case kGroupGeoMean:
-            nameOfNewColumn = "GeoMean("+namesOfCombinedColumn.joinWithSeparator("_")+")"
-        case kGroupMin:
-            nameOfNewColumn = "Min("+namesOfCombinedColumn.joinWithSeparator("_")+")"
-        case kGroupMax:
-            nameOfNewColumn = "Max("+namesOfCombinedColumn.joinWithSeparator("_")+")"
-        case kGroupRange:
-            nameOfNewColumn = "Range("+namesOfCombinedColumn.joinWithSeparator("_")+")"
-        case kGroupLogRange:
-            nameOfNewColumn = "Log Range("+namesOfCombinedColumn.joinWithSeparator("_")+")"
-        case kGroupAllStats:
-            nameOfNewColumn = namesOfCombinedColumn.joinWithSeparator("_")
-        default:
-            nameOfNewColumn = namesOfCombinedColumn.joinWithSeparator("?")
-        }
-        return nameOfNewColumn
-    }
-
-    func combinedColumnForMeansAndNewColumnName(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:StringsArray1D , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:StringsMatrix2D, nameOfColumn:String)
-    {
-        let groupStartValue = CSVdata.groupStartValueForString(groupMethod)
-        //create a dict with the keys the params we extracted for grouping
-        //make a blank array to hold the values associated with the grouping for each member of the group
-        var valuesForGroup = [String : (total:Double, count:Double)]()
-        var rangesForGroup = [String : (minm:Double, maxm:Double)]()
-        switch groupMethod
-        {
-        case kGroupMean, kGroupGeoMean:
-            for parameter in arrayOfParamatersInGroup
-            {
-                valuesForGroup[parameter] = (groupStartValue,0.0)
-            }
-        case kGroupRange, kGroupLogRange:
-            for parameter in arrayOfParamatersInGroup
-            {
-                rangesForGroup[parameter] = (CSVdata.groupStartValueForString(kGroupMin),CSVdata.groupStartValueForString(kGroupMax))
-            }
-        default:
-            break
-        }
-        
-        for row in 0..<self.numberOfRowsInData()
-        {
-            let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row)
-            for columnIndexInGroup in columnIndexesToGroup
-            {
-                let rowValS = self.stringValueForCell(fromColumn: columnIndexInGroup, atRow: row)
-                switch groupMethod
-                {
-                case kGroupRange, kGroupLogRange:
-                    guard let running = rangesForGroup[paramID],
-                        let value = Double(rowValS) else {continue}
-                    rangesForGroup[paramID] = (fmin(running.minm, value), fmax(running.maxm,value))
-                case kGroupMean:
-                    guard let running = valuesForGroup[paramID],
-                        let value = Double(rowValS) else {continue}
-                    valuesForGroup[paramID] = (running.total + value, running.count + 1.0)
-                case kGroupGeoMean:
-                    guard let running = valuesForGroup[paramID],
-                        let  value = Double(rowValS) where value > 0 else {continue} //geo mean cannot handle negative numbers
-                    valuesForGroup[paramID] = (running.total +  log(value), running.count + 1.0)
-                default:
-                    break
-                }
-            }
-        }
-        
-        //reprocess dict with the calculated value
-        var processedDict = [String : Double]()
-        
-        switch groupMethod
-        {
-        case kGroupRange:
-            for (key,value) in rangesForGroup
-            {
-                processedDict[key] = value.maxm-value.minm
-            }
-        case kGroupLogRange:
-            for (key,value) in rangesForGroup
-            {
-                if value.maxm-value.minm > 0
-                {
-                    processedDict[key] = log(value.maxm-value.minm)
-                }
-                else
-                {
-                    processedDict[key] = kSubstituteValueForZeroInLogarithm // arbitrary value - log in user guide
-                }
-                
-            }
-        case kGroupMean, kGroupGeoMean:
-            for (key,value) in valuesForGroup
-            {
-                switch groupMethod
-                {
-                case kGroupMean:
-                    processedDict[key] = value.total/value.count
-                case kGroupGeoMean:
-                    processedDict[key] = exp(value.total/value.count)
-                default:
-                    break
-                }
-            }
-        default:
-            break
-        }
-        
-        
-        let nameOfNewColumn = self.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: groupMethod)
-        
-        //createTheCSVdata
-        var csvDataData = StringsMatrix2D()
-        for (parameter,value) in processedDict
-        {
-            csvDataData.append([parameter, String(value)])
-        }
-        
-        return NamedDataMatrix(matrix:csvDataData, name:nameOfNewColumn)
-        
-    }
-
-    
     
 }

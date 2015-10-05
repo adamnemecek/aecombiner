@@ -89,7 +89,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     }
     
     @IBAction func loadPredicates(sender: NSButton) {
-        guard let csvdatavc = self.associatedCSVdataDocument else {return}
+        guard let csvdata = self.associatedCSVdataDocument?.csvDataModel else {return}
         let sp = NSOpenPanel()
         sp.allowsMultipleSelection = false
         sp.canChooseDirectories = false
@@ -98,7 +98,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
         {
             guard  sp.URLs.count>0 else {return}
             guard  let newgpa = PredicateForExtracting.loadExtractingPredicatesArrayFromURL(url: sp.URLs[0]) else {return}
-            self.arrayPredicates = csvdatavc.checkedExtractingPredicatesArray(newgpa)
+            self.arrayPredicates = csvdata.extractedPredicatesArrayWithMissingColumnNamesHighlighted(newgpa)
             self.updateTableViewSelectedColumnAndParameters()
         }
     }
@@ -124,7 +124,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     // MARK: - header Popups
     func populateHeaderPopups()
     {
-        guard let csvdo = self.associatedCSVdataDocument else { return}
+        guard let csvdo = self.associatedCSVdataDocument?.csvDataModel else { return}
         
         self.popupParameterToChart.removeAllItems()
         self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
@@ -392,7 +392,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     
     func addColumnAndSelectedParameter(arrayIdentifier: String)
     {
-        guard let csvdo = self.associatedCSVdataDocument else {return}
+        guard let csvdo = self.associatedCSVdataDocument?.csvDataModel else {return}
         let columnIndex: Int
         let parameterRows: NSIndexSet
         let arrayParamsToUse: StringsMatrix2D

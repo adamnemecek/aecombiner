@@ -61,7 +61,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
    func columnsClearAndRebuild(){
         
         self.associatedCSVdataDocument.columnsClearAndRebuild(self.tvCSVdata)
-        self.labelNumRows.stringValue = String(self.associatedCSVdataDocument.numberOfRowsOfData())
+        self.labelNumRows.stringValue = String(self.associatedCSVdataDocument.csvDataModel.numberOfRowsInData())
     }
     
     func renameColumnAtIndex(columnIndex: Int, newName:String)
@@ -127,7 +127,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         switch tvidentifier
         {
         case "tvCSVdata":
-            return self.associatedCSVdataDocument.numberOfRowsOfData()
+            return self.associatedCSVdataDocument.csvDataModel.numberOfRowsInData()
         default:
             return 0
         }
