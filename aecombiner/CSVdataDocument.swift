@@ -139,14 +139,6 @@ class CSVdataDocument: NSDocument {
         
     }
     
-    func exportDataTabDelimitedTo(fileURL fileURL:NSURL?)
-    {
-        guard let theURL = fileURL else {return}
-        let data = self.csvDataModel.processCSVtoData(delimiter: tabDelimiter)
-        guard let okData = data else {return}
-        
-        okData.writeToURL(theURL, atomically: true)
-    }
 
     // MARK: - CSVdataViewController
 
@@ -176,7 +168,7 @@ class CSVdataDocument: NSDocument {
         }
         for c in 0..<self.csvDataModel.numberOfColumnsInData()
         {
-            tvCSVdata.addTableColumn(CSVdata.columnWithUniqueIdentifierAndTitle(self.csvDataModel.headerStringForColumnIndex(c)))
+            tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(self.csvDataModel.headerStringForColumnIndex(c)))
         }
         tvCSVdata.reloadData()
     }

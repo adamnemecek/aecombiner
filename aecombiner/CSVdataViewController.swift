@@ -66,49 +66,48 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     
     func renameColumnAtIndex(columnIndex: Int, newName:String)
     {
-        guard columnIndex >= 0 && !newName.isEmpty else {return}
-        self.associatedCSVdataDocument.csvDataModel.renameColumnAtIndex(columnIndex: columnIndex, newName:newName)
+        guard
+            self.associatedCSVdataDocument.csvDataModel.renamedColumnAtIndex(columnIndex: columnIndex, newName:newName)
+            else {return}
         self.tvCSVdata.tableColumns[columnIndex].title = newName
         self.tvCSVdata.reloadData()
     }
 
-    func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
+    func recodedColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)->Bool
     {
-        self.associatedCSVdataDocument.csvDataModel.recodeColumnInSitu(columnToRecode: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
+        guard
+            self.associatedCSVdataDocument.csvDataModel.recodedColumnInSitu(columnToRecode: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
+            else {return false}
         self.tvCSVdata.reloadData()
         self.tvCSVdata.scrollColumnToVisible(columnIndex)
+        return true
     }
     
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
+    func addedRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)->Bool
     {
-        self.associatedCSVdataDocument.csvDataModel.addRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
-        
+        guard
+        self.associatedCSVdataDocument.csvDataModel.addedRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
+        else {return false}
         //Safe to add column to table now
-        self.tvCSVdata.addTableColumn(CSVdata.columnWithUniqueIdentifierAndTitle(title))
+        self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(title))
         self.tvCSVdata.reloadData()
         self.tvCSVdata.scrollColumnToVisible(self.tvCSVdata.numberOfColumns-1)
         self.documentMakeDirty()
+        return true
     }
     
-    func deleteColumnAtIndex(columnIndex: Int)
+    func deletedColumnAtIndex(columnIndex: Int)->Bool
     {
-        guard self.associatedCSVdataDocument.csvDataModel.deletedColumnAtIndex(columnIndex) else {return}
+        guard self.associatedCSVdataDocument.csvDataModel.deletedColumnAtIndex(columnIndex) else {return false}
         
         //Safe to delete column to table now
         self.tvCSVdata.removeTableColumn(self.tvCSVdata.tableColumns[columnIndex])
         self.tvCSVdata.reloadData()
         self.documentMakeDirty()
-
+        return true
     }
     
     
-    func addColumnWithIdentifier(notification: NSNotification)
-    {
-        guard let title = notification.object as? String else {return}
-        self.tvCSVdata.addTableColumn(CSVdata.columnWithUniqueIdentifierAndTitle(title))
-        self.tvCSVdata.reloadData()
-        self.tvCSVdata.scrollColumnToVisible(self.tvCSVdata.numberOfColumns-1)
-    }
 
 
     // MARK: - TableView overrides
@@ -146,10 +145,14 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
             // Set the stringValue of the cell's text field to the nameArray value at row
             let colIndex = tableView.columnWithIdentifier((tableColumn?.identifier)!)
-            cellView.textField!.stringValue = self.associatedCSVdataDocument.csvDataModel.stringValueForCell(fromColumn: colIndex, atRow: row)
+            let valS = self.associatedCSVdataDocument.csvDataModel.stringValueForCell(fromColumn: colIndex, atRow: row)
+            if valS != nil
+            {
+                cellView.textField!.stringValue = valS!
+            }
             
         default:
-            break;
+            break
         }
         
         

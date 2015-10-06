@@ -83,17 +83,13 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     }
     
     @IBAction func checkBoxToggleRecodeStatusTapped(sender: NSButton) {
-        self.toggleExtractedParametersArrayrecodeStatus(sender.state)
-    }
-    
-    func toggleExtractedParametersArrayrecodeStatus(state:NSCellStateValue)
-    {
         for row in 0..<self.arrayExtractedParameters.count
         {
-            self.arrayExtractedParameters[row][kParametersArray_BooleanIndex] = String(state)
+            self.arrayExtractedParameters[row][kParametersArray_BooleanIndex] = String(sender.state)
         }
         self.tvExtractedParametersSingle.reloadData()
     }
+    
     
     // MARK: - overrides
 
@@ -307,9 +303,6 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         
     }
     
-    
-    
-    
     func extractParametersIntoSetFromColumn()
     {
         //called from Process menu
@@ -331,11 +324,12 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         //give a name if none
         let colTitle = self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(columnIndex) : self.textFieldColumnRecodedName!.stringValue
 
-        //pass it over
-        csvdVC.addRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState)
-        
+        guard
+            //pass it over
+            csvdVC.addedRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState)
+        else { return}
+
         //reload etc
-        
         self.resetExtractedParameters(andPopupHeaders: true)
         
     }
@@ -347,14 +341,15 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
             let csvdo = self.associatedCSVmodel,
             let csvdVC = self.associatedCSVdataViewController,
             let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
-            else {return}
+        else {return}
+
+        guard
+            //pass it over
+            csvdVC.recodedColumnInSitu(columnToRecode:columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState) == true
+        else { return}
 
         
-        //pass it over
-        csvdVC.recodeColumnInSitu(columnToRecode:columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState)
-        
         //reload etc
-        
         self.resetExtractedParameters(andPopupHeaders: true)
         
     }

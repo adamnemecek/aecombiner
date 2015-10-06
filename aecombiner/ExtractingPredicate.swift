@@ -84,7 +84,18 @@ struct PredicateForExtracting: Comparable
         return self.extractExtractingPredicatesArrayFromNSArray(array)
     }
     
-    
+    static func createArrayFromExtractedParametersToGroup(params params:StringsMatrix2D)->StringsArray1D
+    {
+        //create an array with the keys the params we extracted for grouping
+        var arrayOfExtractedParametersToGroupBy = StringsArray1D()
+        for parameter in params
+        {
+            arrayOfExtractedParametersToGroupBy.append(parameter[kParametersArray_ParametersIndex])
+        }
+        return arrayOfExtractedParametersToGroupBy
+        
+    }
+
 }
 //you implement == type at GLOBAL level not within the body of the struct!!!
 func ==(lhs: PredicateForExtracting, rhs: PredicateForExtracting) -> Bool {

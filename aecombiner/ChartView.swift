@@ -14,7 +14,24 @@ enum ChartCursorStates:Int {
     case ZoomOut
     case Hand
     case Crosshair
-    
+
+    static func cursorForChartCursorState(state state:ChartCursorStates)->NSCursor
+    {
+        switch state
+        {
+        case .Hand:
+            return NSCursor.openHandCursor()
+        case .Crosshair:
+            return NSCursor.crosshairCursor()
+        case .ZoomIn:
+            return NSCursor(image: NSImage(named: kButtonName_ZoomIn)!, hotSpot: CGPoint(x: 6.0, y: 6.0))
+        case .ZoomOut:
+            return NSCursor(image: NSImage(named: kButtonName_ZoomOut)!, hotSpot: CGPoint(x: 6.0, y: 6.0))
+            /*default:
+            return NSCursor.arrowCursor()*/
+        }
+    }
+
 }
 
 class ChartView: SKView {
@@ -57,7 +74,7 @@ class ChartView: SKView {
 
     override func mouseEntered(theEvent: NSEvent) {
         super.mouseEntered(theEvent)
-        self.cursorForChartCursorState(state: self.chartCursorState).set()
+        ChartCursorStates.cursorForChartCursorState(state: self.chartCursorState).set()
     }
     
     override func mouseExited(theEvent: NSEvent) {
@@ -80,22 +97,6 @@ class ChartView: SKView {
         }
     }
 
-    func cursorForChartCursorState(state state:ChartCursorStates)->NSCursor
-    {
-        switch state
-        {
-        case .Hand:
-            return NSCursor.openHandCursor()
-        case .Crosshair:
-            return NSCursor.crosshairCursor()
-        case .ZoomIn:
-            return NSCursor(image: NSImage(named: kButtonName_ZoomIn)!, hotSpot: CGPoint(x: 6.0, y: 6.0))
-        case .ZoomOut:
-            return NSCursor(image: NSImage(named: kButtonName_ZoomOut)!, hotSpot: CGPoint(x: 6.0, y: 6.0))
-            /*default:
-            return NSCursor.arrowCursor()*/
-        }
-    }
     
     
     // MARK: - Charts

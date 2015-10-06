@@ -11,6 +11,7 @@ import Cocoa
 class CSVdataWindowController: NSWindowController {
 
 
+
     // MARK: - @IBActions
     
     @IBAction func exportTABpressed(sender: NSToolbarItem) {
@@ -36,13 +37,11 @@ class CSVdataWindowController: NSWindowController {
         types.append("txt")
         panel.allowedFileTypes = types
         panel.beginSheetModalForWindow(self.window!) { (result) -> Void in
-            if result == NSFileHandlingPanelOKButton
-            {
-                (self.document as? CSVdataDocument)?.exportDataTabDelimitedTo(fileURL: panel.URL)
-            }
+            guard
+                let datam = (self.document as? CSVdataDocument)?.csvDataModel
+                where result == NSFileHandlingPanelOKButton
+            else {return}
+            datam.exportDataTabDelimitedTo(fileURL: panel.URL)
         }
-        
     }
-
-    
 }

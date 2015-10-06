@@ -96,10 +96,12 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
         sp.allowedFileTypes = ["aePreds"]
         if sp.runModal() == NSFileHandlingPanelOKButton
         {
-            guard  sp.URLs.count>0 else {return}
-            guard  let newgpa = PredicateForExtracting.loadExtractingPredicatesArrayFromURL(url: sp.URLs[0]) else {return}
-            self.arrayPredicates = csvdata.extractedPredicatesArrayWithMissingColumnNamesHighlighted(newgpa)
-            self.updateTableViewSelectedColumnAndParameters()
+            if  sp.URLs.count>0
+            {
+                guard  let newgpa = PredicateForExtracting.loadExtractingPredicatesArrayFromURL(url: sp.URLs[0]) else {return}
+                self.arrayPredicates = csvdata.extractedPredicatesArrayWithMissingColumnNamesHighlighted(newgpa)
+                self.updateTableViewSelectedColumnAndParameters()
+            }
         }
     }
     
@@ -366,9 +368,9 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
 
         let matchStr = self.arrayColParams1[safeParam1Index][kParametersArray_ParametersIndex]
         guard
-            let set = csvdm.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn:columnToExtractIndex, matchString:matchStr, matchColumn:columnToMatchIndex)
+            let set = csvdm.dataMatrixOfParametersWithNoBlanksFromColumnIfStringMatchedInColumn(fromColumn:columnToExtractIndex, matchString:matchStr, matchColumn:columnToMatchIndex)
         else { return }
-        self.array2ColParams2 = CSVdata.dataMatrixWithNoBlanksFromSet(set: set)
+        self.array2ColParams2 = set
         self.tv2colParameters2.reloadData()
 
         

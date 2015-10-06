@@ -115,10 +115,10 @@ extension CSVdata
         
         for row in 0..<self.numberOfRowsInData()
         {
-            let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row)
+            guard let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row) else {continue}
             for columnIndexInGroup in columnIndexesToGroup
             {
-                let rowValS = self.stringValueForCell(fromColumn: columnIndexInGroup, atRow: row)
+                guard let rowValS = self.stringValueForCell(fromColumn: columnIndexInGroup, atRow: row) else {continue}
                 switch groupMethod
                 {
                 case kGroupRange, kGroupLogRange:
@@ -221,10 +221,10 @@ extension CSVdata
         
         for row in 0..<self.numberOfRowsInData()
         {
-            let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row)
+            guard let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row) else {continue}
             for columnIndexInGroup in columnIndexesToGroup
             {
-                let rowValS = self.stringValueForCell(fromColumn: columnIndexInGroup, atRow: row)
+               guard let rowValS = self.stringValueForCell(fromColumn: columnIndexInGroup, atRow: row) else {continue}
                switch groupMethod
                 {
                 case kGroupMin:
@@ -300,13 +300,18 @@ extension CSVdata
         
         for row in 0..<self.numberOfRowsInData()
         {
-            let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row)
+            guard let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row) else {continue}
             for columnIndexInGroup in columnIndexesToGroup
             {
-                let rowValS = self.stringValueForCell(fromColumn: columnIndexInGroup, atRow: row)
-                guard var running = statsForGroup[paramID] else {continue}
-                guard let value = Double(rowValS)
-                    else {running.skippedValues++; continue}
+                guard
+                    let rowValS = self.stringValueForCell(fromColumn: columnIndexInGroup, atRow: row),
+                    var running = statsForGroup[paramID]
+                else {continue}
+                
+                guard
+                    let value = Double(rowValS)
+                else {running.skippedValues++; continue}
+                
                 running.minm = fmin(running.minm, value)
                 running.maxm = fmax(running.maxm, value)
                 running.sum += value

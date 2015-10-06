@@ -40,7 +40,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     }
     
     @IBAction func groupAndChartTapped(sender: NSButton) {
-        self.groupAndChartData()
+        self.groupAndChartDataUsingSingleMethod()
         
     }
     
@@ -151,12 +151,14 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     
     override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
         guard let csvdata = self.associatedCSVdataDocument?.csvDataModel else {return}
+        
+        // 2 step as we use self.groupedDataAfterCombiningToUseForCharting
         let extractedDataMatrix = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: indexes, datamatrix: self.groupedDataAfterCombiningToUseForCharting)
         csvdata.createNewDocumentFromExtractedRows(cvsData: extractedDataMatrix, headers: self.headersExtractedDataModelForChart, name: nameOfDataSet)
     }
     
     
-    func groupAndChartData()
+    func groupAndChartDataUsingSingleMethod()
     {
         guard
             let groupMethod = self.popupGroupMethod.titleOfSelectedItem,
@@ -190,21 +192,10 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     
     
     
-    class func createArrayFromExtractedParametersToGroup(params params:StringsMatrix2D)->StringsArray1D
-    {
-        //create an array with the keys the params we extracted for grouping
-        var arrayOfExtractedParametersToGroupBy = StringsArray1D()
-        for parameter in params
-        {
-            arrayOfExtractedParametersToGroupBy.append(parameter[kParametersArray_ParametersIndex])
-        }
-        return arrayOfExtractedParametersToGroupBy
-
-    }
     
     func arrayOfExtractedParametersToGroupBy()->StringsArray1D
     {
-        return GroupParametersViewController.createArrayFromExtractedParametersToGroup(params:self.arrayColumnsToGroupTogether)
+        return PredicateForExtracting.createArrayFromExtractedParametersToGroup(params:self.arrayColumnsToGroupTogether)
     }
     
     

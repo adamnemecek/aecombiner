@@ -50,11 +50,11 @@ class ColumnsViewController: ColumnSortingChartingViewController {
         alert.addButtonWithTitle("Cancel")
         
         alert.beginSheetModalForWindow(self.view.window!) { (response) -> Void in
-            if response == NSAlertFirstButtonReturn
-            {
-                csdo.deleteColumnAtIndex(self.tvHeaders.selectedRow)
-                self.tvHeaders.reloadData()
-            }
+            guard
+                response == NSAlertFirstButtonReturn &&
+                csdo.deletedColumnAtIndex(self.tvHeaders.selectedRow)
+            else {return}
+            self.tvHeaders.reloadData()
         }
     }
     
@@ -88,7 +88,7 @@ class ColumnsViewController: ColumnSortingChartingViewController {
     // MARK: - TableView overrides
     
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let csvdo = self.associatedCSVmodel else { return 0 }
+        guard let csvdo = self.associatedCSVmodel else {return 0}
         
         switch tableView
         {
@@ -114,7 +114,7 @@ class ColumnsViewController: ColumnSortingChartingViewController {
             cellView = csvdatamodel.cellForHeadersTable(tableView: tableView, row: row)
             
         default:
-            break;
+            break
         }
         
         
@@ -133,14 +133,12 @@ class ColumnsViewController: ColumnSortingChartingViewController {
         default:
             break
         }
-        
     }
 
     func enableButtons(enabled enabled:Bool)
     {
         self.buttonModel?.enabled = enabled
         self.buttonTrash?.enabled = enabled
-        
     }
 
 }

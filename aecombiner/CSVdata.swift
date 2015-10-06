@@ -115,17 +115,16 @@ class CSVdata {
     
 
     // MARK: - Column
-    class func columnWithUniqueIdentifierAndTitle(title:String)->NSTableColumn
-    {
-        let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
-        col.title = title
-        col.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)
-        
-        return col
-    }
 
-    func numberOfColumnsInData()->Int{
-        return self.dataStringsMatrix2D.count
+    func notAnEmptyDataSet()->Bool
+    {
+        return self.numberOfRowsInData() > 0 && self.numberOfColumnsInData() > 0
+    }
+    
+    func numberOfColumnsInData()->Int
+    {
+        return self.headersStringsArray1D.count
+        //self.dataStringsMatrix2D.count
     }
     
     func validatedColumnIndex(columnIndex:Int)->Int?
@@ -140,89 +139,59 @@ class CSVdata {
     func deletedColumnAtIndex(index:Int)->Bool
     {
         guard let validindex = self.validatedColumnIndex(index) else {return false}
-        self.dataStringsMatrix2D.removeAtIndex(validindex)
+        for rowN in 0..<self.numberOfRowsInData()
+        {
+            self.dataStringsMatrix2D[rowN].removeAtIndex(validindex)
+        }
         //remove from headers array
         self.headersStringsArray1D.removeAtIndex(validindex)
         return true
         
     }
 
-    func addRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
+    func addedRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)->Bool
     {
-        guard let validCI = self.validatedColumnIndex(columnIndex) else {return}
+        guard let validCI = self.validatedColumnIndex(columnIndex) else {return false}
         
         //make a temporary dictionary
         var paramsDict = CSVdata.paramsDictFromParamsArray(paramsArray)
-        var newColumn = StringsArray1D()
         // must add the column to Array BEFORE adding column to table
-        for row in 0..<self.dataStringsMatrix2D[validCI].count
+        for row in 0..<self.numberOfRowsInData()
         {
             //ADD CORRECT PARAMETER AFTER LOOKUP
-            let existingValue = self.dataStringsMatrix2D[validCI][row]
+            let existingValue = self.dataStringsMatrix2D[row][validCI]
             // use ?? to ask if lookup gives nil use alternative or if not nil use the lookup. if nil ask if clear or keep existing based on copyUnmatchedValues
             let recodedValue = paramsDict[existingValue] ?? (copyUnmatchedValues == true ? existingValue : "")
-            newColumn.append(recodedValue)
+            //add new column
+           self.dataStringsMatrix2D[row].append(recodedValue)
         }
-        //add new column
-        self.dataStringsMatrix2D.append(newColumn)
         //add name to headers array
         self.headersStringsArray1D.append(title)
+        return true
     }
     
-    func recodeColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)
+    func recodedColumnInSitu(columnToRecode columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)->Bool
     {
-        guard let validCI = self.validatedColumnIndex(columnIndex) else {return}
+        guard let validCI = self.validatedColumnIndex(columnIndex) else {return false}
         //make a temporary dictionary
         var paramsDict = CSVdata.paramsDictFromParamsArray(paramsArray)
         
-        for row in 0..<self.dataStringsMatrix2D[validCI].count
+        for row in 0..<self.numberOfRowsInData()
         {
             //ovewrite CORRECT PARAMETER AFTER LOOKUP or skip
-            let existingValue = self.dataStringsMatrix2D[validCI][row]
+            let existingValue = self.dataStringsMatrix2D[row][validCI]
             // use ?? to ask if lookup gives nil use alternative or if not nil use the lookup. if nil ask if clear or keep existing based on copyUnmatchedValues
-            self.dataStringsMatrix2D[validCI][row] = paramsDict[existingValue] ?? (copyUnmatchedValues == true ? existingValue : "")
+            self.dataStringsMatrix2D[row][validCI] = paramsDict[existingValue] ?? (copyUnmatchedValues == true ? existingValue : "")
             
         }
-        
+        return true
     }
     
     // MARK: - Add to Column
-    func appendThisRowToCSVdata(inout arrayOfColumns arrayOfColumns:StringsMatrix2D, rowArray:StringsArray1D)
-    {
-        switch arrayOfColumns.count
-        {
-        case 0: //we have to initiate things.
-            self.headersStringsArray1D = rowArray
-            for col in 0..<rowArray.count
-            {
-                arrayOfColumns.append([rowArray[col]])
-            }
-            
-        default:
-            for col in 0..<rowArray.count
-            {
-                arrayOfColumns[col].append(rowArray[col])
-            }
-        }
-        
-    }
     
     class func appendThisStringsArray1DToStringsMatrix2D(inout matrix2DToBeAppendedTo matrix2DToBeAppendedTo:StringsMatrix2D, array1DToAppend:StringsArray1D)
     {
-        switch matrix2DToBeAppendedTo.count
-        {
-        case 0: //we have to initiate things.
-            for col in 0..<array1DToAppend.count
-            {
-                matrix2DToBeAppendedTo.append([array1DToAppend[col]])
-            }
-            
-        default:
-            for col in 0..<array1DToAppend.count
-            {
-                matrix2DToBeAppendedTo[col].append(array1DToAppend[col])
-            }
-        }
+        matrix2DToBeAppendedTo.append(array1DToAppend)
         
     }
     
@@ -248,7 +217,7 @@ class CSVdata {
     }
     
 
-    
+/*
     class func removeHeadersFromColumnArray(inout arrayOfColumns arrayOfColumns:StringsMatrix2D)
     {
         for col in 0..<arrayOfColumns.count
@@ -257,16 +226,19 @@ class CSVdata {
         }
 
     }
-    
+ */
     // MARK: - INSTANCE
     // MARK: - Import Export
 
-    func postProcessCSVdataMatrix(inout arrayOfColumns arrayOfColumns:StringsMatrix2D)
+    func postProcessCSVdataMatrix(var arrayOfColumns arrayOfColumns:StringsMatrix2D, name:String)
     {
-        CSVdata.removeHeadersFromColumnArray(arrayOfColumns: &arrayOfColumns)
+        guard arrayOfColumns.count > 0 else {return}
+        
+        self.headersStringsArray1D = arrayOfColumns.removeAtIndex(0)
         self.dataStringsMatrix2D = arrayOfColumns
         self.processedDataOK = true
-    }
+        self.name = name
+   }
     
     func importCSVstring(dataAsString dataAsString:NSString, name:String)
     {
@@ -286,19 +258,16 @@ class CSVdata {
                     subStrings[substringIndex] = subStrings[substringIndex].stringByReplacingOccurrencesOfString(commaDelimiter, withString: commaReplacement)
                 }
                 let newRow = (subStrings.joinWithSeparator(quotationMarksReplacement).componentsSeparatedByString(commaDelimiter))
-                self.appendThisRowToCSVdata(arrayOfColumns: &arrayOfColumnArrays , rowArray: newRow)
+                arrayOfColumnArrays.append(newRow)
             }
             else
             {
                 let newRow = (line.componentsSeparatedByString(commaDelimiter))
-                self.appendThisRowToCSVdata(arrayOfColumns: &arrayOfColumnArrays , rowArray: newRow)
+                arrayOfColumnArrays.append(newRow)
           }
         })
-        if arrayOfColumnArrays.count > 0
-        {
-            self.postProcessCSVdataMatrix(arrayOfColumns: &arrayOfColumnArrays)
-            self.name = name
-        }
+        
+        self.postProcessCSVdataMatrix(arrayOfColumns: arrayOfColumnArrays, name: name)
     }
     
     func importTABstring(dataAsString dataAsString:NSString, name:String)
@@ -307,55 +276,55 @@ class CSVdata {
         dataAsString.enumerateLinesUsingBlock({ (line, okay) -> Void in
             // we dont check for tabs inside quotes
             let newRow = (line.componentsSeparatedByString(tabDelimiter))
-            self.appendThisRowToCSVdata(arrayOfColumns: &arrayOfColumnArrays , rowArray: newRow)
+            arrayOfColumnArrays.append(newRow)
         })
-        if arrayOfColumnArrays.count > 0
-        {
-            self.postProcessCSVdataMatrix(arrayOfColumns: &arrayOfColumnArrays)
-            self.name = name
-        }
-    }
+
+        self.postProcessCSVdataMatrix(arrayOfColumns: arrayOfColumnArrays, name: name)
+}
 
     func processCSVtoData(delimiter delimiter:String) -> NSData?
     {
-        guard self.numberOfColumnsInData() > 0 else {return nil}
+        guard
+            self.notAnEmptyDataSet()
+        else {return nil}
         
         var tempDataArray = StringsArray1D()
         //add headers string
         tempDataArray.append(self.headersStringsArray1D.joinWithSeparator(delimiter))
         //build the rows strings one by one and append
-        for rowN in 0..<self.dataStringsMatrix2D[0].count//hope we have same number of rows in each col!
+        for rowN in 0..<self.numberOfRowsInData()
         {
-            var tempRowArray = StringsArray1D()
-            for colNo in 0..<self.numberOfColumnsInData()
-            {
-                let valS = self.dataStringsMatrix2D[colNo][rowN]
-                tempRowArray.append(valS)
-            }
-            tempDataArray.append(tempRowArray.joinWithSeparator(delimiter))
+            tempDataArray.append(self.dataStringsMatrix2D[rowN].joinWithSeparator(delimiter))
         }
         
         let fileString = tempDataArray.joinWithSeparator(carriageReturn)
         return fileString.dataUsingEncoding(NSUTF8StringEncoding)
     }
+    
+    func exportDataTabDelimitedTo(fileURL fileURL:NSURL?)
+    {
+        guard let theURL = fileURL else {return}
+        let data = self.processCSVtoData(delimiter: tabDelimiter)
+        guard let okData = data else {return}
+        
+        okData.writeToURL(theURL, atomically: true)
+    }
 
+    
+    // MARK: - Sorting
+
+    
     // MARK: - Extract Rows
     class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:StringsMatrix2D)->StringsMatrix2D
     {
         guard datamatrix.count  > 0 else {return StringsMatrix2D()}
-        var extractedRows = StringsMatrix2D()
-        for colIndex in 0..<datamatrix.count
-        {
-            guard let newCol = (datamatrix[colIndex] as NSArray).objectsAtIndexes(rows) as? StringsArray1D else {continue}
-            extractedRows.append(newCol)
-        }
-        
+        guard let extractedRows = ((datamatrix as NSArray).objectsAtIndexes(rows) as? StringsMatrix2D) else {return StringsMatrix2D()}
         return extractedRows
     }
     
     func extractTheseRowsFromSelfAsCSVdata(rows rows:NSIndexSet)->CSVdata
     {
-        guard self.numberOfColumnsInData() > 0 else {return CSVdata()}
+        guard self.notAnEmptyDataSet() else {return CSVdata()}
         
         let extractedRows = CSVdata.extractTheseRowsFromDataMatrixAsDataMatrix(rows: rows, datamatrix: self.dataStringsMatrix2D)
         return CSVdata(headers: self.headersStringsArray1D, csvdata: extractedRows, name:"")
@@ -385,7 +354,6 @@ class CSVdata {
             
             // rowOfColumns is a [string] array of row columns
             // the predicate is a [column#][query text] both strings
-            
             
             //do NOT first as if just one is matched then we reject the row
             for predicateNOT in predicatesSplitByBoolean.NOTpredicates
@@ -450,10 +418,12 @@ class CSVdata {
     {
         guard let validCI = self.validatedColumnIndex(columnIndex) else {return nil}
         var set = SetOfStrings()
-        for rowN in 0..<self.dataStringsMatrix2D[validCI].count
+        for rowN in 0..<self.numberOfRowsInData()
         {
-            // parameter is a [string] array of row columns
-            set.insert(self.dataStringsMatrix2D[validCI][rowN])
+            guard
+                let stringV = self.stringValueForCell(fromColumn: validCI, atRow: rowN)
+            else {continue}
+            set.insert(stringV)
         }
         if replaceBlank == true
         {
@@ -481,7 +451,14 @@ class CSVdata {
         return set.count == 0 ? nil : CSVdata.dataMatrixWithNoBlanksFromSet(set: set)
     }
     
+    func dataMatrixOfParametersWithNoBlanksFromColumnIfStringMatchedInColumn(fromColumn columnToExtractIndex:Int, matchString:String, matchColumn:Int)->StringsMatrix2D?
+    {
+        guard let set = self.setOfParametersFromColumnIfStringMatchedInColumn(fromColumn:columnToExtractIndex, matchString:matchString, matchColumn:matchColumn) else {return nil}
+        
+        return set.count == 0 ? nil : CSVdata.dataMatrixWithNoBlanksFromSet(set: set)
+    }
     
+
     func setOfParametersFromColumnIfStringMatchedInColumn(fromColumn fromColumn:Int, matchString:String, matchColumn:Int)->SetOfStrings?
     {
         guard
@@ -491,12 +468,13 @@ class CSVdata {
         guard numberOfRowsInData() > 0 else {return nil}
         
         var set = SetOfStrings()
-        for rowN in 0..<self.dataStringsMatrix2D[validMatchC].count
+        for rowN in 0..<self.numberOfRowsInData()
         {
-            if self.dataStringsMatrix2D[validMatchC][rowN] == matchString
-            {
-                set.insert(self.dataStringsMatrix2D[validFromC][rowN])
-            }
+            guard
+                let matchV = self.stringValueForCell(fromColumn: validMatchC, atRow: rowN) where matchV == matchString,
+                let stringV = self.stringValueForCell(fromColumn: validFromC, atRow: rowN)
+            else {continue}
+            set.insert(stringV)
         }
         
         return set.count == 0 ? nil : set
@@ -508,17 +486,14 @@ class CSVdata {
         guard
             columnIndex < self.numberOfColumnsInData() &&
             rowIndex >= 0 &&
-            rowIndex < self.numberOfRowsInData() &&
-            rowIndex < self.dataStringsMatrix2D[columnIndex].count
+            rowIndex < self.numberOfRowsInData()
         else {print("non validatedRowIndex col \(columnIndex) row - \(rowIndex)"); return nil}
         return rowIndex
     }
     
 
     func numberOfRowsInData()->Int{
-        guard self.dataStringsMatrix2D.count > 0 else {return 0}
-        return self.dataStringsMatrix2D[0].count
-        // just hope all cols same length
+        return self.dataStringsMatrix2D.count
     }
     
     
@@ -534,11 +509,12 @@ class CSVdata {
         return (self.headersStringsArray1D[index])
     }
     
-    func renameColumnAtIndex(columnIndex columnIndex: Int, newName:String)
+    func renamedColumnAtIndex(columnIndex columnIndex: Int, newName:String)->Bool
     {
-        guard !newName.isEmpty else {return}
-        guard let index = self.validatedColumnIndex(columnIndex) else {return}
+        guard !newName.isEmpty else {return false}
+        guard let index = self.validatedColumnIndex(columnIndex) else {return false}
         self.headersStringsArray1D[index] = newName
+        return true
     }
 
     func columnIndexForHeaderString(headerString:String)->Int?
@@ -567,14 +543,14 @@ class CSVdata {
     }
 
     // MARK: - Data Access
-    func stringValueForCell(fromColumn fromColumn:Int, atRow:Int)->String
+    func stringValueForCell(fromColumn fromColumn:Int, atRow:Int)->String?
     {
         guard
             let validCI = self.validatedColumnIndex(fromColumn),
             let validRI = self.validatedRowIndexForColumn(atRow, columnIndex: fromColumn)
-            else {return "💀"}
+            else {return nil}
         
-        return self.dataStringsMatrix2D[validCI][validRI]
+        return self.dataStringsMatrix2D[validRI][validCI]
         
     }
     
