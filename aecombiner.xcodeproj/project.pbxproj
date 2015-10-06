@@ -11,7 +11,7 @@
 		8E0E0E6B1B872EB400BD1C06 /* ChartNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0E0E6A1B872EB400BD1C06 /* ChartNodes.swift */; };
 		8E10726E1B40768D00E4E409 /* CSVdata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E10726D1B40768D00E4E409 /* CSVdata.swift */; };
 		8E2F39951BB708C900B69564 /* ColumnSortingChartingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2F39941BB708C900B69564 /* ColumnSortingChartingViewController.swift */; };
-		8E55A3DA1BAF2C6700F6D41D /* GlobalFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E55A3D91BAF2C6700F6D41D /* GlobalFunctions.swift */; };
+		8E55A3DA1BAF2C6700F6D41D /* GlobalUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E55A3D91BAF2C6700F6D41D /* GlobalUtilities.swift */; };
 		8E69F3101B67DA4100BDB720 /* CSVdataViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */; };
 		8E69F3111B67DA4100BDB720 /* CSVdataWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */; };
 		8E77E8EC1B8B2DB800A0D46F /* ChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */; };
@@ -46,7 +46,7 @@
 		8E0E0E6A1B872EB400BD1C06 /* ChartNodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ChartNodes.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E10726D1B40768D00E4E409 /* CSVdata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdata.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E2F39941BB708C900B69564 /* ColumnSortingChartingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColumnSortingChartingViewController.swift; sourceTree = "<group>"; };
-		8E55A3D91BAF2C6700F6D41D /* GlobalFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalFunctions.swift; sourceTree = "<group>"; };
+		8E55A3D91BAF2C6700F6D41D /* GlobalUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalUtilities.swift; sourceTree = "<group>"; };
 		8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdataViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdataWindowController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewController.swift; sourceTree = "<group>"; };
@@ -125,7 +125,7 @@
 				8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */,
 				8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */,
 				C5CBBC3F1B3C0BFA008FB844 /* Images.xcassets */,
-				8E55A3D91BAF2C6700F6D41D /* GlobalFunctions.swift */,
+				8E55A3D91BAF2C6700F6D41D /* GlobalUtilities.swift */,
 				C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */,
 				8E10726D1B40768D00E4E409 /* CSVdata.swift */,
 				C5AC0A5D1BC2A3BB002625D1 /* CSVdata_Grouping.swift */,
@@ -247,7 +247,7 @@
 			files = (
 				8E911A711B94B2D2004D717A /* ChartDataPointsSets.swift in Sources */,
 				C5CBBC3C1B3C0BFA008FB844 /* RecodeColumnViewController.swift in Sources */,
-				8E55A3DA1BAF2C6700F6D41D /* GlobalFunctions.swift in Sources */,
+				8E55A3DA1BAF2C6700F6D41D /* GlobalUtilities.swift in Sources */,
 				C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */,
 				8E2F39951BB708C900B69564 /* ColumnSortingChartingViewController.swift in Sources */,
 				C5AC0A5E1BC2A3BB002625D1 /* CSVdata_Grouping.swift in Sources */,

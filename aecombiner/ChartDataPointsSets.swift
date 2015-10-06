@@ -47,11 +47,11 @@ class ChartDataSet {
     {
         self.init()
         guard data.count > 0 && data[0].count > 0 else {
-            alertWithMessage("No data to chart",style: .WarningAlertStyle)
+            GlobalUtilities.alertWithMessage("No data to chart",style: .WarningAlertStyle)
             return}
 
         guard columnIndex>=0 && columnIndex < data.count else {
-            alertWithMessage("The data does not have the column you want to chart",style: .WarningAlertStyle)
+            GlobalUtilities.alertWithMessage("The data does not have the column you want to chart",style: .WarningAlertStyle)
             return}
         
         var hadErrors = 0
@@ -74,17 +74,17 @@ class ChartDataSet {
         {
             if self.dataPoints.count == 0
             {
-                alertWithMessage("No values could be detected\nData must be numeric to be charted",style: .WarningAlertStyle)
+                GlobalUtilities.alertWithMessage("No values could be detected\nData must be numeric to be charted",style: .WarningAlertStyle)
             }
             else
             {
                 if hadErrors == 1
                 {
-                    alertWithMessage("One value was rejected",style: .WarningAlertStyle)
+                    GlobalUtilities.alertWithMessage("One value was rejected",style: .WarningAlertStyle)
                 }
                 else
                 {
-                    alertWithMessage("\(hadErrors) values were rejected",style: .WarningAlertStyle)
+                    GlobalUtilities.alertWithMessage("\(hadErrors) values were rejected",style: .WarningAlertStyle)
                 }
             }
 
