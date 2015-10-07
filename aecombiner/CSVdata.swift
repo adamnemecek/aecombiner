@@ -257,13 +257,13 @@ class CSVdata {
                 {
                     subStrings[substringIndex] = subStrings[substringIndex].stringByReplacingOccurrencesOfString(commaDelimiter, withString: commaReplacement)
                 }
-                let newRow = (subStrings.joinWithSeparator(quotationMarksReplacement).componentsSeparatedByString(commaDelimiter))
-                arrayOfColumnArrays.append(newRow)
+                //let newRow = (subStrings.joinWithSeparator(quotationMarksReplacement).componentsSeparatedByString(commaDelimiter))
+                arrayOfColumnArrays.append((subStrings.joinWithSeparator(quotationMarksReplacement).componentsSeparatedByString(commaDelimiter)))
             }
             else
             {
-                let newRow = (line.componentsSeparatedByString(commaDelimiter))
-                arrayOfColumnArrays.append(newRow)
+                //let newRow = (line.componentsSeparatedByString(commaDelimiter))
+                arrayOfColumnArrays.append((line.componentsSeparatedByString(commaDelimiter)))
           }
         })
         
@@ -275,8 +275,8 @@ class CSVdata {
         var arrayOfColumnArrays = StringsMatrix2D()
         dataAsString.enumerateLinesUsingBlock({ (line, okay) -> Void in
             // we dont check for tabs inside quotes
-            let newRow = (line.componentsSeparatedByString(tabDelimiter))
-            arrayOfColumnArrays.append(newRow)
+            //let newRow = (line.componentsSeparatedByString(tabDelimiter))
+            arrayOfColumnArrays.append((line.componentsSeparatedByString(tabDelimiter)))
         })
 
         self.postProcessCSVdataMatrix(arrayOfColumns: arrayOfColumnArrays, name: name)
@@ -297,8 +297,8 @@ class CSVdata {
             tempDataArray.append(self.dataStringsMatrix2D[rowN].joinWithSeparator(delimiter))
         }
         
-        let fileString = tempDataArray.joinWithSeparator(carriageReturn)
-        return fileString.dataUsingEncoding(NSUTF8StringEncoding)
+        //let fileString = tempDataArray.joinWithSeparator(carriageReturn)
+        return tempDataArray.joinWithSeparator(carriageReturn).dataUsingEncoding(NSUTF8StringEncoding)
     }
     
     func exportDataTabDelimitedTo(fileURL fileURL:NSURL?)
@@ -318,8 +318,8 @@ class CSVdata {
     class func extractTheseRowsFromDataMatrixAsDataMatrix(rows rows:NSIndexSet, datamatrix:StringsMatrix2D)->StringsMatrix2D
     {
         guard datamatrix.count  > 0 else {return StringsMatrix2D()}
-        guard let extractedRows = ((datamatrix as NSArray).objectsAtIndexes(rows) as? StringsMatrix2D) else {return StringsMatrix2D()}
-        return extractedRows
+        let extractedRows = ((datamatrix as NSArray).objectsAtIndexes(rows) as? StringsMatrix2D)
+        return extractedRows == nil ? StringsMatrix2D() : extractedRows!
     }
     
     func extractTheseRowsFromSelfAsCSVdata(rows rows:NSIndexSet)->CSVdata
@@ -545,6 +545,11 @@ class CSVdata {
     // MARK: - Data Access
     func stringValueForCell(fromColumn fromColumn:Int, atRow:Int)->String?
     {
+        return self.dataStringsMatrix2D[fromColumn][atRow]
+    }
+    
+    func stringValueForCellAfterValidation(fromColumn fromColumn:Int, atRow:Int)->String?
+    {
         guard
             let validCI = self.validatedColumnIndex(fromColumn),
             let validRI = self.validatedRowIndexForColumn(atRow, columnIndex: fromColumn)
@@ -553,7 +558,7 @@ class CSVdata {
         return self.dataStringsMatrix2D[validRI][validCI]
         
     }
-    
+
     // MARK: - Document
     class func createNewDocumentFromCVSDataAndColumnName(cvsData cvsData: CSVdata, name:String)
     {
