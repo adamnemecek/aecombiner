@@ -17,13 +17,18 @@ let kSelectedParametersArrayParameterIndex = 1
 let kStringEmpty = "- Empty -"
 let kStringRecodedColumnNameSuffix = "_#_"
 
+
+let kRadioID_radio_ConvertInteger = "radio_ConvertInteger"
+let kRadioID_radio_TimeSince = "radio_TimeSince"
+
 class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabViewDelegate {
     
+    // MARK: - class constants
 
     // MARK: - class vars
     var arrayExtractedParameters =  StringsMatrix2D()
-
-    // MARK: - class constants
+    var radioDate_Selected = kRadioID_radio_ConvertInteger
+    
     
     
     // MARK: - @IBOutlet
@@ -46,6 +51,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var buttonSetValue: NSButton!
     @IBOutlet weak var buttonRecodeTo: NSButton!
     
+    @IBOutlet weak var datePicker_TimeSince: NSDatePicker!
     
     @IBOutlet weak var progressSetValue: NSProgressIndicator!
     
@@ -53,6 +59,10 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     
     // MARK: - @IBAction
 
+    @IBAction func radioTimeDateTapped(sender: NSButton) {
+        self.radioDate_Selected = sender.identifier!
+    }
+    
     @IBAction func setValueTapped(sender: NSButton) {
         self.setValueForSelectedRows()
         self.enableSetValueControls(false)
@@ -316,42 +326,60 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     
     func doTheRecodeParametersAndAddNewColumn()
     {
-        guard self.arrayExtractedParameters.count > 0  else {return}
-        guard   let csvdo = self.associatedCSVmodel,
+        guard let id = self.tabbedVrecoding.selectedTabViewItem?.identifier as? String else {return}
+        switch id
+        {
+            case "datetime":
+            self.recodeDateTime(overwrite: false)
+        default:
+            guard self.arrayExtractedParameters.count > 0  else {return}
+            guard   let csvdo = self.associatedCSVmodel,
                 let csvdVC = self.associatedCSVdataViewController,
                 let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
                 else {return}
-        //give a name if none
-        let colTitle = self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(columnIndex) : self.textFieldColumnRecodedName!.stringValue
-
-        guard
-            //pass it over
-            csvdVC.addedRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState)
-        else { return}
-
-        //reload etc
-        self.resetExtractedParameters(andPopupHeaders: true)
+            //give a name if none
+            let colTitle = self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(columnIndex) : self.textFieldColumnRecodedName!.stringValue
+            
+            guard
+                //pass it over
+                csvdVC.addedRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState)
+                else { return}
+            
+            //reload etc
+            self.resetExtractedParameters(andPopupHeaders: true)
+        }
+        
+    }
+    
+    func recodeDateTime(overwrite overwrite:Bool)
+    {
         
     }
     
     func doRecodeOverwrite()
     {
-        guard self.arrayExtractedParameters.count > 0  else { return}
-        guard
-            let csvdo = self.associatedCSVmodel,
-            let csvdVC = self.associatedCSVdataViewController,
-            let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
-        else {return}
-
-        guard
-            //pass it over
-            csvdVC.recodedColumnInSitu(columnToRecode:columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState) == true
-        else { return}
-
-        
-        //reload etc
-        self.resetExtractedParameters(andPopupHeaders: true)
-        
+        guard let id = self.tabbedVrecoding.selectedTabViewItem?.identifier as? String else {return}
+        switch id
+        {
+        case "datetime":
+            self.recodeDateTime(overwrite: false)
+        default:
+            guard self.arrayExtractedParameters.count > 0  else { return}
+            guard
+                let csvdo = self.associatedCSVmodel,
+                let csvdVC = self.associatedCSVdataViewController,
+                let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
+                else {return}
+            
+            guard
+                //pass it over
+                csvdVC.recodedColumnInSitu(columnToRecode:columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState) == true
+                else { return}
+            
+            
+            //reload etc
+            self.resetExtractedParameters(andPopupHeaders: true)
+        }
     }
 
 
