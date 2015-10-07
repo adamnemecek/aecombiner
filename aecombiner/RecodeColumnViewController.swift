@@ -326,17 +326,19 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     
     func doTheRecodeParametersAndAddNewColumn()
     {
-        guard let id = self.tabbedVrecoding.selectedTabViewItem?.identifier as? String else {return}
+        guard
+            let csvdo = self.associatedCSVmodel,
+            let csvdVC = self.associatedCSVdataViewController,
+            let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem),
+            let id = self.tabbedVrecoding.selectedTabViewItem?.label
+        else {return}
+
         switch id
         {
-            case "datetime":
+        case "Date-Time":
             self.recodeDateTime(overwrite: false)
         default:
             guard self.arrayExtractedParameters.count > 0  else {return}
-            guard   let csvdo = self.associatedCSVmodel,
-                let csvdVC = self.associatedCSVdataViewController,
-                let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
-                else {return}
             //give a name if none
             let colTitle = self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(columnIndex) : self.textFieldColumnRecodedName!.stringValue
             
@@ -353,7 +355,22 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     
     func recodeDateTime(overwrite overwrite:Bool)
     {
-        
+        guard
+            let csvdo = self.associatedCSVmodel,
+            let csvdVC = self.associatedCSVdataViewController,
+            let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
+            else {return}
+        for rowN in 0..<csvdo.numberOfRowsInData()
+        {
+            let val = csvdo.stringValueForCell(fromColumn: columnIndex, atRow: rowN)
+            let dateFormat = NSDateFormatter()
+            let local = NSLocale(localeIdentifier: "en_US_POSIX")
+            dateFormat.locale = local
+            dateFormat.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm'"
+            dateFormat.timeZone = NSTimeZone(forSecondsFromGMT: 0)
+            let date = dateFormat.dateFromString(val!)
+            print("val:\(val) --> \(date) --> \(date?.description)")
+        }
     }
     
     func doRecodeOverwrite()

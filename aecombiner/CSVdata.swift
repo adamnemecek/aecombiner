@@ -545,7 +545,7 @@ class CSVdata {
     // MARK: - Data Access
     func stringValueForCell(fromColumn fromColumn:Int, atRow:Int)->String?
     {
-        return self.dataStringsMatrix2D[fromColumn][atRow]
+        return self.dataStringsMatrix2D[atRow][fromColumn]
     }
     
     func stringValueForCellAfterValidation(fromColumn fromColumn:Int, atRow:Int)->String?
