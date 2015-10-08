@@ -187,6 +187,38 @@ class CSVdata {
         return true
     }
     
+    // MARK: - Date Time
+    class func standardDateFormatterWithFormatString(formatString:String)->NSDateFormatter
+    {
+        let dateFormat = NSDateFormatter()
+        dateFormat.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+        dateFormat.dateFormat = formatString
+        dateFormat.timeZone = NSTimeZone(forSecondsFromGMT: 0)
+        return dateFormat
+    }
+
+    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, toColumnIndex:Int, method:String, formatString:String, copyUnmatchedValues:Bool)->Bool
+    {
+        let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatString)
+        var errors = 0
+        for rowN in 0..<self.numberOfRowsInData()
+        {
+            let val = self.dataStringsMatrix2D[rowN][fromColum]
+            let date = dateFormat.dateFromString(val)
+            if date == nil
+            {
+                self.dataStringsMatrix2D[rowN].append("⚠️ "+val)
+                errors++
+            }
+            else
+            {
+                self.dataStringsMatrix2D[rowN].append(String(date!.timeIntervalSinceReferenceDate))
+            }
+        }
+        //add name to headers array
+        self.headersStringsArray1D.append(title)
+       return true
+    }
     // MARK: - Add to Column
     
     class func appendThisStringsArray1DToStringsMatrix2D(inout matrix2DToBeAppendedTo matrix2DToBeAppendedTo:StringsMatrix2D, array1DToAppend:StringsArray1D)

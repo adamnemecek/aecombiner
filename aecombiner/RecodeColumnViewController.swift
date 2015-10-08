@@ -21,6 +21,8 @@ let kStringRecodedColumnNameSuffix = "_#_"
 let kRadioID_radio_ConvertInteger = "radio_ConvertInteger"
 let kRadioID_radio_TimeSince = "radio_TimeSince"
 
+let kDateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm"
+
 class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabViewDelegate {
     
     // MARK: - class constants
@@ -41,6 +43,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var textFieldSetValue: NSTextField!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     @IBOutlet weak var textFieldBooleanComparator: NSTextField!
+    @IBOutlet weak var textFieldDateFormatString: NSTextField!
 
     @IBOutlet weak var tabbedVrecoding: NSTabView!
     
@@ -62,6 +65,12 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBAction func radioTimeDateTapped(sender: NSButton) {
         self.radioDate_Selected = sender.identifier!
     }
+    
+    @IBAction func dateTimeFormatStringResetTapped(sender: AnyObject) {
+        
+        self.textFieldDateFormatString.stringValue  = kDateFormatString
+    }
+    
     
     @IBAction func setValueTapped(sender: NSButton) {
         self.setValueForSelectedRows()
@@ -327,9 +336,6 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     func doTheRecodeParametersAndAddNewColumn()
     {
         guard
-            let csvdo = self.associatedCSVmodel,
-            let csvdVC = self.associatedCSVdataViewController,
-            let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem),
             let id = self.tabbedVrecoding.selectedTabViewItem?.label
         else {return}
 
@@ -338,9 +344,14 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         case "Date-Time":
             self.recodeDateTime(overwrite: false)
         default:
+            guard
+                let csvdo = self.associatedCSVmodel,
+                let csvdVC = self.associatedCSVdataViewController,
+                let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
+                else {return}
             guard self.arrayExtractedParameters.count > 0  else {return}
             //give a name if none
-            let colTitle = self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(columnIndex) : self.textFieldColumnRecodedName!.stringValue
+            let colTitle = self.columnAddedSafeTitle(fromColumnIndex: columnIndex)
             
             guard
                 //pass it over
@@ -353,24 +364,28 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         
     }
     
+    func columnAddedSafeTitle(fromColumnIndex fromColumnIndex:Int)->String
+    {
+        return self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(fromColumnIndex) : self.textFieldColumnRecodedName!.stringValue
+    }
+    
     func recodeDateTime(overwrite overwrite:Bool)
     {
         guard
             let csvdo = self.associatedCSVmodel,
             let csvdVC = self.associatedCSVdataViewController,
-            let columnIndex = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
+           let columnIndexFrom = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
             else {return}
-        for rowN in 0..<csvdo.numberOfRowsInData()
-        {
-            let val = csvdo.stringValueForCell(fromColumn: columnIndex, atRow: rowN)
-            let dateFormat = NSDateFormatter()
-            let local = NSLocale(localeIdentifier: "en_US_POSIX")
-            dateFormat.locale = local
-            dateFormat.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm'"
-            dateFormat.timeZone = NSTimeZone(forSecondsFromGMT: 0)
-            let date = dateFormat.dateFromString(val!)
-            print("val:\(val) --> \(date) --> \(date?.description)")
-        }
+        
+        guard
+            //pass it over
+            csvdVC.recodedDateTimeToNewColumn(withTitle: self.columnAddedSafeTitle(fromColumnIndex: columnIndexFrom), fromColum: columnIndexFrom, toColumnIndex: 0, method: self.radioDate_Selected, formatString: self.textFieldDateFormatString.stringValue, copyUnmatchedValues: true)
+            else {return}
+        
+        //reload etc
+        self.resetExtractedParameters(andPopupHeaders: true)
+
+        
     }
     
     func doRecodeOverwrite()

@@ -89,10 +89,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.associatedCSVdataDocument.csvDataModel.addedRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
         else {return false}
         //Safe to add column to table now
-        self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(title))
-        self.tvCSVdata.reloadData()
-        self.tvCSVdata.scrollColumnToVisible(self.tvCSVdata.numberOfColumns-1)
-        self.documentMakeDirty()
+        self.addTableColumnAndScrollWithTitle(title)
         return true
     }
     
@@ -107,9 +104,23 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return true
     }
     
-    
+    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, toColumnIndex:Int, method:String, formatString:String, copyUnmatchedValues:Bool)->Bool
+    {
+        guard
+            self.associatedCSVdataDocument.csvDataModel.recodedDateTimeToNewColumn(withTitle: title, fromColum: fromColum, toColumnIndex: toColumnIndex, method: method, formatString: formatString, copyUnmatchedValues: copyUnmatchedValues)
+            else {return false}
+        //Safe to add column to table now
+        self.addTableColumnAndScrollWithTitle(title)
+        return true
+    }
 
-
+    func addTableColumnAndScrollWithTitle(title:String)
+    {
+        self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(title))
+        self.tvCSVdata.reloadData()
+        self.tvCSVdata.scrollColumnToVisible(self.tvCSVdata.numberOfColumns-1)
+        self.documentMakeDirty()
+    }
     // MARK: - TableView overrides
     func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
         tableView.sortParametersOrValuesInTableViewColumn(tableColumn: tableColumn, arrayToSort: &self.associatedCSVdataDocument.csvDataModel.dataStringsMatrix2D, textOrValue: self.segmentSortTextOrValue.selectedSegment)
