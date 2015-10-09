@@ -69,7 +69,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     
     @IBAction func dateTimeFormatStringResetTapped(sender: AnyObject) {
         
-        self.textFieldDateFormatString.stringValue  = kDateFormatString
+        self.textFieldDateFormatString.stringValue  = kDateFormatString_DateTime
     }
     
     

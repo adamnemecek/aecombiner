@@ -39,6 +39,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     }
     
+    
+
     // MARK: - document
     func documentMakeDirty()
     {
@@ -147,21 +149,25 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
-        guard let tvidentifier = tableView.identifier else {
-            return cellView
-        }
+        guard
+            let tvidentifier = tableView.identifier,
+            let id = tableColumn?.identifier
+        else {return cellView}
+        
+        let colIndex = tableView.columnWithIdentifier(id)
+        guard colIndex >= 0 else {return cellView}
+        
         switch tvidentifier
         {
         case "tvCSVdata":
             cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
             // Set the stringValue of the cell's text field to the nameArray value at row
-            let colIndex = tableView.columnWithIdentifier((tableColumn?.identifier)!)
             let valS = self.associatedCSVdataDocument.csvDataModel.stringValueForCell(fromColumn: colIndex, atRow: row)
             if valS != nil
             {
                 cellView.textField!.stringValue = valS!
             }
-            
+            cellView.textField!.identifier = "\(row),\(colIndex)"
         default:
             break
         }
@@ -184,7 +190,20 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
     */
 
-    
+    func control(control: NSControl, textShouldEndEditing fieldEditor: NSText) -> Bool {
+        guard
+            let _ = control as? NSTextField,
+            let id = control.identifier,
+            let row = Int(id.componentsSeparatedByString(",")[0]),
+            let column = Int(id.componentsSeparatedByString(",")[1]),
+            let str = fieldEditor.string
+        else {return true}
+        
+        self.associatedCSVdataDocument.csvDataModel.setStringValueForCell(valueString: str, toColumn: column, inRow: row)
+        self.documentMakeDirty()
+        return true
+    }
+
   
 
     

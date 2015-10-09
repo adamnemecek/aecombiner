@@ -211,9 +211,9 @@ class CSVdata {
         var errors = 0
         for rowN in 0..<self.numberOfRowsInData()
         {
-            var val = self.dataStringsMatrix2D[rowN][fromColum]
-            let valArray = val.componentsSeparatedByString("T")
-            val = valArray[0]
+            let val = self.dataStringsMatrix2D[rowN][fromColum]
+            //let valArray = val.componentsSeparatedByString("T")
+            //val = valArray[0]
             let date = dateFormat.dateFromString(val)
             /*
             let detected = [dataD .firstMatchInString(val, options: [], range: NSMakeRange(0, (val as NSString).length))]
@@ -602,12 +602,21 @@ class CSVdata {
         guard
             let validCI = self.validatedColumnIndex(fromColumn),
             let validRI = self.validatedRowIndexForColumn(atRow, columnIndex: fromColumn)
-            else {return nil}
+        else {return nil}
         
         return self.dataStringsMatrix2D[validRI][validCI]
         
     }
 
+    func setStringValueForCell(valueString valueString:String, toColumn:Int, inRow:Int)
+    {
+        guard
+            let validCI = self.validatedColumnIndex(toColumn),
+            let validRI = self.validatedRowIndexForColumn(inRow, columnIndex: toColumn)
+        else {return}
+        self.dataStringsMatrix2D[validRI][validCI] = valueString
+    }
+    
     // MARK: - Document
     class func createNewDocumentFromCVSDataAndColumnName(cvsData cvsData: CSVdata, name:String)
     {
