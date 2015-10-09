@@ -8,6 +8,8 @@
 
 import Cocoa
 
+let kRowColumnSeparator = ","
+
 class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
     // MARK: - Var
     var associatedCSVdataDocument: CSVdataDocument = CSVdataDocument() {
@@ -167,7 +169,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             {
                 cellView.textField!.stringValue = valS!
             }
-            cellView.textField!.identifier = "\(row),\(colIndex)"
+            cellView.textField!.identifier = "\(row)"+kRowColumnSeparator+"\(colIndex)"
         default:
             break
         }
@@ -194,8 +196,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         guard
             let _ = control as? NSTextField,
             let id = control.identifier,
-            let row = Int(id.componentsSeparatedByString(",")[0]),
-            let column = Int(id.componentsSeparatedByString(",")[1]),
+            let row = Int(id.componentsSeparatedByString(kRowColumnSeparator)[0]),
+            let column = Int(id.componentsSeparatedByString(kRowColumnSeparator)[1]),
             let str = fieldEditor.string
         else {return true}
         
