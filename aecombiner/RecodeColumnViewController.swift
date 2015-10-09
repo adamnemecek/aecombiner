@@ -21,7 +21,8 @@ let kStringRecodedColumnNameSuffix = "_#_"
 let kRadioID_radio_ConvertInteger = "radio_ConvertInteger"
 let kRadioID_radio_TimeSince = "radio_TimeSince"
 
-let kDateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm"
+let kDateFormatString_DateTime = "yyyy'-'MM'-'dd'T'HH':'mm"
+let kDateFormatString_DateOnly = "yyyy'-'MM'-'dd"
 
 class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabViewDelegate {
     

@@ -206,18 +206,22 @@ class CSVdata {
     func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, toColumnIndex:Int, method:String, formatString:String, copyUnmatchedValues:Bool)->Bool
     {
         let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatString)
-        let dataD = CSVdata.dataDetector()
+        //let dataD = CSVdata.dataDetector()
         
         var errors = 0
         for rowN in 0..<self.numberOfRowsInData()
         {
-            let val = self.dataStringsMatrix2D[rowN][fromColum]
+            var val = self.dataStringsMatrix2D[rowN][fromColum]
+            let valArray = val.componentsSeparatedByString("T")
+            val = valArray[0]
             let date = dateFormat.dateFromString(val)
+            /*
             let detected = [dataD .firstMatchInString(val, options: [], range: NSMakeRange(0, (val as NSString).length))]
             for result in detected
             {
                 print("\(val)-->\(result)")
             }
+            */
             if date == nil
             {
                 self.dataStringsMatrix2D[rowN].append("⚠️ "+val)
