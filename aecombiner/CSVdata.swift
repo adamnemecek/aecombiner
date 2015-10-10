@@ -203,35 +203,79 @@ class CSVdata {
         return dataD!
     }
 
-    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, toColumnIndex:Int, method:String, formatString:String, copyUnmatchedValues:Bool)->Bool
+    func appendDateInNewColumn(date date:NSDate, asString:Bool, rowN:Int)
     {
-        let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatString)
-        //let dataD = CSVdata.dataDetector()
-        
-        var errors = 0
-        for rowN in 0..<self.numberOfRowsInData()
+        if asString
         {
-            let val = self.dataStringsMatrix2D[rowN][fromColum]
-            //let valArray = val.componentsSeparatedByString("T")
-            //val = valArray[0]
-            let date = dateFormat.dateFromString(val)
-            /*
-            let detected = [dataD .firstMatchInString(val, options: [], range: NSMakeRange(0, (val as NSString).length))]
-            for result in detected
-            {
-                print("\(val)-->\(result)")
-            }
-            */
-            if date == nil
-            {
-                self.dataStringsMatrix2D[rowN].append("⚠️ "+val)
-                errors++
-            }
+            self.dataStringsMatrix2D[rowN].append(date.description)
+        }
+        else
+        {
+            self.dataStringsMatrix2D[rowN].append(String(date.timeIntervalSinceReferenceDate))
+        }
+    }
+    
+    func appendedDateFromStringError(dateString dateString:String, dateFormat:NSDateFormatter, rowN:Int, asString:Bool)->Int
+    {
+        guard let date = dateFormat.dateFromString(dateString)
             else
+        {
+            self.dataStringsMatrix2D[rowN].append("⚠️ "+dateString)
+            return 1
+        }
+        self.appendDateInNewColumn(date: date, asString: asString, rowN: rowN)
+        return 0
+    }
+    
+    func appendedDateDetectedInStringError(dateString dateString:String, dateFormat:NSDataDetector, rowN:Int, asString:Bool)->Int
+    {
+        let detected = [dateFormat .firstMatchInString(dateString, options: [], range: NSMakeRange(0, (dateString as NSString).length))]
+        for result in detected
+        {
+            guard
+                let date = result?.date
+                else
             {
-                self.dataStringsMatrix2D[rowN].append(String(date!.timeIntervalSinceReferenceDate))
+                self.dataStringsMatrix2D[rowN].append("⚠️ "+dateString)
+                return 1
+            }
+            self.appendDateInNewColumn(date: date, asString: asString, rowN: rowN)
+            return 0
+        }
+        return 1
+    }
+    
+    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, toColumnIndex:Int, formatMethod:DateTimeFormatMethod, formatString:String, copyUnmatchedValues:Bool, asString:Bool)->Bool
+    {
+        var errors = 0
+        switch formatMethod
+        {
+        case .DateWithTime:
+            let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatMethod.rawValue)
+            for rowN in 0..<self.numberOfRowsInData()
+            {
+                errors += self.appendedDateFromStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum], dateFormat: dateFormat, rowN: rowN, asString:asString)
+            }
+        case .DateOnly:
+            let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatMethod.rawValue)
+            for rowN in 0..<self.numberOfRowsInData()
+            {
+                errors += self.appendedDateFromStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum].componentsSeparatedByString("T")[0], dateFormat: dateFormat, rowN: rowN, asString:asString)
+            }
+        case .Custom:
+            let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatString)
+            for rowN in 0..<self.numberOfRowsInData()
+            {
+                errors += self.appendedDateFromStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum], dateFormat: dateFormat, rowN: rowN, asString:asString)
+            }
+       case .TextRecognition:
+            let dateFormat = CSVdata.dataDetector()
+            for rowN in 0..<self.numberOfRowsInData()
+            {
+                errors += self.appendedDateDetectedInStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum].stringByReplacingOccurrencesOfString("T", withString: " at "), dateFormat: dateFormat, rowN: rowN, asString:asString)
             }
         }
+        
         //add name to headers array
         self.headersStringsArray1D.append(title)
        return true

@@ -17,12 +17,31 @@ let kSelectedParametersArrayParameterIndex = 1
 let kStringEmpty = "- Empty -"
 let kStringRecodedColumnNameSuffix = "_#_"
 
+enum DateTimeRecodeMethod:String
+{
+    case Integer = "radio_ConvertInteger"
+    case TimeSinceCustom = "radio_TimeSinceCustom"
+    case TimeSinceColumn = "radio_TimeSinceColumn"
+    case String = "radio_ConvertString"
+}
 
-let kRadioID_radio_ConvertInteger = "radio_ConvertInteger"
-let kRadioID_radio_TimeSince = "radio_TimeSince"
 
-let kDateFormatString_DateTime = "yyyy'-'MM'-'dd'T'HH':'mm"
-let kDateFormatString_DateOnly = "yyyy'-'MM'-'dd"
+enum DateTimeFormatMethod:String
+{
+    case DateWithTime = "yyyy'-'MM'-'dd'T'HH':'mm"
+    case DateOnly = "yyyy'-'MM'-'dd"
+    case Custom = "Custom:"
+    case TextRecognition = "Text Recognition"
+}
+
+enum DateFormatInformation:String
+{
+    case DateWithTime = "Requires complete Year-Month-Day Hour:Minute"
+    case DateOnly = "Requires complete Year-Month-Day, ignores time and uses 00:00 instead"
+    case Custom = "Requires exact match with defined format"
+    case TextRecognition = "Requires complete Year-Month-Day, uses 12:00 if time missing"
+}
+
 
 class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabViewDelegate {
     
@@ -30,7 +49,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
 
     // MARK: - class vars
     var arrayExtractedParameters =  StringsMatrix2D()
-    var radioDate_Selected = kRadioID_radio_ConvertInteger
+    var radio_DateTimeMethod_Selected = DateTimeRecodeMethod.Integer
     
     
     
@@ -39,7 +58,9 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var tvExtractedParametersSingle: NSTableView!
     @IBOutlet weak var tvExtractedParametersMultiple: NSTableView!
     @IBOutlet weak var tvExtractedParametersPredicate: NSTableView!
+    
     @IBOutlet weak var labelNumberOfParameterOrGroupingItems: NSTextField!
+    @IBOutlet weak var labelDateFormatInfo: NSTextField!
     
     @IBOutlet weak var textFieldSetValue: NSTextField!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
@@ -50,6 +71,8 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     
     @IBOutlet weak var popupHeaders: NSPopUpButton!
     @IBOutlet weak var popupBooleans: NSPopUpButton!
+    @IBOutlet weak var popupDateFormatMethod: NSPopUpButton!
+    @IBOutlet weak var popupHeadersDateEnd: NSPopUpButton!
  
     @IBOutlet weak var buttonOverwite: NSButton!
     @IBOutlet weak var buttonSetValue: NSButton!
@@ -64,14 +87,44 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     // MARK: - @IBAction
 
     @IBAction func radioTimeDateTapped(sender: NSButton) {
-        self.radioDate_Selected = sender.identifier!
+        guard
+            let id = sender.identifier,
+            let method = DateTimeRecodeMethod(rawValue: id)
+        else {return}
+        self.radio_DateTimeMethod_Selected = method
     }
     
-    @IBAction func dateTimeFormatStringResetTapped(sender: AnyObject) {
-        
-        self.textFieldDateFormatString.stringValue  = kDateFormatString_DateTime
+    @IBAction func popupDateFormatTapped(sender: AnyObject) {
+        guard
+            let title = self.popupDateFormatMethod.selectedItem?.title,
+            let format = DateTimeFormatMethod(rawValue: title)
+        else {return}
+        switch format
+        {
+        case .Custom:
+            self.textFieldDateFormatString.enabled = true
+            self.textFieldDateFormatString.hidden = false
+            self.labelDateFormatInfo.stringValue = DateFormatInformation.Custom.rawValue
+
+        case .DateOnly:
+            self.textFieldDateFormatString.hidden = false
+            self.textFieldDateFormatString.hidden = false
+           self.textFieldDateFormatString.stringValue  = title
+            self.labelDateFormatInfo.stringValue = DateFormatInformation.DateOnly.rawValue
+
+        case .DateWithTime:
+            self.textFieldDateFormatString.hidden = false
+            self.textFieldDateFormatString.hidden = false
+            self.textFieldDateFormatString.stringValue  = title
+            self.labelDateFormatInfo.stringValue = DateFormatInformation.DateWithTime.rawValue
+
+        case .TextRecognition:
+            self.textFieldDateFormatString.enabled = true
+            self.textFieldDateFormatString.hidden = true
+            self.labelDateFormatInfo.stringValue = DateFormatInformation.TextRecognition.rawValue
+            
+        }
     }
-    
     
     @IBAction func setValueTapped(sender: NSButton) {
         self.setValueForSelectedRows()
@@ -125,6 +178,8 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         // Do any additional setup after loading the view.
         self.populateHeaderPopups()
         self.reloadTables()
+        self.textFieldDateFormatString.stringValue  = DateTimeFormatMethod.DateWithTime.rawValue
+        self.labelDateFormatInfo.stringValue = DateFormatInformation.DateWithTime.rawValue
    }
 
     func reloadTables()
@@ -142,6 +197,9 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.popupHeaders.removeAllItems()
         self.popupHeaders.addItemsWithTitles(csvdm.headerStringsForAllColumns())
         self.popupHeaders.selectItemAtIndex(-1)
+        self.popupHeadersDateEnd.removeAllItems()
+        self.popupHeadersDateEnd.addItemsWithTitles(csvdm.headerStringsForAllColumns())
+        self.popupHeadersDateEnd.selectItemAtIndex(0)
     }
     
     func popupChangedSelection(popup: NSPopUpButton)
@@ -343,7 +401,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         switch id
         {
         case "Date-Time":
-            self.recodeDateTime(overwrite: false)
+            self.recodeDateTime_FromOneColumn(overwrite: false)
         default:
             guard
                 let csvdo = self.associatedCSVmodel,
@@ -370,23 +428,30 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         return self.textFieldColumnRecodedName!.stringValue.isEmpty ? self.stringForRecodedColumn(fromColumnIndex) : self.textFieldColumnRecodedName!.stringValue
     }
     
-    func recodeDateTime(overwrite overwrite:Bool)
+    func recodeDateTime_FromOneColumn(overwrite overwrite:Bool)
     {
         guard
             let csvdo = self.associatedCSVmodel,
             let csvdVC = self.associatedCSVdataViewController,
-           let columnIndexFrom = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
-            else {return}
+            let columnIndexFrom = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem),
+            let methodString = self.popupDateFormatMethod.selectedItem?.title,
+            let formatMethod = DateTimeFormatMethod(rawValue: methodString)
+        else {return}
         
-        guard
-            //pass it over
-            csvdVC.recodedDateTimeToNewColumn(withTitle: self.columnAddedSafeTitle(fromColumnIndex: columnIndexFrom), fromColum: columnIndexFrom, toColumnIndex: 0, method: self.radioDate_Selected, formatString: self.textFieldDateFormatString.stringValue, copyUnmatchedValues: true)
-            else {return}
+        var recodedOK = false
         
-        //reload etc
-        self.resetExtractedParameters(andPopupHeaders: true)
-
+        switch self.radio_DateTimeMethod_Selected
+        {
+        case .Integer, .String:
+            recodedOK = csvdVC.recodedDateTimeToNewColumn(withTitle: self.columnAddedSafeTitle(fromColumnIndex: columnIndexFrom), fromColum: columnIndexFrom, toColumnIndex: 0, formatMethod: formatMethod, formatString: self.textFieldDateFormatString.stringValue, copyUnmatchedValues: true, asString: self.radio_DateTimeMethod_Selected == .String)
+        default: break
+        }
         
+        if recodedOK
+        {
+            //reload etc
+            self.resetExtractedParameters(andPopupHeaders: true)
+        }
     }
     
     func doRecodeOverwrite()
@@ -395,7 +460,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         switch id
         {
         case "datetime":
-            self.recodeDateTime(overwrite: false)
+            self.recodeDateTime_FromOneColumn(overwrite: false)
         default:
             guard self.arrayExtractedParameters.count > 0  else { return}
             guard
