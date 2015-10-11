@@ -20,9 +20,24 @@ let kStringRecodedColumnNameSuffix = "_#_"
 enum DateTimeRecodeMethod:String
 {
     case Integer = "radio_ConvertInteger"
-    case TimeSinceCustom = "radio_TimeSinceCustom"
     case TimeSinceColumn = "radio_TimeSinceColumn"
     case String = "radio_ConvertString"
+}
+
+enum DateTimeRoundingUnits:String
+{
+    case Seconds = "Seconds"
+    case Hours = "Hours"
+    case Days = "Days"
+    static func roundedTimeAccordingToUnits(time time:NSTimeInterval, units:DateTimeRoundingUnits)->NSTimeInterval
+    {
+        switch units
+        {
+        case .Seconds: return time
+        case .Days: return time/86400.0
+        case .Hours: return time/3600.0
+        }
+    }
 }
 
 
@@ -49,7 +64,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
 
     // MARK: - class vars
     var arrayExtractedParameters =  StringsMatrix2D()
-    var radio_DateTimeMethod_Selected = DateTimeRecodeMethod.Integer
+    var radio_DateTimeMethod_Selected = DateTimeRecodeMethod.TimeSinceColumn
     
     
     
@@ -73,12 +88,11 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var popupBooleans: NSPopUpButton!
     @IBOutlet weak var popupDateFormatMethod: NSPopUpButton!
     @IBOutlet weak var popupHeadersDateEnd: NSPopUpButton!
+    @IBOutlet weak var popupDateTimeRoundingUnits: NSPopUpButton!
  
     @IBOutlet weak var buttonOverwite: NSButton!
     @IBOutlet weak var buttonSetValue: NSButton!
     @IBOutlet weak var buttonRecodeTo: NSButton!
-    
-    @IBOutlet weak var datePicker_TimeSince: NSDatePicker!
     
     @IBOutlet weak var progressSetValue: NSProgressIndicator!
     
@@ -433,18 +447,31 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         guard
             let csvdo = self.associatedCSVmodel,
             let csvdVC = self.associatedCSVdataViewController,
-            let columnIndexFrom = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem),
             let methodString = self.popupDateFormatMethod.selectedItem?.title,
             let formatMethod = DateTimeFormatMethod(rawValue: methodString)
         else {return}
         
         var recodedOK = false
+        let formatString = self.textFieldDateFormatString.stringValue
         
         switch self.radio_DateTimeMethod_Selected
         {
         case .Integer, .String:
-            recodedOK = csvdVC.recodedDateTimeToNewColumn(withTitle: self.columnAddedSafeTitle(fromColumnIndex: columnIndexFrom), fromColum: columnIndexFrom, toColumnIndex: 0, formatMethod: formatMethod, formatString: self.textFieldDateFormatString.stringValue, copyUnmatchedValues: true, asString: self.radio_DateTimeMethod_Selected == .String)
-        default: break
+            guard
+                let columnIndexFrom = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
+            else {return}
+           recodedOK = csvdVC.recodedDateTimeToNewColumn(withTitle: self.columnAddedSafeTitle(fromColumnIndex: columnIndexFrom), fromColum: columnIndexFrom, formatMethod: formatMethod, formatString: formatString, copyUnmatchedValues: true, asString: self.radio_DateTimeMethod_Selected == .String)
+        case .TimeSinceColumn:
+            guard
+            let columnIndexStart = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem),
+            let columnIndexEnd = csvdo.validatedColumnIndex(self.popupHeadersDateEnd.indexOfSelectedItem),
+            let roundingString = self.popupDateTimeRoundingUnits.selectedItem?.title,
+            let roundingunits = DateTimeRoundingUnits(rawValue: roundingString)
+            else {return}
+            
+            let newTitle = csvdo.headerStringForColumnIndex(columnIndexStart)+"->"+csvdo.headerStringForColumnIndex(columnIndexEnd)
+            recodedOK = csvdVC.calculatedDateTimeToNewColumn(withTitle: newTitle, startColumn: columnIndexStart, endColumn: columnIndexEnd, formatMethod: formatMethod, formatString: formatString, roundingUnits: roundingunits)
+            
         }
         
         if recodedOK

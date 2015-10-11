@@ -108,16 +108,26 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return true
     }
     
-    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, toColumnIndex:Int, formatMethod:DateTimeFormatMethod, formatString:String, copyUnmatchedValues:Bool, asString:Bool)->Bool
+    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, formatMethod:DateTimeFormatMethod, formatString:String, copyUnmatchedValues:Bool, asString:Bool)->Bool
     {
         guard
-            self.associatedCSVdataDocument.csvDataModel.recodedDateTimeToNewColumn(withTitle: title, fromColum: fromColum, toColumnIndex: toColumnIndex, formatMethod: formatMethod, formatString: formatString, copyUnmatchedValues: copyUnmatchedValues, asString:asString)
+            self.associatedCSVdataDocument.csvDataModel.recodedDateTimeToNewColumn(withTitle: title, fromColum: fromColum, formatMethod: formatMethod, formatString: formatString, copyUnmatchedValues: copyUnmatchedValues, asString:asString)
             else {return false}
         //Safe to add column to table now
         self.addTableColumnAndScrollWithTitle(title)
         return true
     }
 
+    func calculatedDateTimeToNewColumn(withTitle title:String, startColumn:Int, endColumn:Int, formatMethod:DateTimeFormatMethod, formatString:String, roundingUnits:DateTimeRoundingUnits)->Bool
+    {
+        guard
+            self.associatedCSVdataDocument.csvDataModel.calculatedDateTimeToNewColumn(withTitle: title, startColumn: startColumn, endColumn: endColumn, formatMethod: formatMethod, formatString: formatString, roundingUnits: roundingUnits)
+            else {return false}
+        //Safe to add column to table now
+        self.addTableColumnAndScrollWithTitle(title)
+        return true
+    }
+    
     func addTableColumnAndScrollWithTitle(title:String)
     {
         self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(title))

@@ -245,7 +245,52 @@ class CSVdata {
         return 1
     }
     
-    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, toColumnIndex:Int, formatMethod:DateTimeFormatMethod, formatString:String, copyUnmatchedValues:Bool, asString:Bool)->Bool
+    func appendedCalculatedTimeFromStringError(startDateString startDateString:String, endDateString:String, dateFormat:NSDateFormatter, rowN:Int, roundingUnits:DateTimeRoundingUnits)->Int
+    {
+        guard
+            let startdate = dateFormat.dateFromString(startDateString),
+            let enddate = dateFormat.dateFromString(endDateString)
+        else
+        {
+            self.dataStringsMatrix2D[rowN].append(startDateString+" ⚠️ "+endDateString)
+            return 1
+        }
+        self.dataStringsMatrix2D[rowN].append(String(DateTimeRoundingUnits.roundedTimeAccordingToUnits(time: enddate.timeIntervalSinceDate(startdate), units: roundingUnits)))
+        return 0
+    }
+    
+    func appendedCalculatedTimeDetectedInStringError(startDateString startDateString:String, endDateString:String, dateFormat:NSDataDetector, rowN:Int, roundingUnits:DateTimeRoundingUnits)->Int
+    {
+        let detectedStart = [dateFormat .firstMatchInString(startDateString, options: [], range: NSMakeRange(0, (startDateString as NSString).length))]
+        let detectedEnd = [dateFormat .firstMatchInString(endDateString, options: [], range: NSMakeRange(0, (endDateString as NSString).length))]
+        var startDate: NSDate?
+        var endDate: NSDate?
+        
+        for resultS in detectedStart
+        {
+            guard
+                let sDate = resultS?.date
+            else {continue}
+            startDate = sDate
+        }
+        for resultE in detectedEnd
+        {
+            guard
+                let eDate = resultE?.date
+                else {continue}
+            endDate = eDate
+        }
+
+        if startDate != nil && endDate != nil
+        {
+            self.dataStringsMatrix2D[rowN].append(String(DateTimeRoundingUnits.roundedTimeAccordingToUnits(time: endDate!.timeIntervalSinceDate(startDate!), units: roundingUnits)))
+            return 0
+        }
+        self.dataStringsMatrix2D[rowN].append(startDateString+" ⚠️ "+endDateString)
+        return 1
+    }
+
+    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, formatMethod:DateTimeFormatMethod, formatString:String, copyUnmatchedValues:Bool, asString:Bool)->Bool
     {
         var errors = 0
         switch formatMethod
@@ -280,6 +325,46 @@ class CSVdata {
         self.headersStringsArray1D.append(title)
        return true
     }
+    
+    func calculatedDateTimeToNewColumn(withTitle title:String, startColumn:Int, endColumn:Int, formatMethod:DateTimeFormatMethod, formatString:String, roundingUnits:DateTimeRoundingUnits)->Bool
+    {
+        var errors = 0
+        switch formatMethod
+        {
+        case .DateWithTime:
+            let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatMethod.rawValue)
+            for rowN in 0..<self.numberOfRowsInData()
+            {
+                errors += self.appendedCalculatedTimeFromStringError(startDateString: self.dataStringsMatrix2D[rowN][startColumn], endDateString: self.dataStringsMatrix2D[rowN][endColumn], dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits)
+            }
+        case .DateOnly:
+            let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatMethod.rawValue)
+            for rowN in 0..<self.numberOfRowsInData()
+            {
+                errors += self.appendedCalculatedTimeFromStringError(startDateString: self.dataStringsMatrix2D[rowN][startColumn].componentsSeparatedByString("T")[0], endDateString: self.dataStringsMatrix2D[rowN][endColumn].componentsSeparatedByString("T")[0], dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits)
+            }
+        case .Custom:
+            let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatString)
+            for rowN in 0..<self.numberOfRowsInData()
+            {
+                errors += self.appendedCalculatedTimeFromStringError(startDateString: self.dataStringsMatrix2D[rowN][startColumn], endDateString: self.dataStringsMatrix2D[rowN][endColumn], dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits)
+            }
+        case .TextRecognition:
+            let dateFormat = CSVdata.dataDetector()
+            for rowN in 0..<self.numberOfRowsInData()
+            {
+                errors += self.appendedCalculatedTimeDetectedInStringError(
+                    startDateString: self.dataStringsMatrix2D[rowN][startColumn].stringByReplacingOccurrencesOfString("T", withString: " at "),
+                    endDateString: self.dataStringsMatrix2D[rowN][endColumn].stringByReplacingOccurrencesOfString("T", withString: " at "),
+                    dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits)
+            }
+        }
+        
+        //add name to headers array
+        self.headersStringsArray1D.append(title+"("+roundingUnits.rawValue+")")
+        return true
+    }
+
     // MARK: - Add to Column
     
     class func appendThisStringsArray1DToStringsMatrix2D(inout matrix2DToBeAppendedTo matrix2DToBeAppendedTo:StringsMatrix2D, array1DToAppend:StringsArray1D)
