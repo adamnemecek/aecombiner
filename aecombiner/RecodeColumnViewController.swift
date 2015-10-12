@@ -8,14 +8,23 @@
 
 import Cocoa
 
-
-let kParametersArray_ParametersIndex = 0
-let kParametersArray_ValueIndex = 1
-let kParametersArray_BooleanIndex = 2
-let kSelectedParametersArrayColumnIndex = 0
-let kSelectedParametersArrayParameterIndex = 1
 let kStringEmpty = "- Empty -"
 let kStringRecodedColumnNameSuffix = "_#_"
+
+enum ParametersValueBoolColumnIndexes: Int
+{
+    case ParametersIndex = 0
+    case ValueIndex = 1
+    case BooleanIndex = 2
+}
+
+enum RecodeTabViewTitles:String
+{
+    case Single = "Single"
+    case Multiple = "Multiple"
+    case Boolean = "Boolean"
+    case DateTime = "Date-Time"
+}
 
 enum DateTimeRecodeMethod:String
 {
@@ -27,15 +36,17 @@ enum DateTimeRecodeMethod:String
 enum DateTimeRoundingUnits:String
 {
     case Seconds = "Seconds"
+    case Minutes = "Minutes"
     case Hours = "Hours"
     case Days = "Days"
     static func roundedTimeAccordingToUnits(time time:NSTimeInterval, units:DateTimeRoundingUnits)->NSTimeInterval
     {
         switch units
         {
-        case .Seconds: return time
         case .Days: return time/86400.0
         case .Hours: return time/3600.0
+        case .Minutes: return time/60.0
+        case .Seconds: return time
         }
     }
 }
@@ -172,7 +183,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBAction func checkBoxToggleRecodeStatusTapped(sender: NSButton) {
         for row in 0..<self.arrayExtractedParameters.count
         {
-            self.arrayExtractedParameters[row][kParametersArray_BooleanIndex] = String(sender.state)
+            self.arrayExtractedParameters[row][ParametersValueBoolColumnIndexes.BooleanIndex.rawValue] = String(sender.state)
         }
         self.tvExtractedParametersSingle.reloadData()
     }
@@ -240,7 +251,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         {
         case "checkBoxRecode":
             guard sender.tag < self.arrayExtractedParameters.count else {break}
-            self.arrayExtractedParameters[sender.tag][kParametersArray_BooleanIndex] = String(sender.state)
+            self.arrayExtractedParameters[sender.tag][ParametersValueBoolColumnIndexes.BooleanIndex.rawValue] = String(sender.state)
         default:
             break
         }
@@ -259,7 +270,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
             {
                 break
             }
-            self.arrayExtractedParameters[control.tag][kParametersArray_ValueIndex] = str
+            self.arrayExtractedParameters[control.tag][ParametersValueBoolColumnIndexes.ValueIndex.rawValue] = str
         default:
             break
         }
@@ -271,7 +282,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         let valueS = self.textFieldSetValue.stringValue
         for index in self.tvExtractedParametersMultiple.selectedRowIndexes
         {
-            self.arrayExtractedParameters[index][kParametersArray_ValueIndex] = valueS
+            self.arrayExtractedParameters[index][ParametersValueBoolColumnIndexes.ValueIndex.rawValue] = valueS
         }
         self.reloadTables()
     }
@@ -299,10 +310,10 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
                 {
                 case "parameter":
                     cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
-                    cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArray_ParametersIndex]
+                    cellView.textField!.stringValue = self.arrayExtractedParameters[row][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]
                 case "value"://parameters
                     cellView = tableView.makeViewWithIdentifier("parametersValueCell", owner: self) as! NSTableCellView
-                    cellView.textField!.stringValue = self.arrayExtractedParameters[row][kParametersArray_ValueIndex]
+                    cellView.textField!.stringValue = self.arrayExtractedParameters[row][ParametersValueBoolColumnIndexes.ValueIndex.rawValue]
                     cellView.textField!.tag = row
                 case "bool"://parameters
                     cellView = tableView.makeViewWithIdentifier("parametersBoolCell", owner: self) as! NSTableCellView
@@ -310,7 +321,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
                     {
                         guard
                         let box = (subview as? NSButton),
-                        let value = NSCellStateValue(self.arrayExtractedParameters[row][kParametersArray_BooleanIndex])
+                        let value = NSCellStateValue(self.arrayExtractedParameters[row][ParametersValueBoolColumnIndexes.BooleanIndex.rawValue])
                         else {continue}
                         box.tag = row
                         box.state =  value//== "true" ? NSOnState : NSOffState
@@ -368,6 +379,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
 
     func tabView(tabView: NSTabView, didSelectTabViewItem tabViewItem: NSTabViewItem?) {
         self.resetExtractedParameters(andPopupHeaders: true)
+        self.buttonOverwite.hidden = tabView.selectedTabViewItem!.label == RecodeTabViewTitles.DateTime.rawValue
     }
     
     // MARK: - Column parameters
@@ -409,14 +421,15 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     func doTheRecodeParametersAndAddNewColumn()
     {
         guard
-            let id = self.tabbedVrecoding.selectedTabViewItem?.label
+            let id = self.tabbedVrecoding.selectedTabViewItem?.label,
+        let tabTitle = RecodeTabViewTitles(rawValue: id)
         else {return}
 
-        switch id
+        switch tabTitle
         {
-        case "Date-Time":
+        case .DateTime:
             self.recodeDateTime_FromOneColumn(overwrite: false)
-        default:
+        case .Single, .Multiple, .Boolean:
             guard
                 let csvdo = self.associatedCSVmodel,
                 let csvdVC = self.associatedCSVdataViewController,
@@ -429,7 +442,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
             guard
                 //pass it over
                 csvdVC.addedRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState)
-                else { return}
+                else {return}
             
             //reload etc
             self.resetExtractedParameters(andPopupHeaders: true)
@@ -470,7 +483,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
             else {return}
             
             let newTitle = csvdo.headerStringForColumnIndex(columnIndexStart)+"->"+csvdo.headerStringForColumnIndex(columnIndexEnd)
-            recodedOK = csvdVC.calculatedDateTimeToNewColumn(withTitle: newTitle, startColumn: columnIndexStart, endColumn: columnIndexEnd, formatMethod: formatMethod, formatString: formatString, roundingUnits: roundingunits)
+            recodedOK = csvdVC.calculatedDateTimeToNewColumn(withTitle: newTitle, startColumn: columnIndexStart, endColumn: columnIndexEnd, formatMethod: formatMethod, formatString: formatString, roundingUnits: roundingunits, copyUnmatchedValues: self.checkboxCopyUnmatchedValues.state == NSOnState)
             
         }
         

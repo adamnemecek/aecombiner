@@ -90,7 +90,7 @@ struct PredicateForExtracting: Comparable
         var arrayOfExtractedParametersToGroupBy = StringsArray1D()
         for parameter in params
         {
-            arrayOfExtractedParametersToGroupBy.append(parameter[kParametersArray_ParametersIndex])
+            arrayOfExtractedParametersToGroupBy.append(parameter[ParametersValueBoolColumnIndexes.ParametersIndex.rawValue])
         }
         return arrayOfExtractedParametersToGroupBy
         

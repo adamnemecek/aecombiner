@@ -1069,8 +1069,8 @@
                                 <rect key="frame" x="0.0" y="42" width="277" height="270"/>
                                 <animations/>
                             </customView>
-                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tro-bF-AhT">
-                                <rect key="frame" x="-4" y="-2" width="63" height="24"/>
+                            <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tro-bF-AhT">
+                                <rect key="frame" x="-4" y="-2" width="63" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="63" id="ng7-rH-sXh"/>
                                 </constraints>
@@ -1088,8 +1088,8 @@
                                     <action selector="segmentChartTypeTapped:" target="3ve-cH-Ehb" id="zMw-YV-9PF"/>
                                 </connections>
                             </segmentedControl>
-                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gyU-vu-SOY">
-                                <rect key="frame" x="93" y="-2" width="137" height="24"/>
+                            <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gyU-vu-SOY">
+                                <rect key="frame" x="93" y="-2" width="137" height="25"/>
                                 <animations/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="separated" trackingMode="selectOne" id="A27-V9-4sU">
                                     <font key="font" metaFont="system"/>
@@ -1186,7 +1186,7 @@
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sJa-48-Gnf">
                                 <rect key="frame" x="161" y="55" width="113" height="32"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="101" id="V7I-N3-ejn"/>
+                                    <constraint firstAttribute="width" constant="101" id="dun-rt-XJx"/>
                                 </constraints>
                                 <animations/>
                                 <buttonCell key="cell" type="push" title="Add Column:" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7gB-6v-Rns">
@@ -1200,7 +1200,7 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z3H-G4-Ueu">
                                 <rect key="frame" x="399" y="364" width="152" height="17"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="148" id="6OJ-OR-una"/>
+                                    <constraint firstAttribute="width" constant="148" id="yfa-ZF-raF"/>
                                 </constraints>
                                 <animations/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" id="EqU-LW-TDz">
@@ -1230,7 +1230,7 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FkN-VM-u0q">
                                 <rect key="frame" x="18" y="364" width="127" height="17"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="123" id="Lm6-WG-yMg"/>
+                                    <constraint firstAttribute="width" constant="123" id="BTw-nR-7Bt"/>
                                 </constraints>
                                 <animations/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Column To Recode" id="GGU-kc-hJ3">
@@ -1246,7 +1246,7 @@
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oSv-YT-pc7">
                                 <rect key="frame" x="14" y="55" width="151" height="32"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="139" id="sBJ-rR-a5c"/>
+                                    <constraint firstAttribute="width" constant="139" id="1Q5-ki-c7I"/>
                                 </constraints>
                                 <animations/>
                                 <buttonCell key="cell" type="push" title="Overwrite Column" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="52I-WW-7bK">
@@ -1260,7 +1260,7 @@
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="e0U-wn-BM4">
                                 <rect key="frame" x="473" y="65" width="187" height="18"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="183" id="Vp5-tr-gXm"/>
+                                    <constraint firstAttribute="width" constant="183" id="wsk-3x-TrP"/>
                                 </constraints>
                                 <animations/>
                                 <buttonCell key="cell" type="check" title="Keep Unmatched Values" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1Mj-zT-djg">
@@ -1271,7 +1271,7 @@
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1LE-X9-Xpc">
                                 <rect key="frame" x="14" y="13" width="76" height="32"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="64" id="oBL-An-Ooe"/>
+                                    <constraint firstAttribute="width" constant="64" id="hhe-ry-sZf"/>
                                 </constraints>
                                 <animations/>
                                 <buttonCell key="cell" type="push" title="Close" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xTt-hU-0vv">
@@ -1878,16 +1878,124 @@
                                             <rect key="frame" x="10" y="33" width="636" height="231"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <box title="Date Formatting String" boxType="secondary" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="Jo4-hx-RJC">
-                                                    <rect key="frame" x="6" y="5" width="624" height="80"/>
+                                                <box title="Recode To Perform" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="JHL-Er-dbf">
+                                                    <rect key="frame" x="6" y="5" width="624" height="121"/>
+                                                    <view key="contentView" id="E6Z-3q-nFA">
+                                                        <rect key="frame" x="1" y="1" width="622" height="99"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        <subviews>
+                                                            <button identifier="radio_TimeSinceColumn" translatesAutoresizingMaskIntoConstraints="NO" id="RIq-pR-GxG">
+                                                                <rect key="frame" x="19" y="70" width="128" height="18"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="width" constant="125" id="TiM-BZ-gZH"/>
+                                                                </constraints>
+                                                                <animations/>
+                                                                <buttonCell key="cell" type="radio" title="Calculate time to:" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="612-zB-GiX">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="radioTimeDateTapped:" target="5gI-5U-AMq" id="Zlw-Ex-tAW"/>
+                                                                </connections>
+                                                            </button>
+                                                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2s0-8r-oYH">
+                                                                <rect key="frame" x="151" y="66" width="239" height="26"/>
+                                                                <animations/>
+                                                                <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="dX9-fH-NM5" id="l0S-5O-bBs">
+                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="menu"/>
+                                                                    <menu key="menu" id="9Dz-9q-Lzv">
+                                                                        <items>
+                                                                            <menuItem title="Item 1" state="on" id="dX9-fH-NM5"/>
+                                                                            <menuItem title="Item 2" id="Cm4-Tg-7v8"/>
+                                                                            <menuItem title="Item 3" id="UiA-Mm-xvU"/>
+                                                                        </items>
+                                                                    </menu>
+                                                                </popUpButtonCell>
+                                                            </popUpButton>
+                                                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EwH-Lv-mSF">
+                                                                <rect key="frame" x="460" y="66" width="134" height="26"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="width" constant="129" id="GDU-3Y-Fli"/>
+                                                                </constraints>
+                                                                <animations/>
+                                                                <popUpButtonCell key="cell" type="push" title="Seconds" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="C5A-n6-hE8" id="J0D-eN-Dln">
+                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="menu"/>
+                                                                    <menu key="menu" id="jhe-iy-cGT">
+                                                                        <items>
+                                                                            <menuItem title="Days" id="Qrv-Re-QnM"/>
+                                                                            <menuItem title="Hours" id="TKN-Kc-wrP"/>
+                                                                            <menuItem title="Minutes" id="eq1-hh-IYU"/>
+                                                                            <menuItem title="Seconds" state="on" id="C5A-n6-hE8"/>
+                                                                        </items>
+                                                                    </menu>
+                                                                </popUpButtonCell>
+                                                            </popUpButton>
+                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2UJ-gT-Zpt">
+                                                                <rect key="frame" x="393" y="71" width="70" height="17"/>
+                                                                <animations/>
+                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Express in:" id="48C-Jv-kCO">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <button identifier="radio_ConvertInteger" translatesAutoresizingMaskIntoConstraints="NO" id="c3t-18-gcY">
+                                                                <rect key="frame" x="19" y="32" width="427" height="18"/>
+                                                                <animations/>
+                                                                <buttonCell key="cell" type="radio" title="Convert to integer values (time elapsed from a from standard date)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="X6Z-yK-GO6">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="radioTimeDateTapped:" target="5gI-5U-AMq" id="uJw-OK-JaL"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button identifier="radio_ConvertString" translatesAutoresizingMaskIntoConstraints="NO" id="ZB1-78-Ezy">
+                                                                <rect key="frame" x="19" y="10" width="267" height="18"/>
+                                                                <animations/>
+                                                                <buttonCell key="cell" type="radio" title="Convert to a standard date format string" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="MfU-XA-tcn">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="radioTimeDateTapped:" target="5gI-5U-AMq" id="bKT-KA-bvu"/>
+                                                                </connections>
+                                                            </button>
+                                                        </subviews>
+                                                        <constraints>
+                                                            <constraint firstItem="2s0-8r-oYH" firstAttribute="top" secondItem="E6Z-3q-nFA" secondAttribute="top" constant="9" id="3xy-zd-LWM"/>
+                                                            <constraint firstItem="RIq-pR-GxG" firstAttribute="leading" secondItem="E6Z-3q-nFA" secondAttribute="leading" constant="20" symbolic="YES" id="Gpt-4R-UPx"/>
+                                                            <constraint firstItem="2s0-8r-oYH" firstAttribute="baseline" secondItem="EwH-Lv-mSF" secondAttribute="baseline" id="Jaw-Q6-IxI"/>
+                                                            <constraint firstItem="ZB1-78-Ezy" firstAttribute="leading" secondItem="c3t-18-gcY" secondAttribute="leading" id="Xhq-wC-r3G"/>
+                                                            <constraint firstItem="ZB1-78-Ezy" firstAttribute="top" secondItem="c3t-18-gcY" secondAttribute="bottom" constant="6" symbolic="YES" id="aaq-2r-Z0B"/>
+                                                            <constraint firstItem="EwH-Lv-mSF" firstAttribute="centerY" secondItem="2UJ-gT-Zpt" secondAttribute="centerY" id="bvN-wE-GtD"/>
+                                                            <constraint firstAttribute="trailing" secondItem="EwH-Lv-mSF" secondAttribute="trailing" constant="31" id="gdP-Rm-I2r"/>
+                                                            <constraint firstItem="c3t-18-gcY" firstAttribute="leading" secondItem="RIq-pR-GxG" secondAttribute="leading" id="jPd-pN-SgS"/>
+                                                            <constraint firstItem="2s0-8r-oYH" firstAttribute="leading" secondItem="RIq-pR-GxG" secondAttribute="trailing" constant="8" symbolic="YES" id="jUk-2Y-GTG"/>
+                                                            <constraint firstItem="EwH-Lv-mSF" firstAttribute="leading" secondItem="2UJ-gT-Zpt" secondAttribute="trailing" constant="1" id="nec-fr-KgM"/>
+                                                            <constraint firstItem="2UJ-gT-Zpt" firstAttribute="baseline" secondItem="RIq-pR-GxG" secondAttribute="baseline" id="tcj-s4-fVa"/>
+                                                            <constraint firstItem="c3t-18-gcY" firstAttribute="top" secondItem="2s0-8r-oYH" secondAttribute="bottom" constant="20" id="twV-FB-ixb"/>
+                                                            <constraint firstItem="2UJ-gT-Zpt" firstAttribute="leading" secondItem="2s0-8r-oYH" secondAttribute="trailing" constant="8" symbolic="YES" id="uIp-6x-K3A"/>
+                                                        </constraints>
+                                                        <animations/>
+                                                    </view>
+                                                    <animations/>
+                                                    <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                    <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    <font key="titleFont" metaFont="system" size="16"/>
+                                                </box>
+                                                <box title="Date Formatting String Required" boxType="secondary" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="Jo4-hx-RJC">
+                                                    <rect key="frame" x="6" y="144" width="624" height="80"/>
                                                     <view key="contentView" id="Mja-Vo-v7g">
-                                                        <rect key="frame" x="1" y="1" width="622" height="61"/>
+                                                        <rect key="frame" x="1" y="1" width="622" height="58"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4KB-QE-Yxk">
-                                                                <rect key="frame" x="18" y="32" width="246" height="26"/>
+                                                                <rect key="frame" x="18" y="29" width="246" height="26"/>
                                                                 <constraints>
-                                                                    <constraint firstAttribute="width" constant="241" id="z8M-vk-2kr"/>
+                                                                    <constraint firstAttribute="width" constant="241" id="M4o-DK-uNN"/>
                                                                 </constraints>
                                                                 <animations/>
                                                                 <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="tCC-pM-3ng">
@@ -1907,7 +2015,7 @@
                                                                 </connections>
                                                             </popUpButton>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DL0-bu-T9y">
-                                                                <rect key="frame" x="18" y="10" width="586" height="17"/>
+                                                                <rect key="frame" x="18" y="7" width="586" height="17"/>
                                                                 <animations/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="XLE-Zr-20p">
                                                                     <font key="font" metaFont="system"/>
@@ -1916,7 +2024,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qmG-FI-e64">
-                                                                <rect key="frame" x="269" y="35" width="333" height="22"/>
+                                                                <rect key="frame" x="269" y="32" width="333" height="22"/>
                                                                 <animations/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="yyyy'-'MM'-'dd'T'HH':'mm" drawsBackground="YES" id="tx7-sf-MSf">
                                                                     <font key="font" metaFont="system"/>
@@ -1926,119 +2034,32 @@
                                                             </textField>
                                                         </subviews>
                                                         <constraints>
-                                                            <constraint firstAttribute="bottom" secondItem="DL0-bu-T9y" secondAttribute="bottom" constant="10" id="7K9-Vp-tqM"/>
-                                                            <constraint firstItem="DL0-bu-T9y" firstAttribute="top" secondItem="4KB-QE-Yxk" secondAttribute="bottom" constant="8" symbolic="YES" id="9ao-V4-5Ip"/>
-                                                            <constraint firstAttribute="trailing" secondItem="qmG-FI-e64" secondAttribute="trailing" constant="20" symbolic="YES" id="S8E-OT-pOr"/>
-                                                            <constraint firstItem="qmG-FI-e64" firstAttribute="top" secondItem="Mja-Vo-v7g" secondAttribute="top" constant="4" id="W3K-Ze-z4N"/>
-                                                            <constraint firstItem="4KB-QE-Yxk" firstAttribute="leading" secondItem="DL0-bu-T9y" secondAttribute="leading" id="Zx3-pv-lNl"/>
-                                                            <constraint firstItem="qmG-FI-e64" firstAttribute="leading" secondItem="4KB-QE-Yxk" secondAttribute="trailing" constant="8" symbolic="YES" id="bU3-b4-yBP"/>
-                                                            <constraint firstItem="4KB-QE-Yxk" firstAttribute="leading" secondItem="Mja-Vo-v7g" secondAttribute="leading" constant="20" symbolic="YES" id="faR-6N-1WV"/>
-                                                            <constraint firstItem="qmG-FI-e64" firstAttribute="trailing" secondItem="DL0-bu-T9y" secondAttribute="trailing" id="fmF-kH-H7T"/>
-                                                            <constraint firstItem="DL0-bu-T9y" firstAttribute="top" secondItem="qmG-FI-e64" secondAttribute="bottom" constant="8" symbolic="YES" id="pi2-7e-glx"/>
+                                                            <constraint firstItem="DL0-bu-T9y" firstAttribute="top" secondItem="qmG-FI-e64" secondAttribute="bottom" constant="8" symbolic="YES" id="1yw-y5-wsx"/>
+                                                            <constraint firstItem="qmG-FI-e64" firstAttribute="trailing" secondItem="DL0-bu-T9y" secondAttribute="trailing" id="8qb-jz-YZL"/>
+                                                            <constraint firstAttribute="trailing" secondItem="qmG-FI-e64" secondAttribute="trailing" constant="20" symbolic="YES" id="9Tz-BJ-l1C"/>
+                                                            <constraint firstItem="4KB-QE-Yxk" firstAttribute="leading" secondItem="Mja-Vo-v7g" secondAttribute="leading" constant="20" symbolic="YES" id="FzB-lD-nx6"/>
+                                                            <constraint firstItem="qmG-FI-e64" firstAttribute="leading" secondItem="4KB-QE-Yxk" secondAttribute="trailing" constant="8" symbolic="YES" id="L9n-8U-7yT"/>
+                                                            <constraint firstAttribute="bottom" secondItem="DL0-bu-T9y" secondAttribute="bottom" constant="7" id="iqn-h9-re4"/>
+                                                            <constraint firstItem="DL0-bu-T9y" firstAttribute="leading" secondItem="4KB-QE-Yxk" secondAttribute="leading" id="r25-AO-aQO"/>
+                                                            <constraint firstItem="DL0-bu-T9y" firstAttribute="top" secondItem="4KB-QE-Yxk" secondAttribute="bottom" constant="8" symbolic="YES" id="rSf-Ec-HXs"/>
+                                                            <constraint firstItem="qmG-FI-e64" firstAttribute="top" secondItem="Mja-Vo-v7g" secondAttribute="top" constant="4" id="xqZ-Ec-yY0"/>
                                                         </constraints>
                                                         <animations/>
                                                     </view>
                                                     <animations/>
                                                     <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                     <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                    <font key="titleFont" metaFont="system"/>
+                                                    <font key="titleFont" metaFont="system" size="16"/>
                                                 </box>
-                                                <button identifier="radio_TimeSinceColumn" translatesAutoresizingMaskIntoConstraints="NO" id="RIq-pR-GxG">
-                                                    <rect key="frame" x="16" y="208" width="128" height="18"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="125" id="2lF-ZQ-lWb"/>
-                                                    </constraints>
-                                                    <animations/>
-                                                    <buttonCell key="cell" type="radio" title="Calculate time to:" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="612-zB-GiX">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="radioTimeDateTapped:" target="5gI-5U-AMq" id="Zlw-Ex-tAW"/>
-                                                    </connections>
-                                                </button>
-                                                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2s0-8r-oYH">
-                                                    <rect key="frame" x="148" y="204" width="239" height="26"/>
-                                                    <animations/>
-                                                    <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="dX9-fH-NM5" id="l0S-5O-bBs">
-                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="menu"/>
-                                                        <menu key="menu" id="9Dz-9q-Lzv">
-                                                            <items>
-                                                                <menuItem title="Item 1" state="on" id="dX9-fH-NM5"/>
-                                                                <menuItem title="Item 2" id="Cm4-Tg-7v8"/>
-                                                                <menuItem title="Item 3" id="UiA-Mm-xvU"/>
-                                                            </items>
-                                                        </menu>
-                                                    </popUpButtonCell>
-                                                </popUpButton>
-                                                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EwH-Lv-mSF">
-                                                    <rect key="frame" x="457" y="204" width="134" height="26"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="129" id="nRG-Z0-iln"/>
-                                                    </constraints>
-                                                    <animations/>
-                                                    <popUpButtonCell key="cell" type="push" title="Seconds" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="C5A-n6-hE8" id="J0D-eN-Dln">
-                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="menu"/>
-                                                        <menu key="menu" id="jhe-iy-cGT">
-                                                            <items>
-                                                                <menuItem title="Seconds" state="on" id="C5A-n6-hE8"/>
-                                                                <menuItem title="Hours" id="TKN-Kc-wrP"/>
-                                                                <menuItem title="Days" id="Qrv-Re-QnM"/>
-                                                            </items>
-                                                        </menu>
-                                                    </popUpButtonCell>
-                                                </popUpButton>
-                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2UJ-gT-Zpt">
-                                                    <rect key="frame" x="390" y="209" width="63" height="17"/>
-                                                    <animations/>
-                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Round to:" id="48C-Jv-kCO">
-                                                        <font key="font" metaFont="system"/>
-                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                </textField>
-                                                <button identifier="radio_ConvertInteger" translatesAutoresizingMaskIntoConstraints="NO" id="c3t-18-gcY">
-                                                    <rect key="frame" x="16" y="170" width="294" height="18"/>
-                                                    <animations/>
-                                                    <buttonCell key="cell" type="radio" title="Convert to integer values from standard date" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="X6Z-yK-GO6">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="radioTimeDateTapped:" target="5gI-5U-AMq" id="uJw-OK-JaL"/>
-                                                    </connections>
-                                                </button>
-                                                <button identifier="radio_ConvertString" translatesAutoresizingMaskIntoConstraints="NO" id="ZB1-78-Ezy">
-                                                    <rect key="frame" x="16" y="148" width="256" height="18"/>
-                                                    <animations/>
-                                                    <buttonCell key="cell" type="radio" title="Convert to standard date format string" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="MfU-XA-tcn">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="radioTimeDateTapped:" target="5gI-5U-AMq" id="bKT-KA-bvu"/>
-                                                    </connections>
-                                                </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="Jo4-hx-RJC" secondAttribute="bottom" constant="9" id="0tV-RH-7D4"/>
-                                                <constraint firstItem="2UJ-gT-Zpt" firstAttribute="leading" secondItem="2s0-8r-oYH" secondAttribute="trailing" constant="8" symbolic="YES" id="4xp-gP-Kqk"/>
-                                                <constraint firstAttribute="trailing" secondItem="Jo4-hx-RJC" secondAttribute="trailing" constant="9" id="9U5-n9-gx9"/>
-                                                <constraint firstItem="RIq-pR-GxG" firstAttribute="baseline" secondItem="2UJ-gT-Zpt" secondAttribute="baseline" id="BZI-lb-2VC"/>
-                                                <constraint firstItem="ZB1-78-Ezy" firstAttribute="top" secondItem="c3t-18-gcY" secondAttribute="bottom" constant="6" symbolic="YES" id="Bdp-fG-7OV"/>
-                                                <constraint firstItem="c3t-18-gcY" firstAttribute="top" secondItem="2s0-8r-oYH" secondAttribute="bottom" constant="20" id="LCH-vn-NRa"/>
-                                                <constraint firstItem="2s0-8r-oYH" firstAttribute="top" secondItem="B9a-Wf-TDQ" secondAttribute="top" constant="3" id="MV1-nS-aGF"/>
-                                                <constraint firstItem="EwH-Lv-mSF" firstAttribute="leading" secondItem="2UJ-gT-Zpt" secondAttribute="trailing" constant="8" symbolic="YES" id="QDZ-PH-xAb"/>
-                                                <constraint firstAttribute="trailing" secondItem="EwH-Lv-mSF" secondAttribute="trailing" constant="48" id="Qan-kE-g7G"/>
-                                                <constraint firstItem="RIq-pR-GxG" firstAttribute="leading" secondItem="c3t-18-gcY" secondAttribute="leading" id="Rle-JY-iCl"/>
-                                                <constraint firstItem="2UJ-gT-Zpt" firstAttribute="centerY" secondItem="EwH-Lv-mSF" secondAttribute="centerY" id="Trp-Nb-vlu"/>
-                                                <constraint firstItem="2s0-8r-oYH" firstAttribute="baseline" secondItem="EwH-Lv-mSF" secondAttribute="baseline" id="Wcf-N5-3Zk"/>
-                                                <constraint firstItem="RIq-pR-GxG" firstAttribute="leading" secondItem="B9a-Wf-TDQ" secondAttribute="leading" constant="17" id="a3z-r9-JWh"/>
-                                                <constraint firstItem="Jo4-hx-RJC" firstAttribute="leading" secondItem="B9a-Wf-TDQ" secondAttribute="leading" constant="9" id="nvs-mv-bIF"/>
-                                                <constraint firstItem="2s0-8r-oYH" firstAttribute="leading" secondItem="RIq-pR-GxG" secondAttribute="trailing" constant="8" symbolic="YES" id="suu-SR-kOB"/>
-                                                <constraint firstItem="c3t-18-gcY" firstAttribute="leading" secondItem="ZB1-78-Ezy" secondAttribute="leading" id="x4a-Sp-7ya"/>
+                                                <constraint firstItem="JHL-Er-dbf" firstAttribute="trailing" secondItem="Jo4-hx-RJC" secondAttribute="trailing" id="0SC-LF-BjR"/>
+                                                <constraint firstAttribute="bottom" secondItem="JHL-Er-dbf" secondAttribute="bottom" constant="9" id="L0L-Bc-03w"/>
+                                                <constraint firstAttribute="trailing" secondItem="Jo4-hx-RJC" secondAttribute="trailing" constant="9" id="PAZ-pZ-WqF"/>
+                                                <constraint firstItem="JHL-Er-dbf" firstAttribute="top" secondItem="Jo4-hx-RJC" secondAttribute="bottom" constant="22" id="RGO-xv-zBc"/>
+                                                <constraint firstItem="Jo4-hx-RJC" firstAttribute="leading" secondItem="B9a-Wf-TDQ" secondAttribute="leading" constant="9" id="ZWX-HG-DvX"/>
+                                                <constraint firstItem="JHL-Er-dbf" firstAttribute="leading" secondItem="Jo4-hx-RJC" secondAttribute="leading" id="a0A-mN-uuK"/>
+                                                <constraint firstItem="Jo4-hx-RJC" firstAttribute="top" secondItem="B9a-Wf-TDQ" secondAttribute="top" constant="7" id="sRk-nZ-7TG"/>
                                             </constraints>
                                             <animations/>
                                         </view>
@@ -2051,7 +2072,7 @@
                             <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iQB-OF-IYM">
                                 <rect key="frame" x="573" y="360" width="89" height="23"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="89" id="Krf-eh-ILZ"/>
+                                    <constraint firstAttribute="width" constant="89" id="xgf-cM-bLp"/>
                                 </constraints>
                                 <animations/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="smallSquare" trackingMode="selectOne" id="1i7-cB-oJh">
@@ -2064,33 +2085,33 @@
                             </segmentedControl>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="ZxS-fY-5T6" firstAttribute="leading" secondItem="oSv-YT-pc7" secondAttribute="leading" id="1kN-PL-RdY"/>
-                            <constraint firstItem="e0U-wn-BM4" firstAttribute="baseline" secondItem="2Mv-n5-pTT" secondAttribute="baseline" id="8Sg-SJ-xtU"/>
-                            <constraint firstItem="iQB-OF-IYM" firstAttribute="baseline" secondItem="z3H-G4-Ueu" secondAttribute="baseline" id="HpW-cB-jpu"/>
-                            <constraint firstItem="uRL-sW-lLh" firstAttribute="leading" secondItem="FkN-VM-u0q" secondAttribute="trailing" constant="8" symbolic="YES" id="JOy-88-oG5"/>
-                            <constraint firstAttribute="trailing" secondItem="iQB-OF-IYM" secondAttribute="trailing" constant="20" symbolic="YES" id="KKo-mJ-jOJ"/>
-                            <constraint firstItem="z3H-G4-Ueu" firstAttribute="leading" secondItem="uRL-sW-lLh" secondAttribute="trailing" constant="8" symbolic="YES" id="Kms-pO-W0i"/>
-                            <constraint firstItem="oSv-YT-pc7" firstAttribute="top" secondItem="6OG-Ob-sEY" secondAttribute="bottom" constant="10" id="Ls9-He-bEE"/>
-                            <constraint firstItem="iQB-OF-IYM" firstAttribute="leading" secondItem="z3H-G4-Ueu" secondAttribute="trailing" constant="24" id="Oo3-h0-A5R"/>
-                            <constraint firstItem="FkN-VM-u0q" firstAttribute="baseline" secondItem="z3H-G4-Ueu" secondAttribute="baseline" id="Pv7-cn-wrU"/>
-                            <constraint firstItem="6OG-Ob-sEY" firstAttribute="leading" secondItem="FkN-VM-u0q" secondAttribute="leading" id="S5C-xB-RrC"/>
-                            <constraint firstItem="e0U-wn-BM4" firstAttribute="leading" secondItem="2Mv-n5-pTT" secondAttribute="trailing" constant="8" symbolic="YES" id="SXk-Nl-fJY"/>
-                            <constraint firstItem="oSv-YT-pc7" firstAttribute="baseline" secondItem="sJa-48-Gnf" secondAttribute="baseline" id="TQE-9I-2q2"/>
-                            <constraint firstItem="oSv-YT-pc7" firstAttribute="leading" secondItem="6OG-Ob-sEY" secondAttribute="leading" id="Tbk-XO-Q22"/>
-                            <constraint firstItem="uRL-sW-lLh" firstAttribute="centerY" secondItem="FkN-VM-u0q" secondAttribute="centerY" id="VO2-fx-dVq"/>
-                            <constraint firstItem="2Mv-n5-pTT" firstAttribute="leading" secondItem="sJa-48-Gnf" secondAttribute="trailing" constant="8" symbolic="YES" id="XNo-TK-cwM"/>
-                            <constraint firstItem="ZxS-fY-5T6" firstAttribute="top" secondItem="e0U-wn-BM4" secondAttribute="bottom" constant="4" id="Y3O-E1-nFI"/>
-                            <constraint firstItem="1LE-X9-Xpc" firstAttribute="top" secondItem="ZxS-fY-5T6" secondAttribute="bottom" constant="4" id="YhT-6c-JRE"/>
-                            <constraint firstItem="1LE-X9-Xpc" firstAttribute="leading" secondItem="ZxS-fY-5T6" secondAttribute="leading" id="aO6-zO-IWq"/>
-                            <constraint firstItem="FkN-VM-u0q" firstAttribute="top" secondItem="ERx-hH-rdd" secondAttribute="top" constant="20" symbolic="YES" id="aph-tn-8it"/>
-                            <constraint firstItem="6OG-Ob-sEY" firstAttribute="trailing" secondItem="ZxS-fY-5T6" secondAttribute="trailing" id="cCB-LI-8Sc"/>
-                            <constraint firstItem="6OG-Ob-sEY" firstAttribute="top" secondItem="iQB-OF-IYM" secondAttribute="bottom" constant="7" id="fTJ-6D-kyo"/>
-                            <constraint firstAttribute="trailing" secondItem="e0U-wn-BM4" secondAttribute="trailing" constant="24" id="gHG-Ry-1Nj"/>
-                            <constraint firstItem="2Mv-n5-pTT" firstAttribute="top" secondItem="6OG-Ob-sEY" secondAttribute="bottom" constant="8" symbolic="YES" id="qFU-Ec-YRl"/>
-                            <constraint firstItem="iQB-OF-IYM" firstAttribute="trailing" secondItem="6OG-Ob-sEY" secondAttribute="trailing" id="sWs-Ac-tfP"/>
-                            <constraint firstItem="sJa-48-Gnf" firstAttribute="leading" secondItem="oSv-YT-pc7" secondAttribute="trailing" constant="8" id="wRi-Pi-2g1"/>
-                            <constraint firstAttribute="bottom" secondItem="1LE-X9-Xpc" secondAttribute="bottom" constant="20" symbolic="YES" id="yMT-v8-XG0"/>
-                            <constraint firstItem="FkN-VM-u0q" firstAttribute="leading" secondItem="ERx-hH-rdd" secondAttribute="leading" constant="20" symbolic="YES" id="ze9-cn-1Ws"/>
+                            <constraint firstItem="1LE-X9-Xpc" firstAttribute="top" secondItem="ZxS-fY-5T6" secondAttribute="bottom" constant="4" id="0BF-gE-0eX"/>
+                            <constraint firstItem="FkN-VM-u0q" firstAttribute="leading" secondItem="ERx-hH-rdd" secondAttribute="leading" constant="20" symbolic="YES" id="1TV-9P-1io"/>
+                            <constraint firstItem="iQB-OF-IYM" firstAttribute="baseline" secondItem="z3H-G4-Ueu" secondAttribute="baseline" id="2WS-vP-WPu"/>
+                            <constraint firstItem="oSv-YT-pc7" firstAttribute="top" secondItem="6OG-Ob-sEY" secondAttribute="bottom" constant="10" id="3Ks-Nb-K12"/>
+                            <constraint firstItem="uRL-sW-lLh" firstAttribute="leading" secondItem="FkN-VM-u0q" secondAttribute="trailing" constant="8" symbolic="YES" id="67C-qX-aca"/>
+                            <constraint firstItem="2Mv-n5-pTT" firstAttribute="baseline" secondItem="e0U-wn-BM4" secondAttribute="baseline" id="9iB-Xe-D0g"/>
+                            <constraint firstAttribute="trailing" secondItem="iQB-OF-IYM" secondAttribute="trailing" constant="20" symbolic="YES" id="A9V-rT-M4f"/>
+                            <constraint firstItem="1LE-X9-Xpc" firstAttribute="leading" secondItem="ZxS-fY-5T6" secondAttribute="leading" id="AAQ-kC-KqB"/>
+                            <constraint firstItem="FkN-VM-u0q" firstAttribute="leading" secondItem="6OG-Ob-sEY" secondAttribute="leading" id="AcV-Sh-t7H"/>
+                            <constraint firstItem="z3H-G4-Ueu" firstAttribute="leading" secondItem="uRL-sW-lLh" secondAttribute="trailing" constant="8" symbolic="YES" id="Adi-jz-QlJ"/>
+                            <constraint firstItem="oSv-YT-pc7" firstAttribute="leading" secondItem="ZxS-fY-5T6" secondAttribute="leading" id="BGM-Ql-MxY"/>
+                            <constraint firstItem="2Mv-n5-pTT" firstAttribute="top" secondItem="6OG-Ob-sEY" secondAttribute="bottom" constant="8" symbolic="YES" id="FOf-rr-Lfs"/>
+                            <constraint firstItem="FkN-VM-u0q" firstAttribute="baseline" secondItem="z3H-G4-Ueu" secondAttribute="baseline" id="Lh3-wI-7BX"/>
+                            <constraint firstAttribute="trailing" secondItem="e0U-wn-BM4" secondAttribute="trailing" constant="24" id="No5-C4-wkM"/>
+                            <constraint firstItem="6OG-Ob-sEY" firstAttribute="leading" secondItem="oSv-YT-pc7" secondAttribute="leading" id="NuM-mK-m7L"/>
+                            <constraint firstItem="6OG-Ob-sEY" firstAttribute="top" secondItem="iQB-OF-IYM" secondAttribute="bottom" constant="7" id="Pmg-Kr-D35"/>
+                            <constraint firstItem="FkN-VM-u0q" firstAttribute="top" secondItem="ERx-hH-rdd" secondAttribute="top" constant="20" symbolic="YES" id="RZg-fn-Xs3"/>
+                            <constraint firstItem="1LE-X9-Xpc" firstAttribute="top" secondItem="oSv-YT-pc7" secondAttribute="bottom" constant="21" id="Rgy-3z-foF"/>
+                            <constraint firstItem="6OG-Ob-sEY" firstAttribute="trailing" secondItem="ZxS-fY-5T6" secondAttribute="trailing" id="S0N-AR-DLs"/>
+                            <constraint firstItem="sJa-48-Gnf" firstAttribute="leading" secondItem="oSv-YT-pc7" secondAttribute="trailing" constant="8" id="Und-N1-lfd"/>
+                            <constraint firstAttribute="bottom" secondItem="1LE-X9-Xpc" secondAttribute="bottom" constant="20" symbolic="YES" id="Ypg-bR-ICZ"/>
+                            <constraint firstItem="2Mv-n5-pTT" firstAttribute="leading" secondItem="sJa-48-Gnf" secondAttribute="trailing" constant="8" symbolic="YES" id="cYy-pD-SAG"/>
+                            <constraint firstItem="6OG-Ob-sEY" firstAttribute="trailing" secondItem="iQB-OF-IYM" secondAttribute="trailing" id="fxr-M1-Nai"/>
+                            <constraint firstItem="e0U-wn-BM4" firstAttribute="leading" secondItem="2Mv-n5-pTT" secondAttribute="trailing" constant="8" symbolic="YES" id="oBD-dz-Xow"/>
+                            <constraint firstItem="iQB-OF-IYM" firstAttribute="leading" secondItem="z3H-G4-Ueu" secondAttribute="trailing" constant="24" id="rEk-e5-Osf"/>
+                            <constraint firstItem="FkN-VM-u0q" firstAttribute="centerY" secondItem="uRL-sW-lLh" secondAttribute="centerY" id="v7W-7s-OMU"/>
+                            <constraint firstItem="sJa-48-Gnf" firstAttribute="baseline" secondItem="oSv-YT-pc7" secondAttribute="baseline" id="wQg-wM-CJW"/>
                         </constraints>
                         <animations/>
                     </view>

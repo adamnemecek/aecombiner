@@ -249,7 +249,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
             {
             case "parameter":
                 cellView = tableView.makeViewWithIdentifier("dataSetCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.arrayColumnsToGroupTogether[row][kParametersArray_ParametersIndex]
+                cellView.textField!.stringValue = self.arrayColumnsToGroupTogether[row][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]
             default:
                 break
             }

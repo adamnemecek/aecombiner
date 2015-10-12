@@ -252,10 +252,10 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
             {
             case "parameter":
                 cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.array1ColParams[row][kParametersArray_ParametersIndex]
+                cellView.textField!.stringValue = self.array1ColParams[row][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]
             case "value"://parameters
                 cellView = tableView.makeViewWithIdentifier("parametersValueCell", owner: self) as! NSTableCellView
-                cellView.textField!.stringValue = self.array1ColParams[row][kParametersArray_ValueIndex]
+                cellView.textField!.stringValue = self.array1ColParams[row][ParametersValueBoolColumnIndexes.ValueIndex.rawValue]
                 cellView.textField!.tag = row
             default:
                 break
@@ -263,10 +263,10 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
             
         case "tv2colParameters1":
             cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
-            cellView.textField!.stringValue = self.arrayColParams1[row][kParametersArray_ParametersIndex]
+            cellView.textField!.stringValue = self.arrayColParams1[row][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]
         case "tv2colParameters2":
             cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
-            cellView.textField!.stringValue = self.array2ColParams2[row][kParametersArray_ParametersIndex]
+            cellView.textField!.stringValue = self.array2ColParams2[row][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]
             
         case "tvPredicates":
             let predcellView = tableView.makeViewWithIdentifier("parameterImageCell", owner: self) as! ExtractingPredicateTableCellView
@@ -366,7 +366,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
             let safeParam1Index = self.param1SelectedIndex()
         else { return }
 
-        let matchStr = self.arrayColParams1[safeParam1Index][kParametersArray_ParametersIndex]
+        let matchStr = self.arrayColParams1[safeParam1Index][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]
         guard
             let set = csvdm.dataMatrixOfParametersWithNoBlanksFromColumnIfStringMatchedInColumn(fromColumn:columnToExtractIndex, matchString:matchStr, matchColumn:columnToMatchIndex)
         else { return }
@@ -443,7 +443,7 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
                       boolS = ""
                     break
                 }
-                self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][kParametersArray_ParametersIndex], booleanString: boolS)
+                self.appendPredicateToArray(columnIndexToSearch: csvdo.headerStringForColumnIndex(columnIndex), matchString: arrayParamsToUse[parameterIndex][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue], booleanString: boolS)
 
             }
         }

@@ -92,7 +92,7 @@ class CSVdata {
     }
     
     class func booleanFromParamArray(param param:StringsArray1D)->Bool{
-        return NSCellStateValue(param[kParametersArray_BooleanIndex]) == NSOnState
+        return NSCellStateValue(param[ParametersValueBoolColumnIndexes.BooleanIndex.rawValue]) == NSOnState
     }
     
     class func paramsDictFromParamsArray(paramsArray:StringsMatrix2D)->ParamsDictionary
@@ -101,7 +101,7 @@ class CSVdata {
         var paramsDict = ParamsDictionary()
         for paramNameValueBool in paramsArray where self.booleanFromParamArray(param: paramNameValueBool)
         {
-            paramsDict[paramNameValueBool[kParametersArray_ParametersIndex]] = paramNameValueBool[kParametersArray_ValueIndex]
+            paramsDict[paramNameValueBool[ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]] = paramNameValueBool[ParametersValueBoolColumnIndexes.ValueIndex.rawValue]
         }
         
         //need to strip out kStringEmpty
@@ -215,19 +215,20 @@ class CSVdata {
         }
     }
     
-    func appendedDateFromStringError(dateString dateString:String, dateFormat:NSDateFormatter, rowN:Int, asString:Bool)->Int
+    func appendedDateFromStringError(dateString dateString:String, dateFormat:NSDateFormatter, rowN:Int, asString:Bool, copyUnmatchedValues:Bool)->Int
     {
         guard let date = dateFormat.dateFromString(dateString)
             else
         {
-            self.dataStringsMatrix2D[rowN].append("⚠️ "+dateString)
+            
+            self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? "⚠️ "+dateString : "")
             return 1
         }
         self.appendDateInNewColumn(date: date, asString: asString, rowN: rowN)
         return 0
     }
     
-    func appendedDateDetectedInStringError(dateString dateString:String, dateFormat:NSDataDetector, rowN:Int, asString:Bool)->Int
+    func appendedDateDetectedInStringError(dateString dateString:String, dateFormat:NSDataDetector, rowN:Int, asString:Bool, copyUnmatchedValues:Bool)->Int
     {
         let detected = [dateFormat .firstMatchInString(dateString, options: [], range: NSMakeRange(0, (dateString as NSString).length))]
         for result in detected
@@ -236,7 +237,7 @@ class CSVdata {
                 let date = result?.date
                 else
             {
-                self.dataStringsMatrix2D[rowN].append("⚠️ "+dateString)
+                self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? "⚠️ "+dateString : "")
                 return 1
             }
             self.appendDateInNewColumn(date: date, asString: asString, rowN: rowN)
@@ -245,21 +246,21 @@ class CSVdata {
         return 1
     }
     
-    func appendedCalculatedTimeFromStringError(startDateString startDateString:String, endDateString:String, dateFormat:NSDateFormatter, rowN:Int, roundingUnits:DateTimeRoundingUnits)->Int
+    func appendedCalculatedTimeFromStringError(startDateString startDateString:String, endDateString:String, dateFormat:NSDateFormatter, rowN:Int, roundingUnits:DateTimeRoundingUnits, copyUnmatchedValues:Bool)->Int
     {
         guard
             let startdate = dateFormat.dateFromString(startDateString),
             let enddate = dateFormat.dateFromString(endDateString)
         else
         {
-            self.dataStringsMatrix2D[rowN].append(startDateString+" ⚠️ "+endDateString)
+            self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? startDateString+" ⚠️ "+endDateString : "")
             return 1
         }
         self.dataStringsMatrix2D[rowN].append(String(DateTimeRoundingUnits.roundedTimeAccordingToUnits(time: enddate.timeIntervalSinceDate(startdate), units: roundingUnits)))
         return 0
     }
     
-    func appendedCalculatedTimeDetectedInStringError(startDateString startDateString:String, endDateString:String, dateFormat:NSDataDetector, rowN:Int, roundingUnits:DateTimeRoundingUnits)->Int
+    func appendedCalculatedTimeDetectedInStringError(startDateString startDateString:String, endDateString:String, dateFormat:NSDataDetector, rowN:Int, roundingUnits:DateTimeRoundingUnits, copyUnmatchedValues:Bool)->Int
     {
         let detectedStart = [dateFormat .firstMatchInString(startDateString, options: [], range: NSMakeRange(0, (startDateString as NSString).length))]
         let detectedEnd = [dateFormat .firstMatchInString(endDateString, options: [], range: NSMakeRange(0, (endDateString as NSString).length))]
@@ -286,11 +287,11 @@ class CSVdata {
             self.dataStringsMatrix2D[rowN].append(String(DateTimeRoundingUnits.roundedTimeAccordingToUnits(time: endDate!.timeIntervalSinceDate(startDate!), units: roundingUnits)))
             return 0
         }
-        self.dataStringsMatrix2D[rowN].append(startDateString+" ⚠️ "+endDateString)
+        self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? startDateString+" ⚠️ "+endDateString : "")
         return 1
     }
 
-    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, formatMethod:DateTimeFormatMethod, formatString:String, copyUnmatchedValues:Bool, asString:Bool)->Bool
+    func recodedDateTimeToNewColumn(withTitle title:String, fromColum:Int, formatMethod:DateTimeFormatMethod, formatString:String, asString:Bool, copyUnmatchedValues:Bool)->Bool
     {
         var errors = 0
         switch formatMethod
@@ -299,25 +300,25 @@ class CSVdata {
             let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatMethod.rawValue)
             for rowN in 0..<self.numberOfRowsInData()
             {
-                errors += self.appendedDateFromStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum], dateFormat: dateFormat, rowN: rowN, asString:asString)
+                errors += self.appendedDateFromStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum], dateFormat: dateFormat, rowN: rowN, asString:asString, copyUnmatchedValues: copyUnmatchedValues)
             }
         case .DateOnly:
             let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatMethod.rawValue)
             for rowN in 0..<self.numberOfRowsInData()
             {
-                errors += self.appendedDateFromStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum].componentsSeparatedByString("T")[0], dateFormat: dateFormat, rowN: rowN, asString:asString)
+                errors += self.appendedDateFromStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum].componentsSeparatedByString("T")[0], dateFormat: dateFormat, rowN: rowN, asString:asString, copyUnmatchedValues: copyUnmatchedValues)
             }
         case .Custom:
             let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatString)
             for rowN in 0..<self.numberOfRowsInData()
             {
-                errors += self.appendedDateFromStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum], dateFormat: dateFormat, rowN: rowN, asString:asString)
+                errors += self.appendedDateFromStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum], dateFormat: dateFormat, rowN: rowN, asString:asString, copyUnmatchedValues: copyUnmatchedValues)
             }
        case .TextRecognition:
             let dateFormat = CSVdata.dataDetector()
             for rowN in 0..<self.numberOfRowsInData()
             {
-                errors += self.appendedDateDetectedInStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum].stringByReplacingOccurrencesOfString("T", withString: " at "), dateFormat: dateFormat, rowN: rowN, asString:asString)
+                errors += self.appendedDateDetectedInStringError(dateString: self.dataStringsMatrix2D[rowN][fromColum].stringByReplacingOccurrencesOfString("T", withString: " at "), dateFormat: dateFormat, rowN: rowN, asString:asString, copyUnmatchedValues: copyUnmatchedValues)
             }
         }
         
@@ -326,7 +327,7 @@ class CSVdata {
        return true
     }
     
-    func calculatedDateTimeToNewColumn(withTitle title:String, startColumn:Int, endColumn:Int, formatMethod:DateTimeFormatMethod, formatString:String, roundingUnits:DateTimeRoundingUnits)->Bool
+    func calculatedDateTimeToNewColumn(withTitle title:String, startColumn:Int, endColumn:Int, formatMethod:DateTimeFormatMethod, formatString:String, roundingUnits:DateTimeRoundingUnits, copyUnmatchedValues:Bool)->Bool
     {
         var errors = 0
         switch formatMethod
@@ -335,19 +336,19 @@ class CSVdata {
             let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatMethod.rawValue)
             for rowN in 0..<self.numberOfRowsInData()
             {
-                errors += self.appendedCalculatedTimeFromStringError(startDateString: self.dataStringsMatrix2D[rowN][startColumn], endDateString: self.dataStringsMatrix2D[rowN][endColumn], dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits)
+                errors += self.appendedCalculatedTimeFromStringError(startDateString: self.dataStringsMatrix2D[rowN][startColumn], endDateString: self.dataStringsMatrix2D[rowN][endColumn], dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits, copyUnmatchedValues: copyUnmatchedValues)
             }
         case .DateOnly:
             let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatMethod.rawValue)
             for rowN in 0..<self.numberOfRowsInData()
             {
-                errors += self.appendedCalculatedTimeFromStringError(startDateString: self.dataStringsMatrix2D[rowN][startColumn].componentsSeparatedByString("T")[0], endDateString: self.dataStringsMatrix2D[rowN][endColumn].componentsSeparatedByString("T")[0], dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits)
+                errors += self.appendedCalculatedTimeFromStringError(startDateString: self.dataStringsMatrix2D[rowN][startColumn].componentsSeparatedByString("T")[0], endDateString: self.dataStringsMatrix2D[rowN][endColumn].componentsSeparatedByString("T")[0], dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits, copyUnmatchedValues: copyUnmatchedValues)
             }
         case .Custom:
             let dateFormat = CSVdata.standardDateFormatterWithFormatString(formatString)
             for rowN in 0..<self.numberOfRowsInData()
             {
-                errors += self.appendedCalculatedTimeFromStringError(startDateString: self.dataStringsMatrix2D[rowN][startColumn], endDateString: self.dataStringsMatrix2D[rowN][endColumn], dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits)
+                errors += self.appendedCalculatedTimeFromStringError(startDateString: self.dataStringsMatrix2D[rowN][startColumn], endDateString: self.dataStringsMatrix2D[rowN][endColumn], dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits, copyUnmatchedValues: copyUnmatchedValues)
             }
         case .TextRecognition:
             let dateFormat = CSVdata.dataDetector()
@@ -356,7 +357,7 @@ class CSVdata {
                 errors += self.appendedCalculatedTimeDetectedInStringError(
                     startDateString: self.dataStringsMatrix2D[rowN][startColumn].stringByReplacingOccurrencesOfString("T", withString: " at "),
                     endDateString: self.dataStringsMatrix2D[rowN][endColumn].stringByReplacingOccurrencesOfString("T", withString: " at "),
-                    dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits)
+                    dateFormat: dateFormat, rowN: rowN, roundingUnits: roundingUnits, copyUnmatchedValues: copyUnmatchedValues)
             }
         }
         
