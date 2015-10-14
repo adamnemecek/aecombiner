@@ -55,9 +55,9 @@ class ChartDataSet {
             return}
         
         var hadErrors = 0
-        for rowN in 0..<data[columnIndex].count
+        for rowN in 0..<data.count
         {
-            let valS = data[columnIndex][rowN]
+            let valS = data[rowN][columnIndex]
             guard
                 !valS.isEmpty,
                 let Yvalue = Double(valS)

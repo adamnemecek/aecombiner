@@ -77,6 +77,14 @@ class ColumnsViewController: ColumnSortingChartingViewController {
         chartviewC.plotNewChartDataSet(dataSet: dataSet, nameOfChartDataSet: csvdatamodel.headerStringForColumnIndex(self.tvHeaders.selectedRow))
     }
 
+    override func extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexes: NSMutableIndexSet, nameOfDataSet: String) {
+        guard let csvdata = self.associatedCSVdataDocument?.csvDataModel else {return}
+        
+        // 1 step as we use self.associatedCSVdataDocument?.csvDataModel directly
+        csvdata.createNewDocumentFromRowsInIndexSet(rows: indexes, docName: nameOfDataSet)
+    }
+
+    // MARK: - overrides
     override func viewWillAppear() {
         super.viewWillAppear()
 
