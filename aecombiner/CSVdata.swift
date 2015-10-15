@@ -785,10 +785,19 @@ class CSVdata {
     }
     
     // MARK: - ChartDataSet
-    func chartDataSetFromColumnIndex(columnIndex columnIndex:Int)->ChartDataSet
+    func chartDataSetFromColumnIndexes(columnIndexes columnIndexes:NSIndexSet)->ChartDataSet
     {
-        return ChartDataSet(data: self.dataStringsMatrix2D, forColumnIndex: columnIndex)
+        switch columnIndexes.count
+        {
+        case 0:
+            return ChartDataSet()
+        case 1:
+            return ChartDataSet(data: self.dataStringsMatrix2D, forColumnIndex: columnIndexes.firstIndex)
+        case 2:
+            return ChartDataSet(data: self.dataStringsMatrix2D, columnIndexY: columnIndexes.firstIndex, columnIndexX: columnIndexes.lastIndex)
+        default:
+            return ChartDataSet()
+        }
     }
 
-    
 }

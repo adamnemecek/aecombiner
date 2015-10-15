@@ -28,7 +28,8 @@ struct ChartBorders {
 }
 
 class DataPointNode: SKSpriteNode {
-    var dataPoint:ChartDataPoint = ChartDataPoint(xvalue: 0.0, yvalue: 0.0)
+
+    var dataPoint:ChartDataPoint = ChartDataPoint(xValue: 0.0, yValue: 0.0, colY: nil, colX: nil)
     
     func initialiseDataSet(dataPoint:ChartDataPoint, colour:NSColor, yScale:CGFloat, xScale:CGFloat, zPos:Int)
     {
