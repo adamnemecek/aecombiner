@@ -35,15 +35,6 @@ struct ChartDataPoint {
     var colY: Int?
     var colX: Int?
     var rowNum: Int
-    /*
-    init (xvalue:Double, yvalue:Double, celly: CellCoordinate, cellx: CellCoordinate)
-    {
-        xValue = xvalue // usually the row in the data model
-        yValue = yvalue
-        cellY = celly
-        cellX = cellx
-    }
-    */
 }
 
 class ChartDataSet {
@@ -140,6 +131,24 @@ class ChartDataSet {
             }
         }
     }
+    
+    func swapXandY()
+    {
+        for rowN in 0..<self.dataPoints.count
+        {
+            let x = dataPoints[rowN].xValue
+            dataPoints[rowN].xValue = dataPoints[rowN].yValue
+            dataPoints[rowN].yValue = x
+        }
+        let maxY = self.maxYvalue
+        let minY = self.minYvalue
+        self.minYvalue = self.minXvalue
+        self.maxYvalue = self.maxXvalue
+        self.minXvalue = minY
+        self.maxXvalue = maxY
+
+    }
+
     
     func alertIfErrors(hadErrors:Int)
     {

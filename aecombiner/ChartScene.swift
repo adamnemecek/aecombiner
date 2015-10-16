@@ -104,6 +104,13 @@ class ChartScene: SKScene {
         
     }
 
+    func swapXYOnAllDataSets()
+    {
+        self.enumerateChildNodesWithName(kNodeName_DataSet) { (node, found) -> Void in
+            guard let dsNode = (node as? DataSetNode) else {return}
+            dsNode.swapXYForDataSet()
+        }
+    }
     
     func reChartTheseDataSets(dataSetNameOrNil dataSetName:String?, sortFirst:Bool)
     {
@@ -325,13 +332,9 @@ class ChartScene: SKScene {
         for view in subviews2search
         {
             guard let id = view.identifier else {continue}
-            switch id
+            if id.hasPrefix("buttonExportSelected")
             {
-            case "buttonExportSelected":
                 self.buttonExportSelected = view as? NSButton
-                
-            default:
-                break
             }
         }
     }

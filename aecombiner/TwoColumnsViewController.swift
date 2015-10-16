@@ -30,5 +30,16 @@ class TwoColumnsViewController: ColumnsViewController {
         
     }
     
+    override func tableViewSelectionDidChange(notification: NSNotification) {
+        guard let tableView = (notification.object as? NSTableView) else {return}
+        
+        switch tableView
+        {
+        case self.tvHeaders:
+            self.enableButtons(enabled: tableView.selectedRowIndexes.count == 2)
+        default:
+            break
+        }
+    }
 
 }

@@ -106,34 +106,46 @@ class DataSetNode: SKNode {
     
     func unSortYourDataSet(flipDirection flipDirection:Bool)
     {
-        self.adjustSortDirection(flipDirection: flipDirection)
-       switch self.sortDirection
+        if !self.dataSet.xyType
         {
-        case kAscending:
-            self.dataSet.dataPoints.sortInPlace(){$0.xValue > $1.xValue}
-        case kDescending:
-            self.dataSet.dataPoints.sortInPlace(){$0.xValue < $1.xValue}
-        default:
-            break
+            self.adjustSortDirection(flipDirection: flipDirection)
+            switch self.sortDirection
+            {
+            case kAscending:
+                self.dataSet.dataPoints.sortInPlace(){$0.xValue > $1.xValue}
+            case kDescending:
+                self.dataSet.dataPoints.sortInPlace(){$0.xValue < $1.xValue}
+            default:
+                break
+            }
+            self.autolocateAndChartDataSet(sortFirst: false)
         }
-        self.autolocateAndChartDataSet(sortFirst: false)
     }
     
     func reSortYourDataSet(flipDirection flipDirection:Bool)
     {
-        self.adjustSortDirection(flipDirection: flipDirection)
-       switch self.sortDirection
+        if !self.dataSet.xyType
         {
-        case kAscending:
-            self.dataSet.dataPoints.sortInPlace(){$0.yValue > $1.yValue}
-        case kDescending:
-            self.dataSet.dataPoints.sortInPlace(){$0.yValue < $1.yValue}
-        default:
-            break
+            self.adjustSortDirection(flipDirection: flipDirection)
+            switch self.sortDirection
+            {
+            case kAscending:
+                self.dataSet.dataPoints.sortInPlace(){$0.yValue > $1.yValue}
+            case kDescending:
+                self.dataSet.dataPoints.sortInPlace(){$0.yValue < $1.yValue}
+            default:
+                break
+            }
+            self.dataSet.renumberXvaluesToRowNumberIfNotXYtype()
+            self.autolocateAndChartDataSet(sortFirst: false)
         }
-        self.dataSet.renumberXvaluesToRowNumberIfNotXYtype()
-        self.autolocateAndChartDataSet(sortFirst: false)
     }
+    
+    func swapXYForDataSet()
+    {
+        self.dataSet.swapXandY()
+        self.autolocateAndChartDataSet(sortFirst: false)
+   }
     
     func sceneSize()->(yExtent:CGFloat, xExent:CGFloat)
     {

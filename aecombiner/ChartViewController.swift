@@ -46,6 +46,12 @@ class ChartViewController: NSViewController {
         self.extractRowsAndMakeNewDocumentsForChartPointsFromNodes()
     }
     
+    @IBAction func swapXYtapped(sender: AnyObject) {
+        guard
+            let scene = self.chartView.scene as? ChartScene
+        else {return}
+        scene.swapXYOnAllDataSets()
+    }
 
 
     // MARK: - Func
@@ -53,7 +59,9 @@ class ChartViewController: NSViewController {
     {
         guard
             let scene = self.chartView.scene as? ChartScene,
-            let imagename = self.segmentSort.imageForSegment((self.segmentSort.selectedSegment))?.name()
+            let segment = self.segmentSort,
+            let image = segment.imageForSegment((segment.selectedSegment)),
+            let imagename = image.name()
             else {return}
         
         switch imagename
@@ -71,7 +79,9 @@ class ChartViewController: NSViewController {
     func chartIsSorted()->Bool
     {
         guard
-            let imagename = self.segmentSort.imageForSegment((self.segmentSort.selectedSegment))?.name()
+            let segment = self.segmentSort,
+            let image = segment.imageForSegment((segment.selectedSegment)),
+            let imagename = image.name()
             else {return false}
         
         switch imagename
@@ -97,7 +107,7 @@ class ChartViewController: NSViewController {
             let indexset = NSMutableIndexSet()
             for chartdatapoint in selectedPointsFromNode.chartDataPoints
             {
-                indexset.addIndex(Int(chartdatapoint.xValue))//this is the row
+                indexset.addIndex(Int(chartdatapoint.rowNum))//this is the row
             }
             
             assocCVCD.extractRowsIntoNewCSVdocumentWithIndexesFromChartDataSet(indexset, nameOfDataSet: selectedPointsFromNode.nodeName)
