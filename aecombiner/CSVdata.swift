@@ -8,6 +8,32 @@
 
 import Cocoa
 
+enum FileDelimiterType
+{
+    case CSV// = "CSV"
+    case TAB// = "TAB"
+}
+
+struct EncodingTypes
+{
+    static func typesArray()->[UInt]
+    {
+        return [NSUTF8StringEncoding, NSASCIIStringEncoding,NSWindowsCP1252StringEncoding]
+    }
+    static func typeNamesArray()->[String]
+    {
+        return ["NSUTF8StringEncoding","NSASCIIStringEncoding","NSWindowsCP1252StringEncoding"]
+    }
+
+    
+    static func typeNameFromType(type: UInt)->String
+    {
+        let a = EncodingTypes.typesArray().indexOf(type)
+        return a == nil ? "?encoding" : EncodingTypes.typeNamesArray()[a!]
+    }
+}
+
+
 let quotationMarks = "\""
 let quotationMarksReplacement = ""
 let commaReplacement = "‚"//,
@@ -63,20 +89,67 @@ class CSVdata {
         processedDataOK = true
     }
     
+    class func decodeDataToString(data: NSData)->NSString?
+    {
+        var dataAsString:NSString?
+        for encoding in EncodingTypes.typesArray()
+        {
+            dataAsString = NSString(data: data, encoding: encoding)
+            if dataAsString != nil
+            {
+                print(EncodingTypes.typeNameFromType(encoding))
+                return dataAsString
+            }
+        }
+        return dataAsString
+    }
+    
+    
+
+    
+    convenience init (data: NSData, name:String, delimiter:FileDelimiterType)
+    {
+        self.init()
+        guard let dataAsString = CSVdata.decodeDataToString(data) else {return}
+        switch delimiter
+        {
+        case .CSV:
+            self.importCSVstring(dataAsString: dataAsString, name:name)
+        case .TAB:
+            self.importTABstring(dataAsString: dataAsString, name:name)
+        }
+    }
+
+ /*
     convenience init (dataCSV: NSData, name:String)
     {
         self.init()
-        guard let dataAsString = NSString(data: dataCSV, encoding: NSUTF8StringEncoding) else {return}
-        self.importCSVstring(dataAsString: dataAsString, name:name)
+        var dataAsString = NSString(data: dataCSV, encoding: NSUTF8StringEncoding)
+        if dataAsString == nil
+        {
+            dataAsString = NSString(data: dataCSV, encoding: NSASCIIStringEncoding)
+        }
+        if dataAsString != nil
+        {
+            self.importCSVstring(dataAsString: dataAsString!, name:name)
+        }
     }
     
     convenience init (dataTAB: NSData, name:String)
     {
         self.init()
-        guard let dataAsString = NSString(data: dataTAB, encoding: NSUTF8StringEncoding) else {return}
-        self.importTABstring(dataAsString: dataAsString, name:name)
+        var dataAsString = NSString(data: dataTAB, encoding: NSUTF8StringEncoding)
+        if dataAsString == nil
+        {
+            dataAsString = NSString(data: dataTAB, encoding: NSASCIIStringEncoding)
+        }
+        if dataAsString != nil
+        {
+            self.importTABstring(dataAsString: dataAsString!, name:name)
+        }        
     }
-    
+*/
+
     convenience init (stringTAB: NSString, name:String)
     {
         self.init()

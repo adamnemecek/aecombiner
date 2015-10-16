@@ -128,7 +128,7 @@ class CSVdataDocument: NSDocument {
         switch typeName
         {
         case "csvFile":
-            self.csvDataModel = CSVdata(dataCSV: data, name:self.displayName)
+            self.csvDataModel = CSVdata(data: data, name: self.displayName, delimiter: .CSV)
             if self.csvDataModel.processedDataOK {
                 return
             }

@@ -122,9 +122,9 @@ class ChartDataSet {
             // we store the row number as the X value and when we sort on the Y value we can always map back to the row in the data for extracting other values. !! If we sort the CSVdata we are lost
             let point = ChartDataPoint(xValue: Xvalue, yValue: Yvalue, colY: columnIndexY, colX: columnIndexX)
             self.dataPoints.append(point)
-            print("ValX \(valX), minXvalue \(minXvalue), maxXvalue \(maxXvalue) --  ValY \(valY), minYvalue \(minYvalue), maxYvalue \(maxYvalue)")
         }
-        return hadErrors
+        print("minXvalue \(minXvalue), maxXvalue \(maxXvalue) --  minYvalue \(minYvalue), maxYvalue \(maxYvalue)")
+       return hadErrors
     }
     
     func alertIfErrors(hadErrors:Int)

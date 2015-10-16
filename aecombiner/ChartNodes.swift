@@ -188,7 +188,7 @@ class DataSetNode: SKNode {
             let node = DataPointNode(imageNamed: "ball")
             node.initialiseDataSet(self.dataSet.dataPoints[row], colour: self.colour, yScale: self.yScale, xScale: self.xScale, zPos: row)
             self.addChild(node)
-            node.position = CGPoint(x: Double(row), y: node.dataPoint.yValue)
+            node.position = CGPoint(x: node.dataPoint.xValue, y: node.dataPoint.yValue)
         }
         
     }
