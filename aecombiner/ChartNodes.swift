@@ -29,7 +29,7 @@ struct ChartBorders {
 
 class DataPointNode: SKSpriteNode {
 
-    var dataPoint:ChartDataPoint = ChartDataPoint(xValue: 0.0, yValue: 0.0, colY: nil, colX: nil)
+    var dataPoint:ChartDataPoint = ChartDataPoint(xValue: 0.0, yValue: 0.0, colY: nil, colX: nil, rowNum: 0)
     
     func initialiseDataSet(dataPoint:ChartDataPoint, colour:NSColor, yScale:CGFloat, xScale:CGFloat, zPos:Int)
     {
@@ -131,6 +131,7 @@ class DataSetNode: SKNode {
         default:
             break
         }
+        self.dataSet.renumberXvaluesToRowNumberIfNotXYtype()
         self.autolocateAndChartDataSet(sortFirst: false)
     }
     

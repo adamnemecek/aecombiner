@@ -34,7 +34,7 @@ struct ChartDataPoint {
     var yValue:Double
     var colY: Int?
     var colX: Int?
-
+    var rowNum: Int
     /*
     init (xvalue:Double, yvalue:Double, celly: CellCoordinate, cellx: CellCoordinate)
     {
@@ -53,10 +53,12 @@ class ChartDataSet {
     var minXvalue:Double = Double(Int.max)
     var dataPoints = ChartDataPointsArray()
     var nameOfDataSet:String = kDataSetDefaultName
+    var xyType:Bool = false
     
     convenience init(data: StringsMatrix2D, forColumnIndex columnIndex:Int)
     {
         self.init()
+        self.xyType = false
         guard data.count > 0 && data[0].count > 0 else {
             GlobalUtilities.alertWithMessage("No data to chart",style: .WarningAlertStyle)
             return}
@@ -71,6 +73,7 @@ class ChartDataSet {
     convenience init(data: StringsMatrix2D, columnIndexY:Int, columnIndexX:Int)
     {
         self.init()
+        self.xyType = true
         guard data.count > 0 && data[0].count > 0 else {
             GlobalUtilities.alertWithMessage("No data to chart",style: .WarningAlertStyle)
             return}
@@ -97,7 +100,7 @@ class ChartDataSet {
             self.minXvalue = fmin(self.minXvalue,Xvalue)
             self.maxXvalue = fmax(self.maxXvalue,Xvalue)
             // we store the row number as the X value and when we sort on the Y value we can always map back to the row in the data for extracting other values. !! If we sort the CSVdata we are lost
-            let point = ChartDataPoint(xValue: Xvalue, yValue: Yvalue, colY: columnIndex, colX: nil)
+            let point = ChartDataPoint(xValue: Xvalue, yValue: Yvalue, colY: columnIndex, colX: nil, rowNum: rowN)
             self.dataPoints.append(point)
         }
         return hadErrors
@@ -120,11 +123,22 @@ class ChartDataSet {
             self.minXvalue = fmin(self.minXvalue,Xvalue)
             self.maxXvalue = fmax(self.maxXvalue,Xvalue)
             // we store the row number as the X value and when we sort on the Y value we can always map back to the row in the data for extracting other values. !! If we sort the CSVdata we are lost
-            let point = ChartDataPoint(xValue: Xvalue, yValue: Yvalue, colY: columnIndexY, colX: columnIndexX)
+            let point = ChartDataPoint(xValue: Xvalue, yValue: Yvalue, colY: columnIndexY, colX: columnIndexX, rowNum: rowN)
             self.dataPoints.append(point)
         }
-        print("minXvalue \(minXvalue), maxXvalue \(maxXvalue) --  minYvalue \(minYvalue), maxYvalue \(maxYvalue)")
+        //print("minXvalue \(minXvalue), maxXvalue \(maxXvalue) --  minYvalue \(minYvalue), maxYvalue \(maxYvalue)")
        return hadErrors
+    }
+    
+    func renumberXvaluesToRowNumberIfNotXYtype()
+    {
+        if !self.xyType
+        {
+            for rowN in 0..<self.dataPoints.count
+            {
+                dataPoints[rowN].xValue = Double(rowN)
+            }
+        }
     }
     
     func alertIfErrors(hadErrors:Int)
