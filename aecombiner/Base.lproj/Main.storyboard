@@ -672,7 +672,7 @@
                                         <segue destination="EBc-G2-mhh" kind="sheet" id="xBp-mz-wp1"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="B5C8CA89-72C7-47BB-BC1E-E478DFB54404" label="2 Column" paletteLabel="2 Column" tag="-1" image="column32" id="vdd-Fr-vcK" userLabel="Two Column">
+                                <toolbarItem implicitItemIdentifier="B5C8CA89-72C7-47BB-BC1E-E478DFB54404" label="2 Column" paletteLabel="2 Column" tag="-1" image="2col96" id="vdd-Fr-vcK" userLabel="Two Column">
                                     <connections>
                                         <segue destination="l4f-Wg-T5l" kind="sheet" id="csE-Ha-c6A"/>
                                     </connections>
@@ -3669,6 +3669,7 @@
     <resources>
         <image name="1NOT" width="32" height="32"/>
         <image name="2AND" width="32" height="32"/>
+        <image name="2col96" width="32" height="32"/>
         <image name="3OR" width="32" height="32"/>
         <image name="NSActionTemplate" width="14" height="14"/>
         <image name="NSFolder" width="32" height="32"/>
