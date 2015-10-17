@@ -12,6 +12,7 @@
 		8E10726E1B40768D00E4E409 /* CSVdata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E10726D1B40768D00E4E409 /* CSVdata.swift */; };
 		8E2F39951BB708C900B69564 /* ColumnSortingChartingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2F39941BB708C900B69564 /* ColumnSortingChartingViewController.swift */; };
 		8E55A3DA1BAF2C6700F6D41D /* GlobalUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E55A3D91BAF2C6700F6D41D /* GlobalUtilities.swift */; };
+		8E5C16771BD28B9900462ED7 /* SplitParametersIntoColumnsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5C16761BD28B9900462ED7 /* SplitParametersIntoColumnsViewController.swift */; };
 		8E69F3101B67DA4100BDB720 /* CSVdataViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */; };
 		8E69F3111B67DA4100BDB720 /* CSVdataWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */; };
 		8E77E8EC1B8B2DB800A0D46F /* ChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */; };
@@ -48,6 +49,7 @@
 		8E10726D1B40768D00E4E409 /* CSVdata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdata.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E2F39941BB708C900B69564 /* ColumnSortingChartingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColumnSortingChartingViewController.swift; sourceTree = "<group>"; };
 		8E55A3D91BAF2C6700F6D41D /* GlobalUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalUtilities.swift; sourceTree = "<group>"; };
+		8E5C16761BD28B9900462ED7 /* SplitParametersIntoColumnsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplitParametersIntoColumnsViewController.swift; sourceTree = "<group>"; };
 		8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdataViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdataWindowController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewController.swift; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 				C5B66EAD1BCFDB150089C00E /* TwoColumnsViewController.swift */,
 				C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */,
 				C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */,
+				8E5C16761BD28B9900462ED7 /* SplitParametersIntoColumnsViewController.swift */,
 				C5557D371B5948BC00C7E94D /* ExtractWithPredicatesViewController.swift */,
 				C5CBBC3D1B3C0BFA008FB844 /* CSVdataDocument.swift */,
 				8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */,
@@ -267,6 +270,7 @@
 				8E0E0E6B1B872EB400BD1C06 /* ChartNodes.swift in Sources */,
 				8E04FB2F1BB08E3E005C35AB /* ExtractingPredicate.swift in Sources */,
 				C52666291B664EC6006C251E /* ColumnsViewController.swift in Sources */,
+				8E5C16771BD28B9900462ED7 /* SplitParametersIntoColumnsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
