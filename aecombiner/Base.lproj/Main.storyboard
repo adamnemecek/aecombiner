@@ -672,7 +672,7 @@
                                         <segue destination="EBc-G2-mhh" kind="sheet" id="xBp-mz-wp1"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="B5C8CA89-72C7-47BB-BC1E-E478DFB54404" label="2 Column" paletteLabel="2 Column" tag="-1" image="2col96" id="vdd-Fr-vcK" userLabel="Two Column">
+                                <toolbarItem implicitItemIdentifier="B5C8CA89-72C7-47BB-BC1E-E478DFB54404" label="2 Column" paletteLabel="2 Column" tag="-1" image="2col" id="vdd-Fr-vcK" userLabel="Two Column">
                                     <connections>
                                         <segue destination="l4f-Wg-T5l" kind="sheet" id="csE-Ha-c6A"/>
                                     </connections>
@@ -3696,7 +3696,7 @@
                                     <rect key="frame" x="1.5" y="1" width="186" height="68"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView identifier="tvGroupParameters" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" enabled="NO" rowSizeStyle="automatic" viewBased="YES" id="ady-Mm-lwH" userLabel="tvExtractedParameters">
+                                        <tableView identifier="tvGroupParametersSplit" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" enabled="NO" rowSizeStyle="automatic" viewBased="YES" id="ady-Mm-lwH" userLabel="tvExtractedParameters">
                                             <rect key="frame" x="0.0" y="0.0" width="186" height="0.0"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <animations/>
@@ -3771,7 +3771,7 @@
                                     <rect key="frame" x="1.5" y="1" width="549" height="217"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView identifier="tvGroupHeadersSecondary" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="20" rowSizeStyle="automatic" viewBased="YES" id="bCT-NP-aT6">
+                                        <tableView identifier="tvGroupHeadersSecondarySplit" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="20" rowSizeStyle="automatic" viewBased="YES" id="bCT-NP-aT6">
                                             <rect key="frame" x="0.0" y="0.0" width="549" height="0.0"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <animations/>
@@ -3868,7 +3868,7 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <popUpButton identifier="popupHeadersGroup" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TPs-Ys-Kuw">
+                            <popUpButton identifier="popupHeadersGroupSplit" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TPs-Ys-Kuw">
                                 <rect key="frame" x="90" y="349" width="288" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="283" id="yYk-fP-RBf"/>
@@ -3944,7 +3944,7 @@
     <resources>
         <image name="1NOT" width="32" height="32"/>
         <image name="2AND" width="32" height="32"/>
-        <image name="2col96" width="32" height="32"/>
+        <image name="2col" width="32" height="32"/>
         <image name="3OR" width="32" height="32"/>
         <image name="NSActionTemplate" width="14" height="14"/>
         <image name="NSFolder" width="32" height="32"/>

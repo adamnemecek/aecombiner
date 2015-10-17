@@ -217,14 +217,14 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     // MARK: - TableView overrides
     
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard   let tvidentifier = tableView.identifier,
+        guard   //let tvidentifier = tableView.identifier,
                 let csvdo = self.associatedCSVdataDocument?.csvDataModel
             else {return 0}
-        switch tvidentifier
+        switch tableView
         {
-        case "tvGroupHeadersSecondary":
+        case tvGroupHeadersSecondary:
             return csvdo.numberOfColumnsInData()
-        case "tvGroupParameters":
+        case tvExtractedParametersToGroupBy:
             self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayColumnsToGroupTogether.count) in group"
             return self.arrayColumnsToGroupTogether.count
         default:
@@ -236,15 +236,13 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
-        guard let tvidentifier = tableView.identifier else {
-            return cellView
-        }
-        switch tvidentifier
+        //guard let tvidentifier = tableView.identifier else {return cellView}
+        switch tableView
         {
-        case "tvGroupHeadersSecondary":
+        case tvGroupHeadersSecondary:
             guard let csvdm = self.associatedCSVmodel else { return cellView}
             cellView = csvdm.cellForHeadersTable(tableView: tableView, row: row)
-        case "tvGroupParameters":
+        case tvExtractedParametersToGroupBy:
             switch tableColumn!.identifier
             {
             case "parameter":
@@ -265,9 +263,9 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     
     func tableViewSelectionDidChange(notification: NSNotification) {
         let tableView = notification.object as! NSTableView
-        switch tableView.identifier!
+        switch tableView
         {
-        case "tvGroupHeadersSecondary":
+        case tvGroupHeadersSecondary:
             self.updateButtonsForGrouping()
 
         default:
