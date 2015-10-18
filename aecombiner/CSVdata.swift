@@ -70,6 +70,7 @@ class CSVdata {
     var dataStringsMatrix2D:StringsMatrix2D// = StringsMatrix2D()
     var processedDataOK:Bool// = false
     var name:String// = ""
+    var encodingUsed: UInt?
     
     // MARK: - Init
     init()
@@ -89,7 +90,7 @@ class CSVdata {
         processedDataOK = true
     }
     
-    class func decodeDataToString(data: NSData)->NSString?
+    class func decodeDataToString(data: NSData)->(decodedString: NSString?, encodingUsed:UInt?)
     {
         var dataAsString:NSString?
         for encoding in EncodingTypes.typesArray()
@@ -98,57 +99,29 @@ class CSVdata {
             if dataAsString != nil
             {
                 print(EncodingTypes.typeNameFromType(encoding))
-                return dataAsString
+                return (dataAsString,encoding)
             }
         }
-        return dataAsString
+        return (nil,nil)
     }
     
-    
-
     
     convenience init (data: NSData, name:String, delimiter:FileDelimiterType)
     {
         self.init()
-        guard let dataAsString = CSVdata.decodeDataToString(data) else {return}
-        switch delimiter
+        let tuple = CSVdata.decodeDataToString(data)
+        if tuple.decodedString != nil
         {
-        case .CSV:
-            self.importCSVstring(dataAsString: dataAsString, name:name)
-        case .TAB:
-            self.importTABstring(dataAsString: dataAsString, name:name)
+            self.encodingUsed = tuple.encodingUsed
+            switch delimiter
+            {
+            case .CSV:
+                self.importCSVstring(dataAsString: tuple.decodedString!, name:name)
+            case .TAB:
+                self.importTABstring(dataAsString: tuple.decodedString!, name:name)
+            }
         }
     }
-
- /*
-    convenience init (dataCSV: NSData, name:String)
-    {
-        self.init()
-        var dataAsString = NSString(data: dataCSV, encoding: NSUTF8StringEncoding)
-        if dataAsString == nil
-        {
-            dataAsString = NSString(data: dataCSV, encoding: NSASCIIStringEncoding)
-        }
-        if dataAsString != nil
-        {
-            self.importCSVstring(dataAsString: dataAsString!, name:name)
-        }
-    }
-    
-    convenience init (dataTAB: NSData, name:String)
-    {
-        self.init()
-        var dataAsString = NSString(data: dataTAB, encoding: NSUTF8StringEncoding)
-        if dataAsString == nil
-        {
-            dataAsString = NSString(data: dataTAB, encoding: NSASCIIStringEncoding)
-        }
-        if dataAsString != nil
-        {
-            self.importTABstring(dataAsString: dataAsString!, name:name)
-        }        
-    }
-*/
 
     convenience init (stringTAB: NSString, name:String)
     {

@@ -126,20 +126,23 @@ class ExtractWithPredicatesViewController: ColumnSortingChartingViewController {
     // MARK: - header Popups
     func populateHeaderPopups()
     {
-        guard let csvdo = self.associatedCSVdataDocument?.csvDataModel else { return}
-        
         self.popupParameterToChart.removeAllItems()
-        self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
-        
         self.popup1ColHeaders.removeAllItems()
+        self.popup2colHeaders2.removeAllItems()
+        self.popup2colHeaders1.removeAllItems()
+        
+        guard let csvdo = self.associatedCSVdataDocument?.csvDataModel where csvdo.headersStringsArray1D.count>0
+            else { return}
+        
+        self.popupParameterToChart.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popupParameterToChart.selectItemAtIndex(-1)
+
         self.popup1ColHeaders.addItemsWithTitles(csvdo.headerStringsForAllColumns())
         self.popup1ColHeaders.selectItemAtIndex(-1)
         
-        self.popup2colHeaders1.removeAllItems()
         self.popup2colHeaders1.addItemsWithTitles(csvdo.headerStringsForAllColumns())
         self.popup2colHeaders1.selectItemAtIndex(-1)
         
-        self.popup2colHeaders2.removeAllItems()
         self.popup2colHeaders2.addItemsWithTitles(csvdo.headerStringsForAllColumns())
         self.popup2colHeaders2.selectItemAtIndex(-1)
         

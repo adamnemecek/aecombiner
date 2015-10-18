@@ -24,6 +24,7 @@ enum RecodeTabViewTitles:String
     case Multiple = "Multiple"
     case Boolean = "Boolean"
     case DateTime = "Date-Time"
+    case ColumnCompare = "Column Compare"
 }
 
 enum DateTimeRecodeMethod:String
@@ -91,14 +92,19 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var textFieldSetValue: NSTextField!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     @IBOutlet weak var textFieldBooleanComparator: NSTextField!
+    @IBOutlet weak var textFieldBooleanNewValue: NSTextField!
+    @IBOutlet weak var textFieldBooleanColumnRecodeNewValue: NSTextField!
     @IBOutlet weak var textFieldDateFormatString: NSTextField!
 
     @IBOutlet weak var tabbedVrecoding: NSTabView!
+    //@IBOutlet weak var tabbedVvalueOrColumn: NSTabView!
     
     @IBOutlet weak var popupHeaders: NSPopUpButton!
     @IBOutlet weak var popupBooleans: NSPopUpButton!
     @IBOutlet weak var popupDateFormatMethod: NSPopUpButton!
     @IBOutlet weak var popupHeadersDateEnd: NSPopUpButton!
+    @IBOutlet weak var popupHeadersBoolean: NSPopUpButton!
+    @IBOutlet weak var popupHeadersBooleanColumnCompare: NSPopUpButton!
     @IBOutlet weak var popupDateTimeRoundingUnits: NSPopUpButton!
  
     @IBOutlet weak var buttonOverwite: NSButton!
@@ -156,12 +162,9 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.enableSetValueControls(false)
     }
 
-    @IBAction func buttonRecodeToTapped(sender: AnyObject) {
+    @IBAction func buttonRecodebyBooleanComparisonTapped(sender: AnyObject) {
         
-        //let predString = self.popupBooleans.titleOfSelectedItem
-        //let valS = self.textFieldBooleanComparator.stringValue
-        //let pred = NSPredicate(
-        
+        self.setValueByBooleanComparisonForAllRows()
     }
     
     @IBAction func recodeParametersAndAddNewColumn(sender: AnyObject) {
@@ -218,13 +221,21 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     // MARK: - header Popups
     func populateHeaderPopups()
     {
-        guard let csvdm = self.associatedCSVmodel else { return}
         self.popupHeaders.removeAllItems()
+        self.popupHeadersDateEnd.removeAllItems()
+        self.popupHeadersBoolean.removeAllItems()
+        self.popupHeadersBooleanColumnCompare.removeAllItems()
+      guard
+            let csvdm = self.associatedCSVmodel where csvdm.headersStringsArray1D.count>0
+        else { return}
         self.popupHeaders.addItemsWithTitles(csvdm.headerStringsForAllColumns())
         self.popupHeaders.selectItemAtIndex(-1)
-        self.popupHeadersDateEnd.removeAllItems()
         self.popupHeadersDateEnd.addItemsWithTitles(csvdm.headerStringsForAllColumns())
         self.popupHeadersDateEnd.selectItemAtIndex(0)
+        self.popupHeadersBoolean.addItemsWithTitles(csvdm.headerStringsForAllColumns())
+        self.popupHeadersBoolean.selectItemAtIndex(0)
+        self.popupHeadersBooleanColumnCompare.addItemsWithTitles(csvdm.headerStringsForAllColumns())
+        self.popupHeadersBooleanColumnCompare.selectItemAtIndex(0)
     }
     
     func popupChangedSelection(popup: NSPopUpButton)
@@ -277,6 +288,29 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         return true
     }
     
+    func setValueByBooleanComparisonForAllRows()
+    {
+        guard
+            let booleanUsed = self.popupBooleans.titleOfSelectedItem,
+            let comparatorvaluedouble = Double(self.textFieldBooleanComparator.stringValue)
+            else {return}
+        let newvalue = self.textFieldBooleanNewValue.stringValue
+        let predicate = NSPredicate(format: "SELF"+booleanUsed+"%@",NSNumber(double: comparatorvaluedouble))
+        
+        for index in 0..<self.arrayExtractedParameters.count
+        {
+            guard
+                let existingparameterdoublevalue = Double(self.arrayExtractedParameters[index][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue])
+            else {continue}
+
+            if predicate.evaluateWithObject(NSNumber(double: existingparameterdoublevalue)) == true
+            {
+                self.arrayExtractedParameters[index][ParametersValueBoolColumnIndexes.ValueIndex.rawValue] = newvalue
+            }
+        }
+        self.reloadTables()
+    }
+    
     func setValueForSelectedRows()
     {
         let valueS = self.textFieldSetValue.stringValue
@@ -286,7 +320,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         }
         self.reloadTables()
     }
-
+    
     // MARK: - TableView overrides
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         switch tableView
@@ -446,8 +480,9 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
             
             //reload etc
             self.resetExtractedParameters(andPopupHeaders: true)
+        case .ColumnCompare:
+            break
         }
-        
     }
     
     func columnAddedSafeTitle(fromColumnIndex fromColumnIndex:Int)->String

@@ -105,8 +105,9 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     // MARK: - header Popups
     func populateHeaderPopups()
     {
-        guard let csvdo = self.associatedCSVdataDocument?.csvDataModel else { return}
         self.popupGroupBy.removeAllItems()
+        guard let csvdo = self.associatedCSVdataDocument?.csvDataModel where csvdo.headersStringsArray1D.count>0
+            else { return}
         self.popupGroupBy.addItemsWithTitles(csvdo.headerStringsForAllColumns())
         self.popupGroupBy.selectItemAtIndex(-1)
     }
