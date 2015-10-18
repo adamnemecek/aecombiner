@@ -195,7 +195,42 @@ class CSVdata {
         
     }
 
-    func addedRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)->Bool
+    func addedRecodedColumnByBooleanCompareWithColumn(fromColum fromColum:Int, compareColumn:Int, booleanString:String, replacementString:String, copyUnmatchedValues:Bool)->Bool
+    {
+        guard
+            let fromColumV = self.validatedColumnIndex(fromColum),
+            let compareColumnV = self.validatedColumnIndex(compareColumn)
+        else {return false}
+        
+
+        for rowN in 0..<self.numberOfRowsInData()
+        {
+            guard
+                let fromS = self.stringValueForCell(fromColumn: fromColumV, atRow: rowN)
+            else {self.dataStringsMatrix2D[rowN].append("Invalid Column To Inspect"); continue}
+            guard
+                let compS = self.stringValueForCell(fromColumn: compareColumnV, atRow: rowN)
+            else {self.dataStringsMatrix2D[rowN].append("Invalid Column To Compare"); continue}
+            guard
+                let fromD = Double(fromS),
+                let compD = Double(compS)
+            else {self.dataStringsMatrix2D[rowN].append(""); continue}
+            
+            let pred = NSPredicate(format: "SELF"+booleanString+"%@",NSNumber(double: compD))
+            if pred.evaluateWithObject(NSNumber(double: fromD)) == true
+            {
+                self.dataStringsMatrix2D[rowN].append(replacementString)
+            }
+            else
+            {
+                self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? fromS : "")
+            }
+        }
+
+        return true
+    }
+    
+    func addedRecodedColumn(title title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)->Bool
     {
         guard let validCI = self.validatedColumnIndex(columnIndex) else {return false}
         
@@ -786,10 +821,15 @@ class CSVdata {
 
     func setStringValueForCell(valueString valueString:String, toColumn:Int, inRow:Int)
     {
+        self.dataStringsMatrix2D[inRow][toColumn] = valueString
+    }
+    
+    func setStringValueForCellAfterValidation(valueString valueString:String, toColumn:Int, inRow:Int)
+    {
         guard
             let validCI = self.validatedColumnIndex(toColumn),
             let validRI = self.validatedRowIndexForColumn(inRow, columnIndex: toColumn)
-        else {return}
+            else {return}
         self.dataStringsMatrix2D[validRI][validCI] = valueString
     }
     

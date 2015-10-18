@@ -90,8 +90,18 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     func addedRecodedColumn(withTitle title:String, fromColum columnIndex:Int, usingParamsArray paramsArray:StringsMatrix2D, copyUnmatchedValues:Bool)->Bool
     {
         guard
-        self.associatedCSVdataDocument.csvDataModel.addedRecodedColumn(withTitle: title, fromColum: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
-        else {return false}
+            self.associatedCSVdataDocument.csvDataModel.addedRecodedColumn(title: title, fromColum: columnIndex, usingParamsArray: paramsArray, copyUnmatchedValues:copyUnmatchedValues)
+            else {return false}
+        //Safe to add column to table now
+        self.addTableColumnAndScrollWithTitle(title)
+        return true
+    }
+    
+    func addedRecodedColumnByBooleanCompareWithColumn(title title:String, fromColum:Int, compareColumn:Int, booleanString:String, replacementString:String, copyUnmatchedValues:Bool)->Bool
+    {
+        guard
+            self.associatedCSVdataDocument.csvDataModel.addedRecodedColumnByBooleanCompareWithColumn(fromColum:fromColum, compareColumn:compareColumn, booleanString:booleanString, replacementString:replacementString, copyUnmatchedValues:copyUnmatchedValues)
+            else {return false}
         //Safe to add column to table now
         self.addTableColumnAndScrollWithTitle(title)
         return true

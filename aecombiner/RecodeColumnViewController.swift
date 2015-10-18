@@ -76,6 +76,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
 
     // MARK: - class vars
     var arrayExtractedParameters =  StringsMatrix2D()
+    var arrayExtractedParametersCompareWith =  StringsMatrix2D()
     var radio_DateTimeMethod_Selected = DateTimeRecodeMethod.TimeSinceColumn
     
     
@@ -85,6 +86,8 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var tvExtractedParametersSingle: NSTableView!
     @IBOutlet weak var tvExtractedParametersMultiple: NSTableView!
     @IBOutlet weak var tvExtractedParametersPredicate: NSTableView!
+    @IBOutlet weak var tvExtractedParametersCompareFrom: NSTableView!
+    @IBOutlet weak var tvExtractedParametersCompareWith: NSTableView!
     
     @IBOutlet weak var labelNumberOfParameterOrGroupingItems: NSTextField!
     @IBOutlet weak var labelDateFormatInfo: NSTextField!
@@ -100,11 +103,12 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     //@IBOutlet weak var tabbedVvalueOrColumn: NSTabView!
     
     @IBOutlet weak var popupHeaders: NSPopUpButton!
+    @IBOutlet weak var popupHeadersColumnCompare: NSPopUpButton!
     @IBOutlet weak var popupBooleans: NSPopUpButton!
+    @IBOutlet weak var popupBooleanColumnCompare: NSPopUpButton!
+
     @IBOutlet weak var popupDateFormatMethod: NSPopUpButton!
     @IBOutlet weak var popupHeadersDateEnd: NSPopUpButton!
-    @IBOutlet weak var popupHeadersBoolean: NSPopUpButton!
-    @IBOutlet weak var popupHeadersBooleanColumnCompare: NSPopUpButton!
     @IBOutlet weak var popupDateTimeRoundingUnits: NSPopUpButton!
  
     @IBOutlet weak var buttonOverwite: NSButton!
@@ -117,6 +121,14 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     
     // MARK: - @IBAction
 
+    @IBAction func popupHeadersColumnCompareTapped(sender: AnyObject) {
+        guard   let datamodel = self.associatedCSVmodel,
+            let dmOfParams = datamodel.dataMatrixOfParametersFromColumn(fromColumn: self.popupHeadersColumnCompare.indexOfSelectedItem)
+            else { return }
+        self.arrayExtractedParametersCompareWith = dmOfParams
+        self.tvExtractedParametersCompareWith.reloadData()
+    }
+    
     @IBAction func radioTimeDateTapped(sender: NSButton) {
         guard
             let id = sender.identifier,
@@ -215,6 +227,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.tvExtractedParametersSingle?.reloadData()
         self.tvExtractedParametersMultiple?.reloadData()
         self.tvExtractedParametersPredicate?.reloadData()
+        self.tvExtractedParametersCompareFrom?.reloadData()
 
     }
     
@@ -223,8 +236,8 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     {
         self.popupHeaders.removeAllItems()
         self.popupHeadersDateEnd.removeAllItems()
-        self.popupHeadersBoolean.removeAllItems()
-        self.popupHeadersBooleanColumnCompare.removeAllItems()
+        self.popupHeadersColumnCompare.removeAllItems()
+        self.popupHeadersColumnCompare.removeAllItems()
       guard
             let csvdm = self.associatedCSVmodel where csvdm.headersStringsArray1D.count>0
         else { return}
@@ -232,10 +245,10 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.popupHeaders.selectItemAtIndex(-1)
         self.popupHeadersDateEnd.addItemsWithTitles(csvdm.headerStringsForAllColumns())
         self.popupHeadersDateEnd.selectItemAtIndex(0)
-        self.popupHeadersBoolean.addItemsWithTitles(csvdm.headerStringsForAllColumns())
-        self.popupHeadersBoolean.selectItemAtIndex(0)
-        self.popupHeadersBooleanColumnCompare.addItemsWithTitles(csvdm.headerStringsForAllColumns())
-        self.popupHeadersBooleanColumnCompare.selectItemAtIndex(0)
+        self.popupHeadersColumnCompare.addItemsWithTitles(csvdm.headerStringsForAllColumns())
+        self.popupHeadersColumnCompare.selectItemAtIndex(0)
+        self.popupHeadersColumnCompare.addItemsWithTitles(csvdm.headerStringsForAllColumns())
+        self.popupHeadersColumnCompare.selectItemAtIndex(0)
     }
     
     func popupChangedSelection(popup: NSPopUpButton)
@@ -325,49 +338,60 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         switch tableView
         {
-        case self.tvExtractedParametersSingle, tvExtractedParametersMultiple, tvExtractedParametersPredicate:
+        case self.tvExtractedParametersSingle, tvExtractedParametersMultiple, tvExtractedParametersPredicate, tvExtractedParametersCompareFrom:
             self.labelNumberOfParameterOrGroupingItems.stringValue = "\(self.arrayExtractedParameters.count) parameters"
             return self.arrayExtractedParameters.count
+        case self.tvExtractedParametersCompareWith:
+            return self.arrayExtractedParametersCompareWith.count
         default:
             return 0
         }
     }
     
-    func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView?
+    {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
         switch tableView
         {
-        case self.tvExtractedParametersSingle, tvExtractedParametersMultiple, tvExtractedParametersPredicate:
-                switch tableColumn!.identifier
+        case self.tvExtractedParametersSingle, tvExtractedParametersMultiple, tvExtractedParametersPredicate, tvExtractedParametersCompareFrom:
+            switch tableColumn!.identifier
+            {
+            case "parameter":
+                cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
+                cellView.textField!.stringValue = self.arrayExtractedParameters[row][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]
+            case "value"://parameters
+                cellView = tableView.makeViewWithIdentifier("parametersValueCell", owner: self) as! NSTableCellView
+                cellView.textField!.stringValue = self.arrayExtractedParameters[row][ParametersValueBoolColumnIndexes.ValueIndex.rawValue]
+                cellView.textField!.tag = row
+            case "bool"://parameters
+                cellView = tableView.makeViewWithIdentifier("parametersBoolCell", owner: self) as! NSTableCellView
+                for subview in cellView.subviews
                 {
-                case "parameter":
-                    cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
-                    cellView.textField!.stringValue = self.arrayExtractedParameters[row][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]
-                case "value"://parameters
-                    cellView = tableView.makeViewWithIdentifier("parametersValueCell", owner: self) as! NSTableCellView
-                    cellView.textField!.stringValue = self.arrayExtractedParameters[row][ParametersValueBoolColumnIndexes.ValueIndex.rawValue]
-                    cellView.textField!.tag = row
-                case "bool"://parameters
-                    cellView = tableView.makeViewWithIdentifier("parametersBoolCell", owner: self) as! NSTableCellView
-                    for subview in cellView.subviews
-                    {
-                        guard
+                    guard
                         let box = (subview as? NSButton),
                         let value = NSCellStateValue(self.arrayExtractedParameters[row][ParametersValueBoolColumnIndexes.BooleanIndex.rawValue])
                         else {continue}
-                        box.tag = row
-                        box.state =  value//== "true" ? NSOnState : NSOffState
-                    }
-                default:
-                    break
+                    box.tag = row
+                    box.state =  value//== "true" ? NSOnState : NSOffState
                 }
-            
             default:
-                break;
+                break
             }
-
+        case self.tvExtractedParametersCompareWith:
+            switch tableColumn!.identifier
+            {
+            case "parameter":
+                cellView = tableView.makeViewWithIdentifier("parametersCell", owner: self) as! NSTableCellView
+                cellView.textField!.stringValue = self.arrayExtractedParametersCompareWith[row][ParametersValueBoolColumnIndexes.ParametersIndex.rawValue]
+            default:
+                break
+            }
+            
+        default:
+            break;
+        }
         
         // Return the cellView
         return cellView;
@@ -456,14 +480,14 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     {
         guard
             let id = self.tabbedVrecoding.selectedTabViewItem?.label,
-        let tabTitle = RecodeTabViewTitles(rawValue: id)
-        else {return}
-
+            let tabTitle = RecodeTabViewTitles(rawValue: id)
+            else {return}
+        
         switch tabTitle
         {
         case .DateTime:
             self.recodeDateTime_FromOneColumn(overwrite: false)
-        case .Single, .Multiple, .Boolean:
+        case .Single, .Multiple, .Boolean,.ColumnCompare:
             guard
                 let csvdo = self.associatedCSVmodel,
                 let csvdVC = self.associatedCSVdataViewController,
@@ -473,15 +497,27 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
             //give a name if none
             let colTitle = self.columnAddedSafeTitle(fromColumnIndex: columnIndex)
             
-            guard
-                //pass it over
-                csvdVC.addedRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState)
+            switch tabTitle
+            {
+            case .Single, .Multiple, .Boolean:
+                guard
+                    //pass it over
+                    csvdVC.addedRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState)
                 else {return}
-            
+            case .ColumnCompare:
+                guard
+                    let columnCompare = csvdo.validatedColumnIndex(self.popupHeadersColumnCompare.indexOfSelectedItem),
+                    let booleanUsed = self.popupBooleanColumnCompare.titleOfSelectedItem
+                else {return}
+                //pass it over
+                guard
+                    csvdVC.addedRecodedColumnByBooleanCompareWithColumn(title: colTitle, fromColum: columnIndex, compareColumn: columnCompare, booleanString: booleanUsed, replacementString: self.textFieldBooleanColumnRecodeNewValue.stringValue, copyUnmatchedValues: self.checkboxCopyUnmatchedValues.state == NSOnState)
+                else {return}
+            default:
+                return
+            }
             //reload etc
             self.resetExtractedParameters(andPopupHeaders: true)
-        case .ColumnCompare:
-            break
         }
     }
     
@@ -497,7 +533,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
             let csvdVC = self.associatedCSVdataViewController,
             let methodString = self.popupDateFormatMethod.selectedItem?.title,
             let formatMethod = DateTimeFormatMethod(rawValue: methodString)
-        else {return}
+            else {return}
         
         var recodedOK = false
         let formatString = self.textFieldDateFormatString.stringValue
@@ -507,14 +543,14 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         case .Integer, .String:
             guard
                 let columnIndexFrom = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem)
-            else {return}
-           recodedOK = csvdVC.recodedDateTimeToNewColumn(withTitle: self.columnAddedSafeTitle(fromColumnIndex: columnIndexFrom), fromColum: columnIndexFrom, formatMethod: formatMethod, formatString: formatString, copyUnmatchedValues: true, asString: self.radio_DateTimeMethod_Selected == .String)
+                else {return}
+            recodedOK = csvdVC.recodedDateTimeToNewColumn(withTitle: self.columnAddedSafeTitle(fromColumnIndex: columnIndexFrom), fromColum: columnIndexFrom, formatMethod: formatMethod, formatString: formatString, copyUnmatchedValues: true, asString: self.radio_DateTimeMethod_Selected == .String)
         case .TimeSinceColumn:
             guard
-            let columnIndexStart = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem),
-            let columnIndexEnd = csvdo.validatedColumnIndex(self.popupHeadersDateEnd.indexOfSelectedItem),
-            let roundingString = self.popupDateTimeRoundingUnits.selectedItem?.title,
-            let roundingunits = DateTimeRoundingUnits(rawValue: roundingString)
+                let columnIndexStart = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem),
+                let columnIndexEnd = csvdo.validatedColumnIndex(self.popupHeadersDateEnd.indexOfSelectedItem),
+                let roundingString = self.popupDateTimeRoundingUnits.selectedItem?.title,
+                let roundingunits = DateTimeRoundingUnits(rawValue: roundingString)
             else {return}
             
             let newTitle = csvdo.headerStringForColumnIndex(columnIndexStart)+"->"+csvdo.headerStringForColumnIndex(columnIndexEnd)
