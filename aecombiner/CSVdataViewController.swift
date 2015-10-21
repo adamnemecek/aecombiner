@@ -24,14 +24,32 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     @IBOutlet weak var tvCSVdata: NSTableView!
     @IBOutlet weak var segmentSortTextOrValue: NSSegmentedControl!
     @IBOutlet weak var labelNumRows: NSTextField!
+    @IBOutlet weak var buttonTrashRows: NSButton!
 
     // MARK: - @IBActions
     
-    @IBAction func rebuildColumns(sender: AnyObject) {
-        self.columnsClearAndRebuild() 
+    
+    @IBAction func buttonTrashRowsTapped(sender: AnyObject)
+    {
+        if self.tvCSVdata.selectedRowIndexes.count > 0
+        {
+            let alert = NSAlert()
+            alert.messageText = "Are you sure you want to delete these rows? This cannot be undone"
+            alert.alertStyle = .CriticalAlertStyle
+            alert.addButtonWithTitle("Delete")
+            alert.addButtonWithTitle("Cancel")
+            if alert.runModal() == NSAlertFirstButtonReturn
+            {
+                if self.associatedCSVdataDocument.csvDataModel.deletedRowsAtIndexes(self.tvCSVdata.selectedRowIndexes) == true
+                {
+                    self.tvCSVdata.reloadData()
+                    self.updateRowCountLabel()
+                    self.updateTrashRowsButtonEnabled()
+                    self.documentMakeDirty()
+                }
+            }
+        }
     }
-    
-    
 
     // MARK: - overrides
 
@@ -46,7 +64,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     // MARK: - document
     func documentMakeDirty()
     {
-        self.associatedCSVdataDocument.updateChangeCount(.ChangeDone)
+        self.associatedCSVdataDocument.documentMakeDirty()
     }
 
     
@@ -58,14 +76,41 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.tvCSVdata.reloadData()
     }
     
-
+    // MARK: - Rows
+    func deleteSelectedRows()
+    {
+        if self.tvCSVdata.selectedRowIndexes.count > 0
+        {
+            let alert = NSAlert()
+            alert.messageText = "Are you sure you want to delete these rows? This cannot be undone"
+            alert.alertStyle = .CriticalAlertStyle
+            alert.addButtonWithTitle("Delete")
+            alert.addButtonWithTitle("Cancel")
+            if alert.runModal() == NSAlertFirstButtonReturn
+            {
+                if self.associatedCSVdataDocument.csvDataModel.deletedRowsAtIndexes(self.tvCSVdata.selectedRowIndexes) == true
+                {
+                    self.tvCSVdata.reloadData()
+                    self.updateRowCountLabel()
+                    self.updateTrashRowsButtonEnabled()
+                    self.associatedCSVdataDocument.documentMakeDirty()
+                }
+            }
+        }
+    }
+    
     // MARK: - Columns
 
+    func updateRowCountLabel()
+    {
+        let suffix = self.associatedCSVdataDocument.csvDataModel.numberOfRowsInData() == 1 ? " row" : " rows"
+        self.labelNumRows.stringValue = String(self.associatedCSVdataDocument.csvDataModel.numberOfRowsInData()) + suffix
+    }
     
    func columnsClearAndRebuild(){
         
         self.associatedCSVdataDocument.columnsClearAndRebuild(self.tvCSVdata)
-        self.labelNumRows.stringValue = String(self.associatedCSVdataDocument.csvDataModel.numberOfRowsInData())
+        self.updateRowCountLabel()
     }
     
     func renameColumnAtIndex(columnIndex: Int, newName:String)
@@ -154,13 +199,10 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
     
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        guard let tvidentifier = tableView.identifier else
+        //guard let tvidentifier = tableView.identifier else {return 0}
+        switch tableView
         {
-            return 0
-        }
-        switch tvidentifier
-        {
-        case "tvCSVdata":
+        case self.tvCSVdata:
             return self.associatedCSVdataDocument.csvDataModel.numberOfRowsInData()
         default:
             return 0
@@ -172,16 +214,15 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
         guard
-            let tvidentifier = tableView.identifier,
             let id = tableColumn?.identifier
         else {return cellView}
         
         let colIndex = tableView.columnWithIdentifier(id)
         guard colIndex >= 0 else {return cellView}
         
-        switch tvidentifier
+        switch tableView
         {
-        case "tvCSVdata":
+        case self.tvCSVdata:
             cellView = tableView.makeViewWithIdentifier("csvCell", owner: self) as! NSTableCellView
             // Set the stringValue of the cell's text field to the nameArray value at row
             let valS = self.associatedCSVdataDocument.csvDataModel.stringValueForCell(fromColumn: colIndex, atRow: row)
@@ -199,18 +240,26 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return cellView;
     }
     
-    /*
+    
     func tableViewSelectionDidChange(notification: NSNotification) {
-        let tableView = notification.object as! NSTableView
-        switch tableView.identifier!
+        guard
+            let tableView = notification.object as? NSTableView
+        else {return}
+        
+        switch tableView
         {
-
+        case self.tvCSVdata:
+            self.updateTrashRowsButtonEnabled()
         default:
             break;
         }
         
     }
-    */
+    
+    func updateTrashRowsButtonEnabled()
+    {
+        self.buttonTrashRows.enabled = self.tvCSVdata.selectedRowIndexes.count > 0
+    }
 
     func control(control: NSControl, textShouldEndEditing fieldEditor: NSText) -> Bool {
         guard

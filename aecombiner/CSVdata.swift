@@ -757,6 +757,16 @@ class CSVdata {
     }
     
     
+    func deletedRowsAtIndexes(indexes:NSIndexSet)->Bool
+    {
+        guard self.notAnEmptyDataSet() else {return false}
+        for var i = indexes.lastIndex; i != NSNotFound; i = indexes.indexLessThanIndex(i)
+        {
+            self.dataStringsMatrix2D.removeAtIndex(i)
+        }
+        return true
+    }
+    
     // MARK: - Header Names
     func headerStringsForAllColumns()->[String]
     {
