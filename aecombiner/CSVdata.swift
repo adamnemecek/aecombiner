@@ -103,8 +103,8 @@ class CSVdata {
             }
         }
         return (nil,nil)
+
     }
-    
     
     convenience init (data: NSData, name:String, delimiter:FileDelimiterType)
     {

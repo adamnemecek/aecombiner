@@ -27,7 +27,19 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     @IBOutlet weak var buttonTrashRows: NSButton!
 
     // MARK: - @IBActions
-    
+    @IBAction func mergeFile(sender: NSToolbarItem)
+    {
+        let panel = NSOpenPanel()
+        var types = StringsArray1D()
+        types.append("csv")
+        types.append("txt")
+        panel.allowedFileTypes = types
+        if panel.runModal() == NSFileHandlingPanelOKButton
+        {
+            self.mergeFileFromURL(panel.URL)
+        }
+    }
+
     
     @IBAction func buttonTrashRowsTapped(sender: AnyObject)
     {
@@ -67,6 +79,92 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.associatedCSVdataDocument.documentMakeDirty()
     }
 
+    
+    func mergeFileFromURL(url:NSURL?)
+    {
+        guard
+            let theURL = url,
+            let urlname = theURL.lastPathComponent,
+            let urltype = theURL.pathExtension,
+            let data = NSData(contentsOfURL: theURL)
+        else {return}
+        
+        let csvdata:CSVdata?
+        switch urltype
+        {
+        case "txt":
+            csvdata = CSVdata(data: data, name: urlname, delimiter: .TAB)
+        case "csv":
+            csvdata = CSVdata(data: data, name: urlname, delimiter: .CSV)
+        default:
+            csvdata = nil
+        }
+        
+        if csvdata != nil
+        {
+            var lastColumn = self.associatedCSVdataDocument.csvDataModel.numberOfColumnsInData()//.count automatically adds 1
+            var newUniqueColHeaders = StringsArray1D()
+            var lookupMatrixOfNewColumns = StringsArray1D()//same length as new unique cols, has either the original column index in if matched, or a new col index if appended
+            for colnum in 0..<csvdata!.numberOfColumnsInData()
+            {
+                let matchedIndex = self.associatedCSVdataDocument.csvDataModel.headersStringsArray1D.indexOf(csvdata!.headersStringsArray1D[colnum])
+                if matchedIndex != nil
+                {
+                    //add the index of original array we have matched
+                    lookupMatrixOfNewColumns.append(String(matchedIndex!))
+                }
+                else
+                {
+                    //add the index of the last col num, and increment the lastcolnum count, add new unique col name
+                    lookupMatrixOfNewColumns.append(String(lastColumn))
+                    lastColumn++
+                    newUniqueColHeaders.append(csvdata!.headersStringsArray1D[colnum])
+               }
+            }
+            
+            if newUniqueColHeaders.count > 0
+            {
+                //append the new col names to existing headers
+                self.associatedCSVdataDocument.csvDataModel.headersStringsArray1D += newUniqueColHeaders
+                
+                //padd the array with new blank columns
+                let padSuffix = StringsArray1D(count: newUniqueColHeaders.count, repeatedValue: "")
+                for row in 0..<self.associatedCSVdataDocument.csvDataModel.dataStringsMatrix2D.count
+                {
+                    self.associatedCSVdataDocument.csvDataModel.dataStringsMatrix2D[row] += padSuffix
+                }
+            }
+            
+            //append the new rows onto array
+            for row in 0..<csvdata!.dataStringsMatrix2D.count
+            {
+                //make a row template to change individual cells
+                var newRow = StringsArray1D(count: lastColumn, repeatedValue: "")
+                for colnumber in 0..<lookupMatrixOfNewColumns.count
+                {
+                    guard
+                        //[x] returns optionals so we force unwrap
+                        let validCN = Int(lookupMatrixOfNewColumns[colnumber])
+                    else {continue}
+                    //replace the cell in the template row with the value in the new csvdata array, place into old columns if matched or new cols if not
+                    //the colnumber is our lookup
+                    newRow[validCN] = csvdata!.dataStringsMatrix2D[row][colnumber]
+                }
+                //append new row to existing
+                self.associatedCSVdataDocument.csvDataModel.dataStringsMatrix2D.append(newRow)
+            }
+            
+            //NOW it is safe to add table columns
+            for col in 0..<newUniqueColHeaders.count
+            {
+                self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(newUniqueColHeaders[col]))
+            }
+            
+            //clean up
+            self.documentMakeDirty()
+            self.tvCSVdata.reloadData()
+        }
+    }
     
     // MARK: - extracting CSV data table
 
