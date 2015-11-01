@@ -1070,8 +1070,8 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="yb5-4j-7Lz" customClass="ChartView" customModule="aecombiner" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="42" width="277" height="270"/>
                             </customView>
-                            <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tro-bF-AhT">
-                                <rect key="frame" x="-2" y="1" width="67" height="25"/>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tro-bF-AhT">
+                                <rect key="frame" x="0.0" y="1" width="63" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="63" id="R8a-j4-4eq"/>
                                 </constraints>
@@ -1088,8 +1088,8 @@
                                     <action selector="segmentChartTypeTapped:" target="3ve-cH-Ehb" id="zMw-YV-9PF"/>
                                 </connections>
                             </segmentedControl>
-                            <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gyU-vu-SOY">
-                                <rect key="frame" x="107" y="1" width="141" height="25"/>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gyU-vu-SOY">
+                                <rect key="frame" x="109" y="1" width="137" height="24"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="separated" trackingMode="selectOne" id="A27-V9-4sU">
                                     <font key="font" metaFont="system"/>
                                     <segments>
@@ -1107,8 +1107,8 @@
                                     <action selector="segmentCursorStateTapped:" target="3ve-cH-Ehb" id="tWf-AF-ZXI"/>
                                 </connections>
                             </segmentedControl>
-                            <button identifier="buttonExportSelected" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="so9-t9-kgX">
-                                <rect key="frame" x="252" y="2" width="25" height="23"/>
+                            <button identifier="buttonExportSelected" translatesAutoresizingMaskIntoConstraints="NO" id="so9-t9-kgX">
+                                <rect key="frame" x="252" y="1" width="25" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="25" id="bwM-23-ext"/>
                                 </constraints>
@@ -1120,8 +1120,8 @@
                                     <action selector="exportSelectedTapped:" target="3ve-cH-Ehb" id="j8C-Yp-bvj"/>
                                 </connections>
                             </button>
-                            <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l3E-6G-bIF">
-                                <rect key="frame" x="67" y="1" width="35" height="25"/>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="l3E-6G-bIF">
+                                <rect key="frame" x="69" y="1" width="31" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="31" id="sCc-ds-b1Y"/>
                                 </constraints>
@@ -1175,8 +1175,8 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="MXs-sb-Qei" customClass="ChartView" customModule="aecombiner" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="42" width="277" height="270"/>
                             </customView>
-                            <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C7N-kn-nfr">
-                                <rect key="frame" x="107" y="-1" width="141" height="25"/>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C7N-kn-nfr">
+                                <rect key="frame" x="109" y="-1" width="137" height="24"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="separated" trackingMode="selectOne" id="BbY-jj-YWD">
                                     <font key="font" metaFont="system"/>
                                     <segments>
@@ -1194,8 +1194,8 @@
                                     <action selector="segmentCursorStateTapped:" target="jRJ-JA-bGo" id="v5x-W9-3LO"/>
                                 </connections>
                             </segmentedControl>
-                            <button identifier="buttonExportSelectedXY" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NYz-u4-C2E">
-                                <rect key="frame" x="252" y="-2" width="25" height="27"/>
+                            <button identifier="buttonExportSelectedXY" translatesAutoresizingMaskIntoConstraints="NO" id="NYz-u4-C2E">
+                                <rect key="frame" x="252" y="-3" width="25" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="25" id="eba-q9-fWE"/>
                                 </constraints>
