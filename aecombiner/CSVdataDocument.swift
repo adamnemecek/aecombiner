@@ -110,7 +110,7 @@ class CSVdataDocument: NSDocument {
         switch typeName
         {
         case "csvFile":
-            if let value = self.csvDataModel.processCSVtoData(delimiter: commaDelimiter) {
+            if let value = self.csvDataModel.processSelfCSVtoData(delimiter: commaDelimiter) {
                 return value
             }
             throw outError

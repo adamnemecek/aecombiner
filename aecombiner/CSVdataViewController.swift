@@ -40,6 +40,13 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         }
     }
 
+    @IBAction func pasteColumns(sender: NSToolbarItem)
+    {
+        guard
+            let csvString = NSPasteboard.generalPasteboard().stringForType(NSPasteboardTypeTabularText)
+        else {return}
+        self.mergeCSVdata(CSVdata(stringTAB: csvString, name: ""))
+    }
     
     @IBAction func buttonTrashRowsTapped(sender: AnyObject)
     {
@@ -71,7 +78,15 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
 
     }
     
-    
+    override func validateMenuItem(menuItem: NSMenuItem) -> Bool {
+        if menuItem.title == "Paste Columns Merged"
+        {
+            return NSPasteboard.generalPasteboard().stringForType(NSPasteboardTypeTabularText) != nil
+        }
+        return super.validateMenuItem(menuItem)
+        
+        
+    }
 
     // MARK: - document
     func documentMakeDirty()
@@ -99,8 +114,12 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         default:
             csvdata = nil
         }
-        
-        if csvdata != nil
+        self.mergeCSVdata(csvdata)
+    }
+    
+    func mergeCSVdata(csvdata: CSVdata?)
+    {
+        if csvdata != nil && csvdata!.notAnEmptyDataSet()
         {
             var lastColumn = self.associatedCSVdataDocument.csvDataModel.numberOfColumnsInData()//.count automatically adds 1
             var newUniqueColHeaders = StringsArray1D()
@@ -301,6 +320,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         switch tableView
         {
         case self.tvCSVdata:
+            self.updateRowCountLabel()
             return self.associatedCSVdataDocument.csvDataModel.numberOfRowsInData()
         default:
             return 0

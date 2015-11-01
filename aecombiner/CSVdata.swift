@@ -34,6 +34,7 @@ struct EncodingTypes
 }
 
 
+
 let quotationMarks = "\""
 let quotationMarksReplacement = ""
 let commaReplacement = "‚"//,
@@ -542,7 +543,7 @@ class CSVdata {
         self.postProcessCSVdataMatrix(arrayOfColumns: arrayOfColumnArrays, name: name)
 }
 
-    func processCSVtoData(delimiter delimiter:String) -> NSData?
+    func processSelfCSVtoData(delimiter delimiter:String) -> NSData?
     {
         guard
             self.notAnEmptyDataSet()
@@ -561,10 +562,31 @@ class CSVdata {
         return tempDataArray.joinWithSeparator(carriageReturn).dataUsingEncoding(NSUTF8StringEncoding)
     }
     
+    class func processThisCSVtoData(csvData csvData:CSVdata, delimiter:String) -> NSData?
+    {
+        guard
+            csvData.notAnEmptyDataSet()
+            else {return nil}
+        
+        var tempDataArray = StringsArray1D()
+        //add headers string
+        tempDataArray.append(csvData.headersStringsArray1D.joinWithSeparator(delimiter))
+        //build the rows strings one by one and append
+        for rowN in 0..<csvData.numberOfRowsInData()
+        {
+            tempDataArray.append(csvData.dataStringsMatrix2D[rowN].joinWithSeparator(delimiter))
+        }
+        
+        //let fileString = tempDataArray.joinWithSeparator(carriageReturn)
+        return tempDataArray.joinWithSeparator(carriageReturn).dataUsingEncoding(NSUTF8StringEncoding)
+    }
+
+    
+    
     func exportDataTabDelimitedTo(fileURL fileURL:NSURL?)
     {
         guard let theURL = fileURL else {return}
-        let data = self.processCSVtoData(delimiter: tabDelimiter)
+        let data = self.processSelfCSVtoData(delimiter: tabDelimiter)
         guard let okData = data else {return}
         
         okData.writeToURL(theURL, atomically: true)
@@ -702,7 +724,34 @@ class CSVdata {
         return Array(set)
     }
     
-
+    func copyColumnsToString(fromColumnIndexes fromColumnIndexes:NSIndexSet)->String?
+    {
+        guard
+            fromColumnIndexes.count > 0
+        else {return nil}
+        
+        var newCSVdata = StringsArray1D()
+        var newheaders = StringsArray1D()
+        for col in fromColumnIndexes
+        {
+            newheaders.append(self.headersStringsArray1D[col])
+        }
+        newCSVdata.append(newheaders.joinWithSeparator(tabDelimiter))
+        for row in 0..<self.dataStringsMatrix2D.count
+        {
+            var newRow = StringsArray1D()
+            for colindex in fromColumnIndexes
+            {
+                guard
+                    let newval = self.stringValueForCell(fromColumn: colindex, atRow: row)
+                else {continue}
+                newRow.append(newval)
+            }
+            newCSVdata.append(newRow.joinWithSeparator(tabDelimiter))
+        }
+        return newCSVdata.joinWithSeparator(carriageReturn)
+    }
+    
     func dataMatrixOfParametersFromColumn(fromColumn columnIndex:Int)->StringsMatrix2D?
     {
         guard let set = self.setOfParametersFromColumn(fromColumn: columnIndex, replaceBlank: false) else {return nil}

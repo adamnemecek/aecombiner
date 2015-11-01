@@ -10,6 +10,26 @@ import Cocoa
 
 class TwoColumnsViewController: ColumnsViewController {
 
+    
+    @IBOutlet weak var buttonCopyColumns: NSButton!
+    
+    
+    @IBAction func copyColumnsTapped(sender: AnyObject) {
+        self.copyColumnsExecute()
+    }
+    
+    func copyColumnsExecute()
+    {
+        guard
+            let copiedCols = self.associatedCSVmodel?.copyColumnsToString(fromColumnIndexes: self.tvHeaders.selectedRowIndexes)
+        else {return}
+        NSPasteboard.generalPasteboard().clearContents()
+        if NSPasteboard.generalPasteboard().setString(copiedCols, forType: NSPasteboardTypeTabularText) == false
+        {
+            print("Not copied: "+(copiedCols as String))
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -40,6 +60,12 @@ class TwoColumnsViewController: ColumnsViewController {
         default:
             break
         }
+    }
+
+    override func enableButtons(enabled enabled:Bool)
+    {
+        super.enableButtons(enabled: enabled)
+        self.buttonCopyColumns?.enabled = self.tvHeaders.selectedRowIndexes.count > 0
     }
 
 }
