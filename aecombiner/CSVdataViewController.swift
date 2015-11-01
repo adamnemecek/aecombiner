@@ -84,8 +84,6 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             return NSPasteboard.generalPasteboard().stringForType(NSPasteboardTypeTabularText) != nil
         }
         return super.validateMenuItem(menuItem)
-        
-        
     }
 
     // MARK: - document
