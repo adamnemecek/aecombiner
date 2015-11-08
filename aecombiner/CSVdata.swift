@@ -46,6 +46,7 @@ typealias SetOfStrings = Set<String>
 typealias StringsMatrix2D = [[String]]
 typealias StringsArray1D = [String]
 typealias ParamsDictionary = [String : String]
+typealias LookupDictionary = [String : StringsArray1D]//key ID : array of col data
 
 
 struct NamedDataMatrix
@@ -99,7 +100,7 @@ class CSVdata {
             dataAsString = NSString(data: data, encoding: encoding)
             if dataAsString != nil
             {
-                print(EncodingTypes.typeNameFromType(encoding))
+                //print(EncodingTypes.typeNameFromType(encoding))
                 return (dataAsString,encoding)
             }
         }
@@ -696,6 +697,81 @@ class CSVdata {
     }
 
     // MARK: - Extract From Column
+    
+    func lookupDictionaryFromColumn(lookupColumn lookupColumn:Int, mergeColumnsIndexes:NSIndexSet)->LookupDictionary?
+    {
+        guard
+            mergeColumnsIndexes.count > 0
+        else {return nil}
+        
+        //make a temporary dictionary
+        var paramsDict = LookupDictionary()
+        //go down the rows collecting the keys and the column data to merge
+        for row in 0..<self.numberOfRowsInData()
+        {
+            guard
+                let lookupKey = self.stringValueForCell(fromColumn: lookupColumn, atRow: row)
+            else {continue}
+            paramsDict[lookupKey] = self.stringsArray1DFromColumns(columns: mergeColumnsIndexes, atRow: row)
+        }
+        
+        return paramsDict
+    }
+
+    func lookedupNewColumnsFromCSVdata(lookupCSVdata lookupCSVdata:CSVdata, lookupColumn:Int, columnsToAdd:NSIndexSet)->StringsArray1D?
+    {
+        guard
+            let matchColumnInMydata = self.headersStringsArray1D.indexOf(lookupCSVdata.headersStringsArray1D[lookupColumn]),
+            let lookupdict = lookupCSVdata.lookupDictionaryFromColumn(lookupColumn: lookupColumn, mergeColumnsIndexes: columnsToAdd),
+            let newHeaders = lookupCSVdata.headersArrayForIndexes(columnsToAdd)
+        else {return nil}
+
+        //add new columns - we shoudl check uniqueness
+        self.headersStringsArray1D += newHeaders
+        
+        //add the new col data or a dummy by lookup
+        let dummyExtension = StringsArray1D(count: newHeaders.count, repeatedValue: "")
+        for row in 0..<self.numberOfRowsInData()
+        {
+            guard
+                let keyValueForRow = self.stringValueForCell(fromColumn: matchColumnInMydata, atRow: row),
+                let colData = lookupdict[keyValueForRow]
+            else
+            {
+                // unable to match so add a dummy data extension
+                self.dataStringsMatrix2D[row] += dummyExtension
+                continue
+            }
+            //matched so add the new columns data
+            self.dataStringsMatrix2D[row] += colData
+
+        }
+        
+        return newHeaders
+    }
+    
+    
+    func stringsArray1DFromColumns(columns columns:NSIndexSet, atRow:Int)->StringsArray1D?
+    {
+        guard
+            columns.count > 0
+        else {return nil}
+        var collectedCols = StringsArray1D()
+        for col in columns
+        {
+            let val = self.stringValueForCell(fromColumn: col, atRow: atRow)
+            if val != nil
+            {
+                collectedCols.append(val!)
+            }
+            else
+            {
+                collectedCols.append("")
+            }
+        }
+        return collectedCols
+    }
+    
     func setOfParametersFromColumn(fromColumn columnIndex:Int, replaceBlank:Bool)->SetOfStrings?
     {
         guard let validCI = self.validatedColumnIndex(columnIndex) else {return nil}
@@ -820,6 +896,19 @@ class CSVdata {
     func headerStringsForAllColumns()->[String]
     {
         return self.headersStringsArray1D
+    }
+    
+    func headersArrayForIndexes(colIndexes:NSIndexSet)->StringsArray1D?
+    {
+        var headersarray = StringsArray1D()
+        for index in colIndexes
+        {
+            guard
+                let _ = self.validatedColumnIndex(index)
+            else {return nil}
+            headersarray.append(self.headersStringsArray1D[index])
+        }
+        return headersarray
     }
     
     func headerStringForColumnIndex(columnIndex:Int) -> String

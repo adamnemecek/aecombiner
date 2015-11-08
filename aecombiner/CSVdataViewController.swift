@@ -39,7 +39,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             self.mergeFileFromURL(panel.URL)
         }
     }
-
+    
     @IBAction func pasteColumns(sender: NSToolbarItem)
     {
         guard
@@ -91,6 +91,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     {
         self.associatedCSVdataDocument.documentMakeDirty()
     }
+
 
     
     func mergeFileFromURL(url:NSURL?)
@@ -183,12 +184,32 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         }
     }
     
+    
+    // MARK: - merge by lookup
+    func lookupNewColumnsFromCSVdata(lookupCSVdata lookupCSVdata:CSVdata, lookupColumn:Int, columnsToAdd:NSIndexSet)
+    {
+        guard
+            let newUniqueColHeaders = self.associatedCSVdataDocument.csvDataModel.lookedupNewColumnsFromCSVdata(lookupCSVdata: lookupCSVdata, lookupColumn: lookupColumn, columnsToAdd: columnsToAdd)
+        else {return}
+        
+        //NOW it is safe to add table columns
+        for col in 0..<columnsToAdd.count
+        {
+            self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(newUniqueColHeaders[col]))
+        }
+        
+        //clean up
+        self.documentMakeDirty()
+        self.tvCSVdata.reloadData()
+    
+    }
     // MARK: - extracting CSV data table
 
     func extractRowsBasedOnPredicatesIntoNewFile(predicates predicates:ArrayOfPredicatesForExtracting)
     {
         self.associatedCSVdataDocument.csvDataModel.extractRowsBasedOnPredicatesIntoNewFile(predicates: predicates)
         self.tvCSVdata.reloadData()
+        
     }
     
     // MARK: - Rows

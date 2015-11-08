@@ -111,6 +111,10 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var popupHeadersDateEnd: NSPopUpButton!
     @IBOutlet weak var popupDateTimeRoundingUnits: NSPopUpButton!
  
+    @IBOutlet weak var popupHeadersLeftColumn: NSPopUpButton!
+    @IBOutlet weak var popupMathsFunction: NSPopUpButton!
+    @IBOutlet weak var popupHeadersRightColumn: NSPopUpButton!
+    
     @IBOutlet weak var buttonOverwite: NSButton!
     @IBOutlet weak var buttonSetValue: NSButton!
     @IBOutlet weak var buttonRecodeTo: NSButton!
@@ -180,11 +184,13 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     }
     
     @IBAction func recodeParametersAndAddNewColumn(sender: AnyObject) {
+        self.tvExtractedParametersSingle?.reloadData()
         self.doTheRecodeParametersAndAddNewColumn()
     }
     
     @IBAction func recodeOverwriteTapped(sender: AnyObject) {
-        self.doRecodeOverwrite()
+        self.tvExtractedParametersSingle?.reloadData()
+       self.doRecodeOverwrite()
     }
     
     @IBAction func popupHeadersButtonSelected(sender: NSPopUpButton) {
@@ -237,7 +243,8 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.popupHeaders.removeAllItems()
         self.popupHeadersDateEnd.removeAllItems()
         self.popupHeadersColumnCompare.removeAllItems()
-        self.popupHeadersColumnCompare.removeAllItems()
+        self.popupHeadersLeftColumn.removeAllItems()
+        self.popupHeadersRightColumn.removeAllItems()
       guard
             let csvdm = self.associatedCSVmodel where csvdm.headersStringsArray1D.count>0
         else { return}
@@ -247,8 +254,10 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.popupHeadersDateEnd.selectItemAtIndex(0)
         self.popupHeadersColumnCompare.addItemsWithTitles(csvdm.headerStringsForAllColumns())
         self.popupHeadersColumnCompare.selectItemAtIndex(0)
-        self.popupHeadersColumnCompare.addItemsWithTitles(csvdm.headerStringsForAllColumns())
-        self.popupHeadersColumnCompare.selectItemAtIndex(0)
+        self.popupHeadersLeftColumn.addItemsWithTitles(csvdm.headerStringsForAllColumns())
+        self.popupHeadersLeftColumn.selectItemAtIndex(-1)
+        self.popupHeadersRightColumn.addItemsWithTitles(csvdm.headerStringsForAllColumns())
+        self.popupHeadersRightColumn.selectItemAtIndex(-1)
     }
     
     func popupChangedSelection(popup: NSPopUpButton)
