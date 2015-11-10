@@ -28,7 +28,6 @@
 		C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */; };
 		C5CBBC3C1B3C0BFA008FB844 /* RecodeColumnViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */; };
 		C5CBBC3E1B3C0BFA008FB844 /* CSVdataDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBBC3D1B3C0BFA008FB844 /* CSVdataDocument.swift */; };
-		C5CBBC401B3C0BFA008FB844 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5CBBC3F1B3C0BFA008FB844 /* Images.xcassets */; };
 		C5CBBC431B3C0BFA008FB844 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C5CBBC411B3C0BFA008FB844 /* Main.storyboard */; };
 		C5DA6E171B7B4DA80079F0DF /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DA6E161B7B4DA80079F0DF /* SpriteKit.framework */; };
 /* End PBXBuildFile section */
@@ -67,7 +66,6 @@
 		C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RecodeColumnViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		C5CBBC3D1B3C0BFA008FB844 /* CSVdataDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdataDocument.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		C5CBBC3F1B3C0BFA008FB844 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		C5CBBC421B3C0BFA008FB844 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C5CBBC481B3C0BFA008FB844 /* aecombinerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = aecombinerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5DA6E161B7B4DA80079F0DF /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
@@ -129,7 +127,6 @@
 				C5CBBC3D1B3C0BFA008FB844 /* CSVdataDocument.swift */,
 				8E69F30E1B67DA4100BDB720 /* CSVdataViewController.swift */,
 				8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */,
-				C5CBBC3F1B3C0BFA008FB844 /* Images.xcassets */,
 				8E55A3D91BAF2C6700F6D41D /* GlobalUtilities.swift */,
 				C5CBBC391B3C0BFA008FB844 /* AppDelegate.swift */,
 				8E10726D1B40768D00E4E409 /* CSVdata.swift */,
@@ -231,7 +228,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C5CBBC401B3C0BFA008FB844 /* Images.xcassets in Resources */,
 				C587D34D1B7B592B00FA3854 /* ChartScene.sks in Resources */,
 				C5CBBC431B3C0BFA008FB844 /* Main.storyboard in Resources */,
 			);
