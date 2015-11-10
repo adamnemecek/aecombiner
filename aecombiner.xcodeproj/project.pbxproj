@@ -17,6 +17,7 @@
 		8E69F3111B67DA4100BDB720 /* CSVdataWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */; };
 		8E77E8EC1B8B2DB800A0D46F /* ChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */; };
 		8E911A711B94B2D2004D717A /* ChartDataPointsSets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E911A701B94B2D2004D717A /* ChartDataPointsSets.swift */; };
+		8EBC26BC1BEFB04200E1C911 /* LookupColumnsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EBC26BB1BEFB04200E1C911 /* LookupColumnsViewController.swift */; };
 		C52666291B664EC6006C251E /* ColumnsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52666271B664EC6006C251E /* ColumnsViewController.swift */; };
 		C5557D381B5948BC00C7E94D /* ExtractWithPredicatesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5557D371B5948BC00C7E94D /* ExtractWithPredicatesViewController.swift */; };
 		C5772F651B7A09DC00C80DF7 /* GroupParametersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */; };
@@ -53,6 +54,7 @@
 		8E69F30F1B67DA4100BDB720 /* CSVdataWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CSVdataWindowController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8E77E8EA1B8B2DB800A0D46F /* ChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewController.swift; sourceTree = "<group>"; };
 		8E911A701B94B2D2004D717A /* ChartDataPointsSets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartDataPointsSets.swift; sourceTree = "<group>"; };
+		8EBC26BB1BEFB04200E1C911 /* LookupColumnsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LookupColumnsViewController.swift; sourceTree = "<group>"; };
 		C52666271B664EC6006C251E /* ColumnsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColumnsViewController.swift; sourceTree = "<group>"; };
 		C5557D371B5948BC00C7E94D /* ExtractWithPredicatesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtractWithPredicatesViewController.swift; sourceTree = "<group>"; };
 		C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GroupParametersViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -111,6 +113,7 @@
 		C5CBBC361B3C0BFA008FB844 /* aecombiner */ = {
 			isa = PBXGroup;
 			children = (
+				8EBC26BB1BEFB04200E1C911 /* LookupColumnsViewController.swift */,
 				C5CBBC411B3C0BFA008FB844 /* Main.storyboard */,
 				8E911A701B94B2D2004D717A /* ChartDataPointsSets.swift */,
 				8E0E0E6A1B872EB400BD1C06 /* ChartNodes.swift */,
@@ -250,6 +253,7 @@
 				8E911A711B94B2D2004D717A /* ChartDataPointsSets.swift in Sources */,
 				C5CBBC3C1B3C0BFA008FB844 /* RecodeColumnViewController.swift in Sources */,
 				8E55A3DA1BAF2C6700F6D41D /* GlobalUtilities.swift in Sources */,
+				8EBC26BC1BEFB04200E1C911 /* LookupColumnsViewController.swift in Sources */,
 				C5CBBC3A1B3C0BFA008FB844 /* AppDelegate.swift in Sources */,
 				8E2F39951BB708C900B69564 /* ColumnSortingChartingViewController.swift in Sources */,
 				C5AC0A5E1BC2A3BB002625D1 /* CSVdata_Grouping.swift in Sources */,
