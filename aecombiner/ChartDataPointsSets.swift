@@ -54,7 +54,7 @@ class ChartDataSet {
             GlobalUtilities.alertWithMessage("No data to chart",style: .WarningAlertStyle)
             return}
         
-        guard columnIndex>=0 && columnIndex < data.count else {
+        guard columnIndex>=0 && columnIndex < data[0].count else {
             GlobalUtilities.alertWithMessage("The data does not have the column you want to chart",style: .WarningAlertStyle)
             return}
         
@@ -69,7 +69,7 @@ class ChartDataSet {
             GlobalUtilities.alertWithMessage("No data to chart",style: .WarningAlertStyle)
             return}
         
-        guard columnIndexY>=0 && columnIndexY < data.count && columnIndexX>=0 && columnIndexX < data.count
+        guard columnIndexY>=0 && columnIndexY < data[0].count && columnIndexX>=0 && columnIndexX < data[0].count
             else {GlobalUtilities.alertWithMessage("The data does not have the column you want to chart",style: .WarningAlertStyle); return}
         
         self.alertIfErrors(self.createSetFromTwoColumnsWithErrors(data: data, columnIndexY: columnIndexY, columnIndexX: columnIndexX))

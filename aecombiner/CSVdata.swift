@@ -197,7 +197,92 @@ class CSVdata {
         
     }
 
-    func addedRecodedColumnByBooleanCompareWithColumn(fromColum fromColum:Int, compareColumn:Int, booleanString:String, replacementString:String, copyUnmatchedValues:Bool)->Bool
+    
+    func addedRecodedColumnByMathsFunction_ColumnMaths(title title:String, fromColum:Int, mathsColumn:Int, functionString:String, copyUnmatchedValues:Bool)->Bool
+    {
+        guard
+            let fromColumV = self.validatedColumnIndex(fromColum),
+            let mathsColumnValid = self.validatedColumnIndex(mathsColumn)
+        else {return false}
+        
+        
+        for rowN in 0..<self.numberOfRowsInData()
+        {
+            guard
+                let fromS = self.stringValueForCell(fromColumn: fromColumV, atRow: rowN)
+            else {self.dataStringsMatrix2D[rowN].append("Invalid Column To Inspect"); continue}
+            guard
+                let mathS = self.stringValueForCell(fromColumn: mathsColumnValid, atRow: rowN)
+            else {self.dataStringsMatrix2D[rowN].append("Invalid Column To Compare"); continue}
+            guard
+                var fromD = Double(fromS),
+                let mathD = Double(mathS)
+            else {self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? fromS : ""); continue}
+            
+            
+            switch functionString
+            {
+            case "+":
+                fromD += mathD
+            case "-":
+                fromD -= mathD
+            case "*":
+                fromD *= mathD
+            case "/":
+                fromD /= mathD
+            default:
+                break
+            }
+            
+            self.dataStringsMatrix2D[rowN].append(String(fromD))
+
+        }
+
+        //add name to headers array
+        self.headersStringsArray1D.append(title)
+
+        return true
+    }
+    
+    func addedRecodedColumnByMathsFunction_AbsoluteValue(title title:String, fromColum:Int, absoluteValue:Double, functionString:String, copyUnmatchedValues:Bool)->Bool
+    {
+        guard let fromColumV = self.validatedColumnIndex(fromColum) else {return false}
+
+        for rowN in 0..<self.numberOfRowsInData()
+        {
+            guard
+                let fromS = self.stringValueForCell(fromColumn: fromColumV, atRow: rowN)
+                else {self.dataStringsMatrix2D[rowN].append("Invalid Column To Inspect"); continue}
+            guard
+                var fromD = Double(fromS)
+            else {self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? fromS : ""); continue}
+            
+            
+            switch functionString
+            {
+            case "+":
+                fromD += absoluteValue
+            case "-":
+                fromD -= absoluteValue
+            case "*":
+                fromD *= absoluteValue
+            case "/":
+                fromD /= absoluteValue
+            default:
+                break
+            }
+            
+            self.dataStringsMatrix2D[rowN].append(String(fromD))
+            
+        }
+
+        //add name to headers array
+        self.headersStringsArray1D.append(title)
+
+        return true
+    }
+    
+    func addedRecodedColumnByBooleanCompareWithColumn(title title:String, fromColum:Int, compareColumn:Int, booleanString:String, replacementString:String, copyUnmatchedValues:Bool)->Bool
     {
         guard
             let fromColumV = self.validatedColumnIndex(fromColum),
@@ -228,6 +313,9 @@ class CSVdata {
                 self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? fromS : "")
             }
         }
+        
+        //add name to headers array
+        self.headersStringsArray1D.append(title)
 
         return true
     }
