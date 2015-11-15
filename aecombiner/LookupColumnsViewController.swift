@@ -8,7 +8,8 @@
 
 import Cocoa
 
-class LookupColumnsViewController: TwoColumnsViewController {
+class LookupColumnsViewController: TwoColumnsViewController
+{
     // MARK: - Var
     var lookupCSVdata: CSVdata = CSVdata()
     {
@@ -18,12 +19,16 @@ class LookupColumnsViewController: TwoColumnsViewController {
         }
     }
     
-    
+    var arrayMatchParameters =  StringsArray1D()
+    var arrayImportColParameters =  StringsArray1D()
+
     // MARK: - @IBOutlet
 
     
     @IBOutlet weak var popupMatchColumn: NSPopUpButton!
     
+    @IBOutlet weak var tvMatchColumnParameters: NSTableView!
+    @IBOutlet weak var tvImportColumnParameters: NSTableView!
     
     // MARK: - @IBActions
     @IBAction func lookupButtonTapped(sender: AnyObject) {
@@ -68,12 +73,19 @@ class LookupColumnsViewController: TwoColumnsViewController {
         {
         case self.tvHeaders:
             return self.lookupCSVdata.numberOfColumnsInData()
+        
+        case self.tvMatchColumnParameters:
+            return self.arrayMatchParameters.count
+        case self.tvImportColumnParameters:
+            return self.arrayImportColParameters.count
+        
         default:
             return 0
         }
     }
 
-    override func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    override func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView?
+    {
         // Retrieve to get the @"MyView" from the pool or,
         // if no version is available in the pool, load the Interface Builder version
         var cellView = NSTableCellView()
@@ -82,16 +94,43 @@ class LookupColumnsViewController: TwoColumnsViewController {
         {
         case self.tvHeaders:
             cellView = self.lookupCSVdata.cellForHeadersTable(tableView: tableView, row: row)
-            
+        case self.tvImportColumnParameters:
+            cellView = tableView.makeViewWithIdentifier("cell", owner: self) as! NSTableCellView
+            cellView.textField!.stringValue = self.arrayImportColParameters[row]
+        case self.tvMatchColumnParameters:
+            cellView = tableView.makeViewWithIdentifier("cell", owner: self) as! NSTableCellView
+            cellView.textField!.stringValue = self.arrayMatchParameters[row]
         default:
             break
         }
         
         
         // Return the cellView
-        return cellView;
+        return cellView
     }
 
+    override func tableViewSelectionDidChange(notification: NSNotification) {
+        guard let tableView = (notification.object as? NSTableView) else {return}
+        switch tableView
+        {
+        case self.tvHeaders:
+            guard
+                self.tvHeaders.selectedRowIndexes.count == 1,
+                let newparams = self.lookupCSVdata.stringsArray1DOfParametersFromColumn(fromColumn: self.tvHeaders.selectedRow, replaceBlank: true)
+                else
+            {
+                self.arrayImportColParameters = StringsArray1D()
+                self.tvImportColumnParameters.reloadData()
+                return
+            }
+            self.arrayImportColParameters = newparams
+            self.tvImportColumnParameters.reloadData()
+
+        default:
+            break;
+        }
+        self.enableButtons(enabled: true)
+    }
     
     // MARK: - header Popups
     func populateHeaderPopups()
@@ -109,10 +148,20 @@ class LookupColumnsViewController: TwoColumnsViewController {
         switch popup
         {
         case self.popupMatchColumn:
-            self.enableButtons(enabled: true)
+            guard
+                let newparams = self.lookupCSVdata.stringsArray1DOfParametersFromColumn(fromColumn: self.popupMatchColumn.indexOfSelectedItem, replaceBlank: true)
+            else
+            {
+                self.arrayMatchParameters = StringsArray1D()
+                self.tvMatchColumnParameters.reloadData()
+                return
+            }
+            self.arrayMatchParameters = newparams
+            self.tvMatchColumnParameters.reloadData()
         default:
             break
         }
+        self.enableButtons(enabled: true)
     }
 
     // MARK: - funcs

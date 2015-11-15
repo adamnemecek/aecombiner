@@ -34,6 +34,7 @@ extension CSVdata
         //join col names to make a mega name for the combination
         //make an array first
         var namesOfCombinedColumn = StringsArray1D()
+        //let sortedindexes = CSVdata.sortedArrayOfIndexesFromNSIndexSet(indexes: columnIndexesToGroup)
         for columnIndex in columnIndexesToGroup
         {
             namesOfCombinedColumn.append(self.headersStringsArray1D[columnIndex])
@@ -92,6 +93,8 @@ extension CSVdata
 
     func combinedColumnsAndNewColumnName_UsingSingleMethod_MeanRange(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:StringsArray1D , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:StringsMatrix2D, nameOfColumn:String)
     {
+        //let sortedcolumnindexesToGroup = CSVdata.sortedArrayOfIndexesFromNSIndexSet(indexes: columnIndexesToGroup)
+        
         let groupStartValue = CSVdata.groupStartValueForString(groupMethod)
         //create a dict with the keys the params we extracted for grouping
         //make a blank array to hold the values associated with the grouping for each member of the group
@@ -196,7 +199,7 @@ extension CSVdata
     
     func combinedColumnsAndNewColumnName_UsingSingleMethod_CountSumMultiplyMaxMin(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, arrayOfParamatersInGroup:StringsArray1D , groupMethod:String) -> NamedDataMatrix//(csvDataMatrix:StringsMatrix2D, nameOfColumn:String)
     {
-
+        //let sortedcolumnindexesToGroup = CSVdata.sortedArrayOfIndexesFromNSIndexSet(indexes: columnIndexesToGroup)
         let groupStartValue = CSVdata.groupStartValueForString(groupMethod)
         //create a dict with the keys the params we extracted for grouping
         //make a blank array to hold the values associated with the grouping for each member of the group
@@ -286,7 +289,7 @@ extension CSVdata
     
     func combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet)->CSVdata//(cvsdata:CSVdata, name:String)
     {
-        guard let arrayOfParamatersInColumnToGroupBy = self.StringsArray1DOfParametersFromColumn(fromColumn: columnIndexForGrouping, replaceBlank: true)
+        guard let arrayOfParamatersInColumnToGroupBy = self.stringsArray1DOfParametersFromColumn(fromColumn: columnIndexForGrouping, replaceBlank: true)
             else {return CSVdata()}
         
         //create a dict with the keys the params we extracted for grouping
@@ -297,7 +300,9 @@ extension CSVdata
         {
             statsForGroup[parameter] = AggregatedStats()
         }
-        
+ 
+        //let sortedcolumnindexesToGroup = CSVdata.sortedArrayOfIndexesFromNSIndexSet(indexes: columnIndexesToGroup)
+
         for row in 0..<self.numberOfRowsInData()
         {
             guard let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row) else {continue}

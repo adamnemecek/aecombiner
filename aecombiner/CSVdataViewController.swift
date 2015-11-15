@@ -25,6 +25,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     @IBOutlet weak var segmentSortTextOrValue: NSSegmentedControl!
     @IBOutlet weak var labelNumRows: NSTextField!
     @IBOutlet weak var buttonTrashRows: NSButton!
+    @IBOutlet weak var buttonExportSelectedRows: NSButton!
 
     // MARK: - @IBActions
     @IBAction func mergeFile(sender: NSToolbarItem)
@@ -63,13 +64,17 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
                 {
                     self.tvCSVdata.reloadData()
                     self.updateRowCountLabel()
-                    self.updateTrashRowsButtonEnabled()
+                    self.updateRowsButtonsEnabled()
                     self.documentMakeDirty()
                 }
             }
         }
     }
 
+    @IBAction func buttonExportSelectedRowsTapped(sender: AnyObject) {
+        self.associatedCSVdataDocument.csvDataModel.createNewDocumentFromRowsInIndexSet(rows: self.tvCSVdata.selectedRowIndexes, docName: "Untitled")
+
+    }
     // MARK: - overrides
 
     override func viewDidLoad() {
@@ -192,8 +197,9 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             let newUniqueColHeaders = self.associatedCSVdataDocument.csvDataModel.lookedupNewColumnsFromCSVdata(lookupCSVdata: lookupCSVdata, lookupColumn: lookupColumn, columnsToAdd: columnsToAdd)
         else {return}
         
+
         //NOW it is safe to add table columns
-        for col in 0..<columnsToAdd.count
+        for col in 0..<newUniqueColHeaders.count
         {
             self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(newUniqueColHeaders[col]))
         }
@@ -228,7 +234,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
                 {
                     self.tvCSVdata.reloadData()
                     self.updateRowCountLabel()
-                    self.updateTrashRowsButtonEnabled()
+                    self.updateRowsButtonsEnabled()
                     self.associatedCSVdataDocument.documentMakeDirty()
                 }
             }
@@ -408,16 +414,17 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         switch tableView
         {
         case self.tvCSVdata:
-            self.updateTrashRowsButtonEnabled()
+            self.updateRowsButtonsEnabled()
         default:
             break;
         }
         
     }
     
-    func updateTrashRowsButtonEnabled()
+    func updateRowsButtonsEnabled()
     {
         self.buttonTrashRows.enabled = self.tvCSVdata.selectedRowIndexes.count > 0
+        self.buttonExportSelectedRows.enabled = self.tvCSVdata.selectedRowIndexes.count > 0
     }
 
     func control(control: NSControl, textShouldEndEditing fieldEditor: NSText) -> Bool {

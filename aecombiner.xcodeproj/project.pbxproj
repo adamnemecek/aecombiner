@@ -116,7 +116,6 @@
 			isa = PBXGroup;
 			children = (
 				C52D03FC1BF21AEA0032F9D4 /* Images.xcassets */,
-				8EBC26BB1BEFB04200E1C911 /* LookupColumnsViewController.swift */,
 				C5CBBC411B3C0BFA008FB844 /* Main.storyboard */,
 				8E911A701B94B2D2004D717A /* ChartDataPointsSets.swift */,
 				8E0E0E6A1B872EB400BD1C06 /* ChartNodes.swift */,
@@ -126,6 +125,7 @@
 				8E2F39941BB708C900B69564 /* ColumnSortingChartingViewController.swift */,
 				C52666271B664EC6006C251E /* ColumnsViewController.swift */,
 				C5B66EAD1BCFDB150089C00E /* TwoColumnsViewController.swift */,
+				8EBC26BB1BEFB04200E1C911 /* LookupColumnsViewController.swift */,
 				C5CBBC3B1B3C0BFA008FB844 /* RecodeColumnViewController.swift */,
 				C5772F641B7A09DC00C80DF7 /* GroupParametersViewController.swift */,
 				8E5C16761BD28B9900462ED7 /* SplitParametersIntoColumnsViewController.swift */,
