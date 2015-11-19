@@ -27,8 +27,9 @@ extension NSTableColumn
     {
         let col =  NSTableColumn(identifier:String(NSDate().timeIntervalSince1970))
         col.title = title
+        col.sizeToFit()
+        col.minWidth = col.width
         col.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)
-        
         return col
     }
 }

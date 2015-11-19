@@ -134,6 +134,19 @@ class CSVdata {
     // MARK: - CLASS
     // MARK: - PVB Params
     
+    
+    typealias SortedArrayOfIndexes = [Int]
+    class func sortedArrayOfIndexesFromNSIndexSet(indexes indexes:NSIndexSet)->SortedArrayOfIndexes
+    {
+        var sortedArray = SortedArrayOfIndexes()
+        for index in indexes
+        {
+            sortedArray.append(index)
+        }
+        sortedArray.sortInPlace()
+        return sortedArray
+    }
+    
     class func newParamValueBool(param param: String)->StringsArray1D
     {
         return [param,"",String(NSOnState)]
@@ -197,7 +210,92 @@ class CSVdata {
         
     }
 
-    func addedRecodedColumnByBooleanCompareWithColumn(fromColum fromColum:Int, compareColumn:Int, booleanString:String, replacementString:String, copyUnmatchedValues:Bool)->Bool
+    
+    func addedRecodedColumnByMathsFunction_ColumnMaths(title title:String, fromColum:Int, mathsColumn:Int, functionString:String, copyUnmatchedValues:Bool)->Bool
+    {
+        guard
+            let fromColumV = self.validatedColumnIndex(fromColum),
+            let mathsColumnValid = self.validatedColumnIndex(mathsColumn)
+        else {return false}
+        
+        
+        for rowN in 0..<self.numberOfRowsInData()
+        {
+            guard
+                let fromS = self.stringValueForCell(fromColumn: fromColumV, atRow: rowN)
+            else {self.dataStringsMatrix2D[rowN].append("Invalid Column To Inspect"); continue}
+            guard
+                let mathS = self.stringValueForCell(fromColumn: mathsColumnValid, atRow: rowN)
+            else {self.dataStringsMatrix2D[rowN].append("Invalid Column To Compare"); continue}
+            guard
+                var fromD = Double(fromS),
+                let mathD = Double(mathS)
+            else {self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? fromS : ""); continue}
+            
+            
+            switch functionString
+            {
+            case "+":
+                fromD += mathD
+            case "-":
+                fromD -= mathD
+            case "*":
+                fromD *= mathD
+            case "/":
+                fromD /= mathD
+            default:
+                break
+            }
+            
+            self.dataStringsMatrix2D[rowN].append(String(fromD))
+
+        }
+
+        //add name to headers array
+        self.headersStringsArray1D.append(title)
+
+        return true
+    }
+    
+    func addedRecodedColumnByMathsFunction_AbsoluteValue(title title:String, fromColum:Int, absoluteValue:Double, functionString:String, copyUnmatchedValues:Bool)->Bool
+    {
+        guard let fromColumV = self.validatedColumnIndex(fromColum) else {return false}
+
+        for rowN in 0..<self.numberOfRowsInData()
+        {
+            guard
+                let fromS = self.stringValueForCell(fromColumn: fromColumV, atRow: rowN)
+                else {self.dataStringsMatrix2D[rowN].append("Invalid Column To Inspect"); continue}
+            guard
+                var fromD = Double(fromS)
+            else {self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? fromS : ""); continue}
+            
+            
+            switch functionString
+            {
+            case "+":
+                fromD += absoluteValue
+            case "-":
+                fromD -= absoluteValue
+            case "*":
+                fromD *= absoluteValue
+            case "/":
+                fromD /= absoluteValue
+            default:
+                break
+            }
+            
+            self.dataStringsMatrix2D[rowN].append(String(fromD))
+            
+        }
+
+        //add name to headers array
+        self.headersStringsArray1D.append(title)
+
+        return true
+    }
+    
+    func addedRecodedColumnByBooleanCompareWithColumn(title title:String, fromColum:Int, compareColumn:Int, booleanString:String, replacementString:String, copyUnmatchedValues:Bool)->Bool
     {
         guard
             let fromColumV = self.validatedColumnIndex(fromColum),
@@ -228,6 +326,9 @@ class CSVdata {
                 self.dataStringsMatrix2D[rowN].append(copyUnmatchedValues ? fromS : "")
             }
         }
+        
+        //add name to headers array
+        self.headersStringsArray1D.append(title)
 
         return true
     }
@@ -498,9 +599,23 @@ class CSVdata {
         
         self.headersStringsArray1D = arrayOfColumns.removeAtIndex(0)
         self.dataStringsMatrix2D = arrayOfColumns
-        self.processedDataOK = true
+        self.processedDataOK = self.checkIntegrityOfFile()
         self.name = name
    }
+    
+    func checkIntegrityOfFile()->Bool
+    {
+        let numHeaderCols = self.headersStringsArray1D.count
+        for row in 0..<self.numberOfRowsInData()
+        {
+            if self.dataStringsMatrix2D[row].count != numHeaderCols
+            {
+                GlobalUtilities.alertWithMessage("The file does not have the same number of columns in the headers and the rows", style: .CriticalAlertStyle)
+                return false
+            }
+        }
+        return true
+    }
     
     func importCSVstring(dataAsString dataAsString:NSString, name:String)
     {
@@ -698,7 +813,7 @@ class CSVdata {
 
     // MARK: - Extract From Column
     
-    func lookupDictionaryFromColumn(lookupColumn lookupColumn:Int, mergeColumnsIndexes:NSIndexSet)->LookupDictionary?
+    func lookupDictionaryFromColumn(lookupColumn lookupColumn:Int, mergeColumnsIndexes:SortedArrayOfIndexes)->LookupDictionary?
     {
         guard
             mergeColumnsIndexes.count > 0
@@ -712,7 +827,7 @@ class CSVdata {
             guard
                 let lookupKey = self.stringValueForCell(fromColumn: lookupColumn, atRow: row)
             else {continue}
-            paramsDict[lookupKey] = self.stringsArray1DFromColumns(columns: mergeColumnsIndexes, atRow: row)
+            paramsDict[lookupKey] = self.stringsArray1DFromSortedColumns(columns: mergeColumnsIndexes, atRow: row)
         }
         
         return paramsDict
@@ -720,14 +835,18 @@ class CSVdata {
 
     func lookedupNewColumnsFromCSVdata(lookupCSVdata lookupCSVdata:CSVdata, lookupColumn:Int, columnsToAdd:NSIndexSet)->StringsArray1D?
     {
+        let sortedIndexes = CSVdata.sortedArrayOfIndexesFromNSIndexSet(indexes: columnsToAdd)
         guard
             let matchColumnInMydata = self.headersStringsArray1D.indexOf(lookupCSVdata.headersStringsArray1D[lookupColumn]),
-            let lookupdict = lookupCSVdata.lookupDictionaryFromColumn(lookupColumn: lookupColumn, mergeColumnsIndexes: columnsToAdd),
-            let newHeaders = lookupCSVdata.headersArrayForIndexes(columnsToAdd)
+            let lookupdict = lookupCSVdata.lookupDictionaryFromColumn(lookupColumn: lookupColumn, mergeColumnsIndexes: sortedIndexes),
+            let newHeaders = lookupCSVdata.headersArrayForSortedIndexes(sortedIndexes)
         else {return nil}
 
         //add new columns - we shoudl check uniqueness
-        self.headersStringsArray1D += newHeaders
+        for c in 0..<newHeaders.count
+        {
+            self.headersStringsArray1D.append(newHeaders[c])
+        }
         
         //add the new col data or a dummy by lookup
         let dummyExtension = StringsArray1D(count: newHeaders.count, repeatedValue: "")
@@ -740,26 +859,33 @@ class CSVdata {
             {
                 // unable to match so add a dummy data extension
                 self.dataStringsMatrix2D[row] += dummyExtension
+                //for c in 0..<dummyExtension.count
+                //{
+                //    self.dataStringsMatrix2D[row].append(dummyExtension[c])
+                //}
                 continue
             }
             //matched so add the new columns data
             self.dataStringsMatrix2D[row] += colData
-
+            //for c in 0..<colData.count
+            //{
+            //    self.dataStringsMatrix2D[row].append(colData[c])
+            //}
+            //print("\(self.dataStringsMatrix2D[row]) <<< \(colData)")
         }
-        
         return newHeaders
     }
     
-    
-    func stringsArray1DFromColumns(columns columns:NSIndexSet, atRow:Int)->StringsArray1D?
+    func stringsArray1DFromSortedColumns(columns columns:SortedArrayOfIndexes, atRow:Int)->StringsArray1D?
     {
         guard
             columns.count > 0
-        else {return nil}
+            else {return nil}
         var collectedCols = StringsArray1D()
-        for col in columns
+        //let sortedCols = CSVdata.sortedArrayOfIndexesFromNSIndexSet(indexes: columns)
+        for col in 0..<columns.count
         {
-            let val = self.stringValueForCell(fromColumn: col, atRow: atRow)
+            let val = self.stringValueForCell(fromColumn: columns[col], atRow: atRow)
             if val != nil
             {
                 collectedCols.append(val!)
@@ -793,7 +919,7 @@ class CSVdata {
         return set
     }
 
-    func StringsArray1DOfParametersFromColumn(fromColumn columnIndex:Int, replaceBlank:Bool)->StringsArray1D?
+    func stringsArray1DOfParametersFromColumn(fromColumn columnIndex:Int, replaceBlank:Bool)->StringsArray1D?
     {
         guard let set = self.setOfParametersFromColumn(fromColumn: columnIndex, replaceBlank: replaceBlank) else {return nil}
         
@@ -808,6 +934,7 @@ class CSVdata {
         
         var newCSVdata = StringsArray1D()
         var newheaders = StringsArray1D()
+        //let sortedCols = CSVdata.sortedArrayOfIndexesFromNSIndexSet(indexes: fromColumnIndexes)
         for col in fromColumnIndexes
         {
             newheaders.append(self.headersStringsArray1D[col])
@@ -898,15 +1025,16 @@ class CSVdata {
         return self.headersStringsArray1D
     }
     
-    func headersArrayForIndexes(colIndexes:NSIndexSet)->StringsArray1D?
+    func headersArrayForSortedIndexes(colIndexes:SortedArrayOfIndexes)->StringsArray1D?
     {
         var headersarray = StringsArray1D()
-        for index in colIndexes
+        //let sortedCols = CSVdata.sortedArrayOfIndexesFromNSIndexSet(indexes: colIndexes)
+        for index in 0..<colIndexes.count
         {
             guard
-                let _ = self.validatedColumnIndex(index)
-            else {return nil}
-            headersarray.append(self.headersStringsArray1D[index])
+                let validCI = self.validatedColumnIndex(colIndexes[index])
+                else {return nil}
+            headersarray.append(self.headersStringsArray1D[validCI])
         }
         return headersarray
     }

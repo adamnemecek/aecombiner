@@ -25,6 +25,7 @@ enum RecodeTabViewTitles:String
     case Boolean = "Boolean"
     case DateTime = "Date-Time"
     case ColumnCompare = "Column Compare"
+    case ColumnF = "Column ⨍"
 }
 
 enum DateTimeRecodeMethod:String
@@ -111,9 +112,13 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var popupHeadersDateEnd: NSPopUpButton!
     @IBOutlet weak var popupDateTimeRoundingUnits: NSPopUpButton!
  
-    @IBOutlet weak var popupHeadersLeftColumn: NSPopUpButton!
     @IBOutlet weak var popupMathsFunction: NSPopUpButton!
     @IBOutlet weak var popupHeadersRightColumn: NSPopUpButton!
+    
+    @IBOutlet weak var radioUseAbsValueForMaths: NSButton!
+    @IBOutlet weak var radioUseRightColumnForMaths: NSButton!
+    
+    @IBOutlet weak var textfieldAbsValue: NSTextField!
     
     @IBOutlet weak var buttonOverwite: NSButton!
     @IBOutlet weak var buttonSetValue: NSButton!
@@ -140,6 +145,10 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         else {return}
         self.radio_DateTimeMethod_Selected = method
     }
+    
+    @IBAction func radioMathsTapped(sender: AnyObject) {
+    }
+    
     
     @IBAction func popupDateFormatTapped(sender: AnyObject) {
         guard
@@ -243,7 +252,6 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.popupHeaders.removeAllItems()
         self.popupHeadersDateEnd.removeAllItems()
         self.popupHeadersColumnCompare.removeAllItems()
-        self.popupHeadersLeftColumn.removeAllItems()
         self.popupHeadersRightColumn.removeAllItems()
       guard
             let csvdm = self.associatedCSVmodel where csvdm.headersStringsArray1D.count>0
@@ -254,8 +262,6 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         self.popupHeadersDateEnd.selectItemAtIndex(0)
         self.popupHeadersColumnCompare.addItemsWithTitles(csvdm.headerStringsForAllColumns())
         self.popupHeadersColumnCompare.selectItemAtIndex(0)
-        self.popupHeadersLeftColumn.addItemsWithTitles(csvdm.headerStringsForAllColumns())
-        self.popupHeadersLeftColumn.selectItemAtIndex(-1)
         self.popupHeadersRightColumn.addItemsWithTitles(csvdm.headerStringsForAllColumns())
         self.popupHeadersRightColumn.selectItemAtIndex(-1)
     }
@@ -496,7 +502,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         {
         case .DateTime:
             self.recodeDateTime_FromOneColumn(overwrite: false)
-        case .Single, .Multiple, .Boolean,.ColumnCompare:
+        case .Single, .Multiple, .Boolean,.ColumnCompare,.ColumnF:
             guard
                 let csvdo = self.associatedCSVmodel,
                 let csvdVC = self.associatedCSVdataViewController,
@@ -505,23 +511,42 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
             guard self.arrayExtractedParameters.count > 0  else {return}
             //give a name if none
             let colTitle = self.columnAddedSafeTitle(fromColumnIndex: columnIndex)
+            let copyUnmatched = self.checkboxCopyUnmatchedValues.state == NSOnState
             
             switch tabTitle
             {
             case .Single, .Multiple, .Boolean:
                 guard
                     //pass it over
-                    csvdVC.addedRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:self.checkboxCopyUnmatchedValues.state == NSOnState)
+                    csvdVC.addedRecodedColumn(withTitle: colTitle, fromColum: columnIndex, usingParamsArray: self.arrayExtractedParameters, copyUnmatchedValues:copyUnmatched)
                 else {return}
             case .ColumnCompare:
                 guard
                     let columnCompare = csvdo.validatedColumnIndex(self.popupHeadersColumnCompare.indexOfSelectedItem),
                     let booleanUsed = self.popupBooleanColumnCompare.titleOfSelectedItem
-                else {return}
+                    else {return}
                 //pass it over
                 guard
-                    csvdVC.addedRecodedColumnByBooleanCompareWithColumn(title: colTitle, fromColum: columnIndex, compareColumn: columnCompare, booleanString: booleanUsed, replacementString: self.textFieldBooleanColumnRecodeNewValue.stringValue, copyUnmatchedValues: self.checkboxCopyUnmatchedValues.state == NSOnState)
+                    csvdVC.addedRecodedColumnByBooleanCompareWithColumn(title: colTitle, fromColum: columnIndex, compareColumn: columnCompare, booleanString: booleanUsed, replacementString: self.textFieldBooleanColumnRecodeNewValue.stringValue, copyUnmatchedValues: copyUnmatched)
+                    else {return}
+            case .ColumnF:
+                guard
+                    let columnLeft = csvdo.validatedColumnIndex(self.popupHeaders.indexOfSelectedItem),
+                    let mathsFuncString = popupMathsFunction.selectedItem?.title
                 else {return}
+
+                if self.radioUseRightColumnForMaths.state == NSOnState
+                {
+                    guard
+                        let mathscolumnIndex = csvdo.validatedColumnIndex(self.popupHeadersRightColumn.indexOfSelectedItem)
+                    else {return}
+                    csvdVC.addedRecodedColumnByMathsFunction_ColumnMaths(title: colTitle, fromColum: columnLeft, mathsColumn: mathscolumnIndex, functionString: mathsFuncString, copyUnmatchedValues: copyUnmatched)
+                }
+                else if self.radioUseAbsValueForMaths.state == NSOnState
+                {
+                    csvdVC.addedRecodedColumnByMathsFunction_AbsoluteValue(title: colTitle, fromColum: columnLeft, absoluteValue: self.textfieldAbsValue.doubleValue, functionString: mathsFuncString, copyUnmatchedValues: copyUnmatched)
+                }
+                
             default:
                 return
             }
