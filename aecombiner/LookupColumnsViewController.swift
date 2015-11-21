@@ -24,12 +24,15 @@ class LookupColumnsViewController: TwoColumnsViewController
 
     // MARK: - @IBOutlet
 
-    
+    @IBOutlet weak var buttonImportMissingFromMatched: NSButton!
+    @IBOutlet weak var buttonExportMissingValues: NSButton!
+ 
     @IBOutlet weak var popupMatchColumn: NSPopUpButton!
     
     @IBOutlet weak var tvMatchColumnParameters: NSTableView!
     @IBOutlet weak var tvImportColumnParameters: NSTableView!
     
+    @IBOutlet weak var checkboxAddZeroes: NSButton!
     // MARK: - @IBActions
     @IBAction func lookupButtonTapped(sender: AnyObject) {
         self.performLookupAndMerge()
@@ -44,6 +47,12 @@ class LookupColumnsViewController: TwoColumnsViewController
         self.requestNewFile()
     }
     
+    @IBAction func exportMissingValuesTapped(sender: AnyObject) {
+        self.importMissingFromMatched(output: .ExportAsCSV)
+   }
+    @IBAction func importMissingFromMatchedTapped(sender: AnyObject) {
+        self.importMissingFromMatched(output: .AppendToSelf)
+    }
     // MARK: - overrides
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,6 +72,8 @@ class LookupColumnsViewController: TwoColumnsViewController
     override func enableButtons(enabled enabled:Bool)
     {
         self.buttonCopyColumns?.enabled = self.tvHeaders.selectedRowIndexes.count > 0 && self.popupMatchColumn.indexOfSelectedItem >= 0
+        self.buttonImportMissingFromMatched?.enabled = self.popupMatchColumn.indexOfSelectedItem >= 0
+        self.buttonExportMissingValues?.enabled = self.popupMatchColumn.indexOfSelectedItem >= 0
     }
 
     
@@ -170,7 +181,7 @@ class LookupColumnsViewController: TwoColumnsViewController
     {
         self.tvHeaders?.reloadData()
         populateHeaderPopups()
-        self.buttonCopyColumns?.enabled = false
+        self.enableButtons(enabled: false)
     }
 
     func requestNewFile()
@@ -214,5 +225,35 @@ class LookupColumnsViewController: TwoColumnsViewController
         
     }
     
+    enum OutputDirection
+    {
+        case ExportAsCSV
+        case AppendToSelf
+    }
+    func importMissingFromMatched(output output:OutputDirection)
+    {
+        guard
+            let assocCSVdata = self.associatedCSVmodel,
+            let assocCSVdataVC = self.associatedCSVdataViewController,
+            let nameOfMatchColumn = self.popupMatchColumn.titleOfSelectedItem,
+            let indexOfMatchColumnInOpenFile = assocCSVdata.indexOfColumnWithName(name: nameOfMatchColumn),
+            let newparams = self.lookupCSVdata.setOfParametersFromColumn(fromColumn: self.popupMatchColumn.indexOfSelectedItem, replaceBlank: true),
+            let openparams = assocCSVdata.setOfParametersFromColumn(fromColumn: indexOfMatchColumnInOpenFile, replaceBlank: true)
+            else {return}
+        
+        let missing = newparams.subtract(openparams)
+        if missing.isEmpty == false
+        {
+            switch output
+            {
+            case .ExportAsCSV:
+                CSVdata.createNewDocumentFromCVSDataAndColumnName(cvsData: CSVdata(singleColumnName: nameOfMatchColumn, singleColumnSetOfData: missing), name: nameOfMatchColumn)
+            case .AppendToSelf:
+                assocCSVdataVC.appendTheseParametersIntoColumn(params: missing, intoColumn: indexOfMatchColumnInOpenFile, padValue: self.checkboxAddZeroes.state == NSOnState ? "0.0" : "")
+            }
+        }
+        
+
+    }
     
 }

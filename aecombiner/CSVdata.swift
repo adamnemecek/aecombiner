@@ -92,6 +92,20 @@ class CSVdata {
         processedDataOK = true
     }
     
+    convenience init (singleColumnName:String, singleColumnSetOfData:SetOfStrings)
+    {
+        self.init()
+        self.headersStringsArray1D = [singleColumnName]
+        var datamatrix = StringsMatrix2D()
+        for param in singleColumnSetOfData
+        {
+            datamatrix.append([param])
+        }
+        self.name = singleColumnName
+        self.dataStringsMatrix2D = datamatrix
+        processedDataOK = true
+    }
+    
     class func decodeDataToString(data: NSData)->(decodedString: NSString?, encodingUsed:UInt?)
     {
         var dataAsString:NSString?
@@ -195,6 +209,11 @@ class CSVdata {
             columnIndex < self.numberOfColumnsInData()
             else {print("non validatedColumnIndex \(columnIndex)"); return nil}
         return columnIndex
+    }
+    
+    func indexOfColumnWithName(name name:String)->Int?
+    {
+        return self.headersStringsArray1D.indexOf(name)
     }
     
     func deletedColumnAtIndex(index:Int)->Bool
@@ -709,7 +728,86 @@ class CSVdata {
     }
 
     
-    // MARK: - Sorting
+    // MARK: - Merge
+    
+    
+    func appendTheseParametersIntoColumn(params params:SetOfStrings, intoColumn:Int, padValue:String)
+    {
+        guard
+            let matchColumnInMydata = self.validatedColumnIndex(intoColumn)
+        else {return}
+        for param in params
+        {
+            var padSuffix = StringsArray1D(count: self.numberOfColumnsInData(), repeatedValue: padValue)
+            padSuffix[matchColumnInMydata] = param
+            self.dataStringsMatrix2D.append(padSuffix)
+        }
+    }
+    
+    func mergeCSVdataAndReturnUniqueHeaders(csvdataToMerge: CSVdata?)->StringsArray1D
+    {
+        if csvdataToMerge != nil && csvdataToMerge!.notAnEmptyDataSet()
+        {
+            var lastColumn = self.numberOfColumnsInData()//.count automatically adds 1
+            var newUniqueColHeaders = StringsArray1D()
+            var lookupMatrixOfNewColumns = StringsArray1D()//same length as new unique cols, has either the original column index in if matched, or a new col index if appended
+            for colnum in 0..<csvdataToMerge!.numberOfColumnsInData()
+            {
+                let matchedIndex = self.headersStringsArray1D.indexOf(csvdataToMerge!.headersStringsArray1D[colnum])
+                if matchedIndex != nil
+                {
+                    //add the index of original array we have matched
+                    lookupMatrixOfNewColumns.append(String(matchedIndex!))
+                }
+                else
+                {
+                    //add the index of the last col num, and increment the lastcolnum count, add new unique col name
+                    lookupMatrixOfNewColumns.append(String(lastColumn))
+                    lastColumn++
+                    newUniqueColHeaders.append(csvdataToMerge!.headersStringsArray1D[colnum])
+                }
+            }
+            
+            if newUniqueColHeaders.count > 0
+            {
+                //append the new col names to existing headers
+                self.headersStringsArray1D += newUniqueColHeaders
+                
+                //padd the array with new blank columns
+                let padSuffix = StringsArray1D(count: newUniqueColHeaders.count, repeatedValue: "")
+                for row in 0..<self.dataStringsMatrix2D.count
+                {
+                    self.dataStringsMatrix2D[row] += padSuffix
+                }
+            }
+            
+            //append the new rows onto array
+            for row in 0..<csvdataToMerge!.dataStringsMatrix2D.count
+            {
+                //make a row template to change individual cells
+                var newRow = StringsArray1D(count: lastColumn, repeatedValue: "")
+                for colnumber in 0..<lookupMatrixOfNewColumns.count
+                {
+                    guard
+                        //[x] returns optionals so we force unwrap
+                        let validCN = Int(lookupMatrixOfNewColumns[colnumber])
+                        else {continue}
+                    //replace the cell in the template row with the value in the new csvdata array, place into old columns if matched or new cols if not
+                    //the colnumber is our lookup
+                    newRow[validCN] = csvdataToMerge!.dataStringsMatrix2D[row][colnumber]
+                }
+                //append new row to existing
+                self.dataStringsMatrix2D.append(newRow)
+            }
+            
+            //send back the headers
+            return newUniqueColHeaders
+        }
+        else
+        {
+            return StringsArray1D()
+        }
+    }
 
     
     // MARK: - Extract Rows
