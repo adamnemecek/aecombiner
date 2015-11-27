@@ -62,10 +62,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             {
                 if self.associatedCSVdataDocument.csvDataModel.deletedRowsAtIndexes(self.tvCSVdata.selectedRowIndexes) == true
                 {
-                    self.tvCSVdata.reloadData()
-                    self.updateRowCountLabel()
-                    self.updateRowsButtonsEnabled()
-                    self.documentMakeDirty()
+                    self.cleanUp(makeDirty:true)
                 }
             }
         }
@@ -97,7 +94,17 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         self.associatedCSVdataDocument.documentMakeDirty()
     }
 
-
+    func cleanUp(makeDirty makeDirty:Bool)
+    {
+        //clean up
+        if makeDirty
+        {
+            self.documentMakeDirty()
+        }
+        self.tvCSVdata.reloadData()
+        self.updateRowCountLabel()
+        self.updateRowsButtonsEnabled()
+    }
     
     func mergeFileFromURL(url:NSURL?)
     {
@@ -125,57 +132,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     {
         if csvdata != nil && csvdata!.notAnEmptyDataSet()
         {
-            var lastColumn = self.associatedCSVdataDocument.csvDataModel.numberOfColumnsInData()//.count automatically adds 1
-            var newUniqueColHeaders = StringsArray1D()
-            var lookupMatrixOfNewColumns = StringsArray1D()//same length as new unique cols, has either the original column index in if matched, or a new col index if appended
-            for colnum in 0..<csvdata!.numberOfColumnsInData()
-            {
-                let matchedIndex = self.associatedCSVdataDocument.csvDataModel.headersStringsArray1D.indexOf(csvdata!.headersStringsArray1D[colnum])
-                if matchedIndex != nil
-                {
-                    //add the index of original array we have matched
-                    lookupMatrixOfNewColumns.append(String(matchedIndex!))
-                }
-                else
-                {
-                    //add the index of the last col num, and increment the lastcolnum count, add new unique col name
-                    lookupMatrixOfNewColumns.append(String(lastColumn))
-                    lastColumn++
-                    newUniqueColHeaders.append(csvdata!.headersStringsArray1D[colnum])
-               }
-            }
-            
-            if newUniqueColHeaders.count > 0
-            {
-                //append the new col names to existing headers
-                self.associatedCSVdataDocument.csvDataModel.headersStringsArray1D += newUniqueColHeaders
-                
-                //padd the array with new blank columns
-                let padSuffix = StringsArray1D(count: newUniqueColHeaders.count, repeatedValue: "")
-                for row in 0..<self.associatedCSVdataDocument.csvDataModel.dataStringsMatrix2D.count
-                {
-                    self.associatedCSVdataDocument.csvDataModel.dataStringsMatrix2D[row] += padSuffix
-                }
-            }
-            
-            //append the new rows onto array
-            for row in 0..<csvdata!.dataStringsMatrix2D.count
-            {
-                //make a row template to change individual cells
-                var newRow = StringsArray1D(count: lastColumn, repeatedValue: "")
-                for colnumber in 0..<lookupMatrixOfNewColumns.count
-                {
-                    guard
-                        //[x] returns optionals so we force unwrap
-                        let validCN = Int(lookupMatrixOfNewColumns[colnumber])
-                    else {continue}
-                    //replace the cell in the template row with the value in the new csvdata array, place into old columns if matched or new cols if not
-                    //the colnumber is our lookup
-                    newRow[validCN] = csvdata!.dataStringsMatrix2D[row][colnumber]
-                }
-                //append new row to existing
-                self.associatedCSVdataDocument.csvDataModel.dataStringsMatrix2D.append(newRow)
-            }
+            var newUniqueColHeaders = self.associatedCSVdataDocument.csvDataModel.mergeCSVdataAndReturnUniqueHeaders(csvdata)
             
             //NOW it is safe to add table columns
             for col in 0..<newUniqueColHeaders.count
@@ -183,14 +140,20 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
                 self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(newUniqueColHeaders[col]))
             }
             
-            //clean up
-            self.documentMakeDirty()
-            self.tvCSVdata.reloadData()
+            self.cleanUp(makeDirty:true)
         }
     }
     
     
     // MARK: - merge by lookup
+    
+    func appendTheseParametersIntoColumn(params params:SetOfStrings, intoColumn:Int, padValue:String)
+    {
+        self.associatedCSVdataDocument.csvDataModel.appendTheseParametersIntoColumn(params: params, intoColumn: intoColumn, padValue: padValue)
+        self.cleanUp(makeDirty: true)
+    }
+
+    
     func lookupNewColumnsFromCSVdata(lookupCSVdata lookupCSVdata:CSVdata, lookupColumn:Int, columnsToAdd:NSIndexSet)
     {
         guard
@@ -204,10 +167,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(newUniqueColHeaders[col]))
         }
         
-        //clean up
-        self.documentMakeDirty()
-        self.tvCSVdata.reloadData()
-    
+        self.cleanUp(makeDirty:true)
     }
     // MARK: - extracting CSV data table
 
@@ -232,10 +192,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
             {
                 if self.associatedCSVdataDocument.csvDataModel.deletedRowsAtIndexes(self.tvCSVdata.selectedRowIndexes) == true
                 {
-                    self.tvCSVdata.reloadData()
-                    self.updateRowCountLabel()
-                    self.updateRowsButtonsEnabled()
-                    self.associatedCSVdataDocument.documentMakeDirty()
+                    self.cleanUp(makeDirty:true)
                 }
             }
         }
@@ -252,7 +209,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
    func columnsClearAndRebuild(){
         
         self.associatedCSVdataDocument.columnsClearAndRebuild(self.tvCSVdata)
-        self.updateRowCountLabel()
+        self.cleanUp(makeDirty:false)
     }
     
     func renameColumnAtIndex(columnIndex: Int, newName:String)
@@ -322,8 +279,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         
         //Safe to delete column to table now
         self.tvCSVdata.removeTableColumn(self.tvCSVdata.tableColumns[columnIndex])
-        self.tvCSVdata.reloadData()
-        self.documentMakeDirty()
+        self.cleanUp(makeDirty:true)
         return true
     }
     
@@ -350,9 +306,8 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     func addTableColumnAndScrollWithTitle(title:String)
     {
         self.tvCSVdata.addTableColumn(NSTableColumn.columnWithUniqueIdentifierAndTitle(title))
-        self.tvCSVdata.reloadData()
+        self.cleanUp(makeDirty:true)
         self.tvCSVdata.scrollColumnToVisible(self.tvCSVdata.numberOfColumns-1)
-        self.documentMakeDirty()
     }
     // MARK: - TableView overrides
     func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
