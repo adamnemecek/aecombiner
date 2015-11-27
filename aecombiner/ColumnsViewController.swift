@@ -11,13 +11,17 @@ import SpriteKit
 
 class ColumnsViewController: ColumnSortingChartingViewController {
     
-    
+    // MARK: - var
+    var arrayMatchParameters =  StringsArray1D()
+
     
     // MARK: - @IBOutlet
     @IBOutlet weak var tvHeaders: NSTableView!
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     @IBOutlet weak var buttonModel: NSButton!
     @IBOutlet weak var buttonTrash: NSButton!
+
+    @IBOutlet weak var tvMatchColumnParameters: NSTableView!
 
     // MARK: - @IBAction
     @IBAction func renameColumn(sender: AnyObject) {
@@ -106,6 +110,8 @@ class ColumnsViewController: ColumnSortingChartingViewController {
         
         switch tableView
         {
+        case self.tvMatchColumnParameters:
+            return self.arrayMatchParameters.count
         case self.tvHeaders:
             return csvdo.numberOfColumnsInData()
         default:
@@ -127,6 +133,9 @@ class ColumnsViewController: ColumnSortingChartingViewController {
             else {return cellView}
             cellView = csvdatamodel.cellForHeadersTable(tableView: tableView, row: row)
             
+        case self.tvMatchColumnParameters:
+            cellView = tableView.makeViewWithIdentifier("cell", owner: self) as! NSTableCellView
+            cellView.textField!.stringValue = self.arrayMatchParameters[row]
         default:
             break
         }
@@ -144,17 +153,49 @@ class ColumnsViewController: ColumnSortingChartingViewController {
         {
         case self.tvHeaders:
             self.enableButtons(enabled: tableView.selectedRowIndexes.count>0)
+            self.matchParametersExtract()
         default:
             break
         }
     }
 
+    // MARK: - Sorting Tables on header click
+    override func tableView(tableView: NSTableView, mouseDownInHeaderOfTableColumn tableColumn: NSTableColumn) {
+        // inheriteds override
+        switch tableView
+        {
+        case self.tvMatchColumnParameters:
+            tableView.sortParametersAsStringsArray1DInTableViewColumn(tableColumn: tableColumn, arrayToSort: &self.arrayMatchParameters, textOrValue: self.segmentedSortAsTextOrNumbers.selectedSegment)
+            tableView.reloadData()
+        default: break
+        }
+        
+    }
+
+    
     func enableButtons(enabled enabled:Bool)
     {
         self.buttonModel?.enabled = enabled
         self.buttonTrash?.enabled = enabled
     }
 
+    // MARK: - match
+    func matchParametersExtract()
+    {
+        guard
+            let newparams = self.associatedCSVmodel?.stringsArray1DOfParametersFromColumn(fromColumn: self.tvHeaders.selectedRow, replaceBlank: true)
+            else
+        {
+            self.arrayMatchParameters = StringsArray1D()
+            self.tvMatchColumnParameters.reloadData()
+            return
+        }
+        self.arrayMatchParameters = newparams
+        self.tvMatchColumnParameters.reloadData()
+    }
+
+    
+    
 }
 
 

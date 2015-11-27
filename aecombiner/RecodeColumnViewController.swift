@@ -99,6 +99,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var textFieldBooleanNewValue: NSTextField!
     @IBOutlet weak var textFieldBooleanColumnRecodeNewValue: NSTextField!
     @IBOutlet weak var textFieldDateFormatString: NSTextField!
+    @IBOutlet weak var textFieldDateAddIncrement: NSTextField!
 
     @IBOutlet weak var tabbedVrecoding: NSTabView!
     //@IBOutlet weak var tabbedVvalueOrColumn: NSTabView!
@@ -127,6 +128,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
     @IBOutlet weak var progressSetValue: NSProgressIndicator!
     
     @IBOutlet weak var checkboxCopyUnmatchedValues: NSButton!
+    @IBOutlet weak var checkboxDateAddIncrement: NSButton!
     
     // MARK: - @IBAction
 
@@ -571,6 +573,7 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
         
         var recodedOK = false
         let formatString = self.textFieldDateFormatString.stringValue
+        let addIncrement = self.checkboxDateAddIncrement.state == NSOnState ? self.textFieldDateAddIncrement.doubleValue : 0.0
         
         switch self.radio_DateTimeMethod_Selected
         {
@@ -587,8 +590,9 @@ class RecodeColumnViewController: ColumnSortingChartingViewController, NSTabView
                 let roundingunits = DateTimeRoundingUnits(rawValue: roundingString)
             else {return}
             
+            
             let newTitle = csvdo.headerStringForColumnIndex(columnIndexStart)+"->"+csvdo.headerStringForColumnIndex(columnIndexEnd)
-            recodedOK = csvdVC.calculatedDateTimeToNewColumn(withTitle: newTitle, startColumn: columnIndexStart, endColumn: columnIndexEnd, formatMethod: formatMethod, formatString: formatString, roundingUnits: roundingunits, copyUnmatchedValues: self.checkboxCopyUnmatchedValues.state == NSOnState)
+            recodedOK = csvdVC.calculatedDateTimeToNewColumn(withTitle: newTitle, startColumn: columnIndexStart, endColumn: columnIndexEnd, formatMethod: formatMethod, formatString: formatString, roundingUnits: roundingunits, copyUnmatchedValues: self.checkboxCopyUnmatchedValues.state == NSOnState, addIncrement: addIncrement)
             
         }
         

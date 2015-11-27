@@ -68,6 +68,27 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         }
     }
 
+    @IBAction func autoSizeColumnsTapped(sender: AnyObject) {
+        guard
+            let  cellView = self.tvCSVdata.makeViewWithIdentifier("csvCell", owner: self) as? NSTableCellView
+            else {return}
+        var maxwidth:CGFloat
+        for tvcol in self.tvCSVdata.tableColumns
+        {
+            maxwidth = tvcol.width
+            let colIndex = self.tvCSVdata.columnWithIdentifier(tvcol.identifier)
+            for row in 0..<self.associatedCSVdataDocument.csvDataModel.numberOfRowsInData()
+            {
+                cellView.textField!.stringValue = self.associatedCSVdataDocument.csvDataModel.stringValueForCell(fromColumn: colIndex, atRow: row)!
+                cellView.textField!.sizeToFit()
+                maxwidth = fmax(maxwidth, cellView.textField!.frame.size.width)
+                print(maxwidth)
+            }
+        }
+        
+        
+    }
+    
     @IBAction func buttonExportSelectedRowsTapped(sender: AnyObject) {
         self.associatedCSVdataDocument.csvDataModel.createNewDocumentFromRowsInIndexSet(rows: self.tvCSVdata.selectedRowIndexes, docName: "Untitled")
 
@@ -293,10 +314,10 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
         return true
     }
 
-    func calculatedDateTimeToNewColumn(withTitle title:String, startColumn:Int, endColumn:Int, formatMethod:DateTimeFormatMethod, formatString:String, roundingUnits:DateTimeRoundingUnits, copyUnmatchedValues: Bool)->Bool
+    func calculatedDateTimeToNewColumn(withTitle title:String, startColumn:Int, endColumn:Int, formatMethod:DateTimeFormatMethod, formatString:String, roundingUnits:DateTimeRoundingUnits, copyUnmatchedValues: Bool, addIncrement: Double)->Bool
     {
         guard
-            self.associatedCSVdataDocument.csvDataModel.calculatedDateTimeToNewColumn(withTitle: title, startColumn: startColumn, endColumn: endColumn, formatMethod: formatMethod, formatString: formatString, roundingUnits: roundingUnits, copyUnmatchedValues: copyUnmatchedValues)
+            self.associatedCSVdataDocument.csvDataModel.calculatedDateTimeToNewColumn(withTitle: title, startColumn: startColumn, endColumn: endColumn, formatMethod: formatMethod, formatString: formatString, roundingUnits: roundingUnits, copyUnmatchedValues: copyUnmatchedValues, addIncrement: addIncrement)
             else {return false}
         //Safe to add column to table now
         self.addTableColumnAndScrollWithTitle(title)

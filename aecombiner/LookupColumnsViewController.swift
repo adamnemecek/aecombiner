@@ -19,7 +19,6 @@ class LookupColumnsViewController: TwoColumnsViewController
         }
     }
     
-    var arrayMatchParameters =  StringsArray1D()
     var arrayImportColParameters =  StringsArray1D()
 
     // MARK: - @IBOutlet
@@ -29,7 +28,6 @@ class LookupColumnsViewController: TwoColumnsViewController
  
     @IBOutlet weak var popupMatchColumn: NSPopUpButton!
     
-    @IBOutlet weak var tvMatchColumnParameters: NSTableView!
     @IBOutlet weak var tvImportColumnParameters: NSTableView!
     
     @IBOutlet weak var checkboxAddZeroes: NSButton!
@@ -143,6 +141,21 @@ class LookupColumnsViewController: TwoColumnsViewController
         self.enableButtons(enabled: true)
     }
     
+    // MARK: - match
+    override func matchParametersExtract()
+    {
+        guard
+            let newparams = self.lookupCSVdata.stringsArray1DOfParametersFromColumn(fromColumn: self.popupMatchColumn.indexOfSelectedItem, replaceBlank: true)
+            else
+        {
+            self.arrayMatchParameters = StringsArray1D()
+            self.tvMatchColumnParameters.reloadData()
+            return
+        }
+        self.arrayMatchParameters = newparams
+        self.tvMatchColumnParameters.reloadData()
+    }
+    
     // MARK: - header Popups
     func populateHeaderPopups()
     {
@@ -159,16 +172,7 @@ class LookupColumnsViewController: TwoColumnsViewController
         switch popup
         {
         case self.popupMatchColumn:
-            guard
-                let newparams = self.lookupCSVdata.stringsArray1DOfParametersFromColumn(fromColumn: self.popupMatchColumn.indexOfSelectedItem, replaceBlank: true)
-            else
-            {
-                self.arrayMatchParameters = StringsArray1D()
-                self.tvMatchColumnParameters.reloadData()
-                return
-            }
-            self.arrayMatchParameters = newparams
-            self.tvMatchColumnParameters.reloadData()
+            self.matchParametersExtract()
         default:
             break
         }
