@@ -20,10 +20,17 @@ class ColumnsViewController: ColumnSortingChartingViewController {
     @IBOutlet weak var textFieldColumnRecodedName: NSTextField!
     @IBOutlet weak var buttonModel: NSButton!
     @IBOutlet weak var buttonTrash: NSButton!
+    @IBOutlet weak var buttonViewParameters: NSButton!
 
     @IBOutlet weak var tvMatchColumnParameters: NSTableView!
 
     // MARK: - @IBAction
+    
+    
+    @IBAction func viewParameterstapped(sender: AnyObject) {
+        self.matchParametersExtract(erase: false)
+    }
+    
     @IBAction func renameColumn(sender: AnyObject) {
         guard
             let csdo = self.associatedCSVdataViewController
@@ -153,7 +160,7 @@ class ColumnsViewController: ColumnSortingChartingViewController {
         {
         case self.tvHeaders:
             self.enableButtons(enabled: tableView.selectedRowIndexes.count>0)
-            self.matchParametersExtract()
+            self.matchParametersExtract(erase: true)
         default:
             break
         }
@@ -177,14 +184,16 @@ class ColumnsViewController: ColumnSortingChartingViewController {
     {
         self.buttonModel?.enabled = enabled
         self.buttonTrash?.enabled = enabled
+        self.buttonViewParameters?.enabled = enabled
     }
 
     // MARK: - match
-    func matchParametersExtract()
+    func matchParametersExtract(erase erase:Bool)
     {
         guard
+            erase == false,
             let newparams = self.associatedCSVmodel?.stringsArray1DOfParametersFromColumn(fromColumn: self.tvHeaders.selectedRow, replaceBlank: true)
-            else
+        else
         {
             self.arrayMatchParameters = StringsArray1D()
             self.tvMatchColumnParameters.reloadData()

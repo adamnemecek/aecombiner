@@ -69,24 +69,7 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
 
     @IBAction func autoSizeColumnsTapped(sender: AnyObject) {
-        guard
-            let  cellView = self.tvCSVdata.makeViewWithIdentifier("csvCell", owner: self) as? NSTableCellView
-            else {return}
-        var maxwidth:CGFloat
-        for tvcol in self.tvCSVdata.tableColumns
-        {
-            maxwidth = tvcol.width
-            let colIndex = self.tvCSVdata.columnWithIdentifier(tvcol.identifier)
-            for row in 0..<self.associatedCSVdataDocument.csvDataModel.numberOfRowsInData()
-            {
-                cellView.textField!.stringValue = self.associatedCSVdataDocument.csvDataModel.stringValueForCell(fromColumn: colIndex, atRow: row)!
-                cellView.textField!.sizeToFit()
-                maxwidth = fmax(maxwidth, cellView.textField!.frame.size.width)
-                print(maxwidth)
-            }
-        }
-        
-        
+        self.tvCSVdata.sizeColumnsToFitWidestValueAndHeader(csvdata: self.associatedCSVdataDocument.csvDataModel, cellIdentifier: "csvCell")
     }
     
     @IBAction func buttonExportSelectedRowsTapped(sender: AnyObject) {

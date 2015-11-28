@@ -68,4 +68,43 @@ class TwoColumnsViewController: ColumnsViewController {
         self.buttonCopyColumns?.enabled = self.tvHeaders.selectedRowIndexes.count > 0
     }
 
+    // MARK: - TableView overrides
+    
+    override func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+        guard let csvdo = self.associatedCSVmodel else {return 0}
+        
+        print(tableView.identifier)
+        switch tableView
+        {
+        case self.tvHeaders:
+            return csvdo.numberOfColumnsInData()
+        default:
+            return 0
+        }
+    }
+    
+    
+    override func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+        // Retrieve to get the @"MyView" from the pool or,
+        // if no version is available in the pool, load the Interface Builder version
+        var cellView = NSTableCellView()
+        
+        switch tableView
+        {
+        case self.tvHeaders:
+            guard
+                let csvdatamodel = self.associatedCSVmodel
+                else {return cellView}
+            cellView = csvdatamodel.cellForHeadersTable(tableView: tableView, row: row)
+            
+        default:
+            break
+        }
+        
+        
+        // Return the cellView
+        return cellView;
+    }
+    
+
 }

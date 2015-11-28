@@ -142,7 +142,7 @@ class LookupColumnsViewController: TwoColumnsViewController
     }
     
     // MARK: - match
-    override func matchParametersExtract()
+    override func matchParametersExtract(erase erase:Bool)
     {
         guard
             let newparams = self.lookupCSVdata.stringsArray1DOfParametersFromColumn(fromColumn: self.popupMatchColumn.indexOfSelectedItem, replaceBlank: true)
@@ -172,7 +172,7 @@ class LookupColumnsViewController: TwoColumnsViewController
         switch popup
         {
         case self.popupMatchColumn:
-            self.matchParametersExtract()
+            self.matchParametersExtract(erase: false)
         default:
             break
         }

@@ -29,9 +29,11 @@ extension NSTableColumn
         col.title = title
         col.sizeToFit()
         col.minWidth = col.width
+        col.maxWidth = CGFloat.max
         col.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: true)
         return col
     }
+    
 }
 
 extension NSTableView
@@ -97,5 +99,38 @@ extension NSTableView
         
         tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: nil, ascending: !sortdirection)
     }
+    
+    func sizeColumnsToFitWidestValueAndHeader(csvdata csvdata:CSVdata, cellIdentifier:String)
+    {
+        guard
+            let  cellView = self.makeViewWithIdentifier(cellIdentifier, owner: self) as? NSTableCellView
+            else {return}
+        var maxwidth:CGFloat
+        for originalColumn in self.tableColumns
+        {
+            maxwidth = cellView.sizeToFitString(originalColumn.title)
+            let colIndex = self.columnWithIdentifier(originalColumn.identifier)
+            for row in 0..<csvdata.numberOfRowsInData()
+            {
+                maxwidth = fmax(maxwidth, cellView.sizeToFitString(csvdata.stringValueForCell(fromColumn: colIndex, atRow: row)))
+            }
+            originalColumn.width = maxwidth+3.0
+        }
 
+        self.reloadData()
+
+    }
+
+}
+
+extension NSTableCellView
+{
+    func sizeToFitString(text:String?)->CGFloat
+    {
+        if text == nil || self.textField == nil {return 0.0}
+
+        self.textField!.stringValue = text!
+        self.textField!.sizeToFit()
+        return self.textField!.frame.size.width
+    }
 }
