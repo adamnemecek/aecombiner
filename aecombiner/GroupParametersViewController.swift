@@ -50,7 +50,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
             else {return}
 
         //let arrayOfExtractedParametersToGroupBy = self.arrayOfExtractedParametersToGroupBy()
-        csdo.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: columnsToGroupTogether())
+        csdo.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: columnsToGroupTogether(), columnIndexToRecord: nil)
     }
     
     @IBAction func popupGroupByButtonSelected(sender: NSPopUpButton) {

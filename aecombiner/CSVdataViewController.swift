@@ -85,11 +85,17 @@ class CSVdataViewController: NSViewController, NSTableViewDataSource, NSTableVie
     }
     
     override func validateMenuItem(menuItem: NSMenuItem) -> Bool {
-        if menuItem.title == "Paste Columns Merged"
+        
+        switch menuItem.title
         {
+        case "Paste Columns Merged":
             return NSPasteboard.generalPasteboard().stringForType(NSPasteboardTypeTabularText) != nil
+        case "Merge…", "Copy Columns For Merge…":
+            return true
+        default:
+            return super.validateMenuItem(menuItem)
         }
-        return super.validateMenuItem(menuItem)
+        
     }
 
     // MARK: - document
