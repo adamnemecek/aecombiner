@@ -23,6 +23,7 @@ class LookupColumnsViewController: TwoColumnsViewController
 
     // MARK: - @IBOutlet
 
+    @IBOutlet weak var labelImportFileName: NSTextField!
     @IBOutlet weak var buttonImportMissingFromMatched: NSButton!
     @IBOutlet weak var buttonExportMissingValues: NSButton!
  
@@ -195,6 +196,7 @@ class LookupColumnsViewController: TwoColumnsViewController
         types.append("csv")
         types.append("txt")
         panel.allowedFileTypes = types
+        self.labelImportFileName.stringValue = ""
         if panel.runModal() == NSFileHandlingPanelOKButton
         {
             self.lookupFromURL(panel.URL)
@@ -221,6 +223,8 @@ class LookupColumnsViewController: TwoColumnsViewController
             break
         }
         self.lookupCSVdata = csvdata
+        self.labelImportFileName.stringValue = urlname
+
     }
     
     func performLookupAndMerge()
