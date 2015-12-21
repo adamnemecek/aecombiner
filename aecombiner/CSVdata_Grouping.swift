@@ -337,6 +337,7 @@ extension CSVdata
 
                 //allocate
                 statsForGroup[paramID] = running
+                print(running.recordedValues)
             }
         }
         let nameOfColumn:String = self.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: kGroupAllStats)

@@ -22,11 +22,13 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     @IBOutlet weak var labelNumberOfParameterOrGroupingItems: NSTextField!
     @IBOutlet weak var tvGroupHeadersSecondary: NSTableView!
     
+    @IBOutlet weak var checkBoxListAEs: NSButton!
     @IBOutlet weak var buttonModelByGrouping: NSButton!
     @IBOutlet weak var buttonCombineColumns: NSButton!
     @IBOutlet weak var buttonExtractAllStatistics: NSButton!
     @IBOutlet weak var popupGroupMethod: NSPopUpButton!
     @IBOutlet weak var popupGroupBy: NSPopUpButton!
+    @IBOutlet weak var popupListAETerms: NSPopUpButton!
 
     // MARK: - @IBAction
 
@@ -50,7 +52,7 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
             else {return}
 
         //let arrayOfExtractedParametersToGroupBy = self.arrayOfExtractedParametersToGroupBy()
-        csdo.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: columnsToGroupTogether(), columnIndexToRecord: nil)
+        csdo.combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping: self.popupGroupBy.indexOfSelectedItem, columnIndexesToGroup: columnsToGroupTogether(), columnIndexToRecord: self.checkBoxListAEs.state == NSOnState && self.popupListAETerms.indexOfSelectedItem > -1 ? self.popupListAETerms.indexOfSelectedItem : nil)
     }
     
     @IBAction func popupGroupByButtonSelected(sender: NSPopUpButton) {
@@ -105,11 +107,14 @@ class GroupParametersViewController: ColumnSortingChartingViewController {
     // MARK: - header Popups
     func populateHeaderPopups()
     {
-        self.popupGroupBy.removeAllItems()
+        self.popupGroupBy?.removeAllItems()
+        self.popupListAETerms?.removeAllItems()
         guard let csvdo = self.associatedCSVdataDocument?.csvDataModel where csvdo.headersStringsArray1D.count>0
             else { return}
-        self.popupGroupBy.addItemsWithTitles(csvdo.headerStringsForAllColumns())
-        self.popupGroupBy.selectItemAtIndex(-1)
+        self.popupGroupBy?.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popupGroupBy?.selectItemAtIndex(-1)
+        self.popupListAETerms?.addItemsWithTitles(csvdo.headerStringsForAllColumns())
+        self.popupListAETerms?.selectItemAtIndex(-1)
     }
 
     func popupChangedSelection(popup: NSPopUpButton)
