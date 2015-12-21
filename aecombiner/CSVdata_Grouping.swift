@@ -287,7 +287,7 @@ extension CSVdata
         return NamedDataMatrix(matrix:csvDataData, name:nameOfNewColumn)
     }
     
-    func combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet)->CSVdata//(cvsdata:CSVdata, name:String)
+    func combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, columnIndexToRecord:Int?)->CSVdata//(cvsdata:CSVdata, name:String)
     {
         guard let arrayOfParamatersInColumnToGroupBy = self.stringsArray1DOfParametersFromColumn(fromColumn: columnIndexForGrouping, replaceBlank: true)
             else {return CSVdata()}
@@ -328,6 +328,14 @@ extension CSVdata
                     running.logCount += 1
                 }
                 else { running.skippedLogs++ }
+                
+                //add recording
+                if columnIndexToRecord != nil && self.stringValueForCell(fromColumn: columnIndexToRecord!, atRow: row) != nil
+                {
+                    running.recordedValues.append([self.stringValueForCell(fromColumn: columnIndexToRecord!, atRow: row)!:value])
+                }
+
+                //allocate
                 statsForGroup[paramID] = running
             }
         }
@@ -364,7 +372,7 @@ extension CSVdata
         return CSVdata(headers: headers, csvdata: finalDatamatrix, name: nameOfColumn)
     }
     
-    func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet)
+    func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, columnIndexToRecord:Int?)
     {
         // check OK to group
         guard
@@ -376,7 +384,7 @@ extension CSVdata
         
         
         //extract the rows and present
-        let stats = self.combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup)
+        let stats = self.combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, columnIndexToRecord: columnIndexToRecord)
         
         CSVdata.createNewDocumentFromCVSDataAndColumnName(cvsData: stats, name: "All Stats("+stats.name+") by "+self.headerStringForColumnIndex(columnIndexForGrouping))
     }
