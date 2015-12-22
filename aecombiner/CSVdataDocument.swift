@@ -35,8 +35,24 @@ let kGroupAllStats = "AllStats"
 let kCsvDataData_column_groupingIDs = 0// in a [[String]] of combined CVSdata 0 is the ids and 1 is the data
 let kCsvDataData_column_value = 1
 
-typealias AETERMandValue = [String : Double]//this is the raw value and the AETERM or other value
-typealias AEsAndValuesArray = [AETERMandValue]
+struct AEscoreColumnAndValue
+{
+    var columnIndex: Int
+    var value: Double
+    
+    init(index:Int, val:Double)
+    {
+        columnIndex = index
+        value = val
+    }
+}
+struct AETERM_Scores
+{
+    var AETERMname = ""
+    var AEScoresArray = [AEscoreColumnAndValue]()
+}
+
+typealias AETERM_ScoresArray = [AETERM_Scores]
 
 struct AggregatedStats {
     var minm:Double = Double(Int.max)
@@ -48,10 +64,10 @@ struct AggregatedStats {
     var logCount:Int = 0
     var skippedValues = 0
     var skippedLogs = 0
-    var recordedValues = AEsAndValuesArray()
+    var AEscores = AETERM_ScoresArray()
 }
 
-
+typealias AggregatedStatsDict = [String : AggregatedStats]
 
 
 

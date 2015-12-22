@@ -287,15 +287,15 @@ extension CSVdata
         return NamedDataMatrix(matrix:csvDataData, name:nameOfNewColumn)
     }
     
-    func combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, columnIndexToRecord:Int?)->CSVdata//(cvsdata:CSVdata, name:String)
+    func combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, columnIndexToRecord:Int?)->[CSVdata]//first is the data, second is an aggregate of AEscores if needed
     {
         guard let arrayOfParamatersInColumnToGroupBy = self.stringsArray1DOfParametersFromColumn(fromColumn: columnIndexForGrouping, replaceBlank: true)
-            else {return CSVdata()}
+            else {return [CSVdata()]}
         
         //create a dict with the keys the params we extracted for grouping
         //make a blank array to hold the values associated with the grouping for each member of the group
         //Doubles for adding and multiplying, Ints for counting - to avoud decimal places in counts string
-        var statsForGroup = [String : AggregatedStats]()
+        var statsForGroup = AggregatedStatsDict()
         for parameter in arrayOfParamatersInColumnToGroupBy
         {
             statsForGroup[parameter] = AggregatedStats()
@@ -305,12 +305,23 @@ extension CSVdata
 
         for row in 0..<self.numberOfRowsInData()
         {
-            guard let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row) else {continue}
+            guard
+                // lookup the USERID or other param
+                let paramID = self.stringValueForCell(fromColumn: columnIndexForGrouping, atRow: row),
+                //lookup the aggregated stats stats for this USERID so far
+                var running = statsForGroup[paramID]
+            else {continue}
+            
+            var AEscoresForRow = AETERM_Scores()
+            if columnIndexToRecord != nil && self.stringValueForCell(fromColumn: columnIndexToRecord!, atRow: row) != nil
+            {
+                AEscoresForRow.AETERMname = self.stringValueForCell(fromColumn: columnIndexToRecord!, atRow: row)!
+            }
+            
             for columnIndexInGroup in columnIndexesToGroup
             {
                 guard
-                    let rowValS = self.stringValueForCell(fromColumn: columnIndexInGroup, atRow: row),
-                    var running = statsForGroup[paramID]
+                    let rowValS = self.stringValueForCell(fromColumn: columnIndexInGroup, atRow: row)
                 else {continue}
                 
                 guard
@@ -329,17 +340,21 @@ extension CSVdata
                 }
                 else { running.skippedLogs++ }
                 
-                //add recording
-                if columnIndexToRecord != nil && self.stringValueForCell(fromColumn: columnIndexToRecord!, atRow: row) != nil
+                //add scores from column in this row
+                if columnIndexToRecord != nil
                 {
-                    running.recordedValues.append([self.stringValueForCell(fromColumn: columnIndexToRecord!, atRow: row)!:value])
+                    let newScore = AEscoreColumnAndValue(index: columnIndexInGroup, val: value)
+                    AEscoresForRow.AEScoresArray.append(newScore)
                 }
-
-                //allocate
-                statsForGroup[paramID] = running
-                print(running.recordedValues)
             }
+            if columnIndexToRecord != nil
+            {
+                running.AEscores.append(AEscoresForRow)
+            }
+            //re-allocate aggregated stats back to the dict now all columns in row aggregated
+            statsForGroup[paramID] = running
         }
+        
         let nameOfColumn:String = self.nameForColumnsUsingGroupMethod(columnIndexesToGroup: columnIndexesToGroup, groupMethod: kGroupAllStats)
         let headers:StringsArray1D = [self.headerStringForColumnIndex(columnIndexForGrouping),"Count("+nameOfColumn+")","Sum("+nameOfColumn+")","Log Sum("+nameOfColumn+")","Product("+nameOfColumn+")","Max("+nameOfColumn+")","Min("+nameOfColumn+")","Range("+nameOfColumn+")","Log Range("+nameOfColumn+")","Mean("+nameOfColumn+")","GeoMean("+nameOfColumn+")","Skipped Values("+nameOfColumn+")","Skipped Logs("+nameOfColumn+")"]
         
@@ -370,7 +385,45 @@ extension CSVdata
             rowS.append(String(stats.skippedLogs))
             CSVdata.appendThisStringsArray1DToStringsMatrix2D(matrix2DToBeAppendedTo: &finalDatamatrix, array1DToAppend: rowS)
         }
-        return CSVdata(headers: headers, csvdata: finalDatamatrix, name: nameOfColumn)
+        
+        var csvdataArray = [CSVdata]()
+        //first add the actual data, must be 0 element
+        csvdataArray.append(CSVdata(headers: headers, csvdata: finalDatamatrix, name: nameOfColumn))
+        //now add other data if needed
+        if columnIndexToRecord != nil
+        {
+            //add the other data
+            let csvd = self.makeCSVDataFromAggregatedStats(stats: statsForGroup)
+        }
+
+        return csvdataArray
+    }
+    
+    func makeCSVDataFromAggregatedStats(stats statsForGroup:AggregatedStatsDict)->CSVdata?
+    {
+        //createTheCSVdata
+        nned to consider layout
+        parameter...
+        aeterm...scores
+        
+        var finalDatamatrix = StringsMatrix2D()
+        for (parameter,stats) in statsForGroup
+        {
+            var rowS = StringsArray1D()
+            rowS.append(parameter)
+            for score in stats.AEscores
+            {
+                rowS.append(score.AETERMname)
+                for scoretypevalue in score.AEScoresArray
+                {
+                    
+                }
+            }
+
+            CSVdata.appendThisStringsArray1DToStringsMatrix2D(matrix2DToBeAppendedTo: &finalDatamatrix, array1DToAppend: rowS)
+        }
+        
+        return nil
     }
     
     func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, columnIndexToRecord:Int?)
@@ -386,8 +439,8 @@ extension CSVdata
         
         //extract the rows and present
         let stats = self.combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, columnIndexToRecord: columnIndexToRecord)
-        
-        CSVdata.createNewDocumentFromCVSDataAndColumnName(cvsData: stats, name: "All Stats("+stats.name+") by "+self.headerStringForColumnIndex(columnIndexForGrouping))
+        // stats is a [CSVData] where 0 = the data, 1+ is extra sheets of aggregated recorded values etc. 0 is alwyas there even if blank
+        CSVdata.createNewDocumentFromCVSDataAndColumnName(cvsData: stats[0], name: "All Stats("+stats[0].name+") by "+self.headerStringForColumnIndex(columnIndexForGrouping))
     }
 
 
