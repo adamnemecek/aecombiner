@@ -393,37 +393,55 @@ extension CSVdata
         if columnIndexToRecord != nil
         {
             //add the other data
-            let csvd = self.makeCSVDataFromAggregatedStats(stats: statsForGroup)
+            csvdataArray.append(self.makeCSVDataFromAggregatedStats(stats: statsForGroup, columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, columnIndexToRecord: columnIndexToRecord!))
         }
 
         return csvdataArray
     }
     
-    func makeCSVDataFromAggregatedStats(stats statsForGroup:AggregatedStatsDict)->CSVdata?
+    func makeCSVDataFromAggregatedStats(stats statsForGroup:AggregatedStatsDict, columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, columnIndexToRecord:Int)->CSVdata
     {
-        //createTheCSVdata
-        nned to consider layout
-        parameter...
-        aeterm...scores
         
-        var finalDatamatrix = StringsMatrix2D()
-        for (parameter,stats) in statsForGroup
+        //make a sorted array from the grouped cols
+        var colsArray = [Int]()
+        for index in columnIndexesToGroup
         {
-            var rowS = StringsArray1D()
-            rowS.append(parameter)
-            for score in stats.AEscores
-            {
-                rowS.append(score.AETERMname)
-                for scoretypevalue in score.AEScoresArray
-                {
-                    
-                }
-            }
-
-            CSVdata.appendThisStringsArray1DToStringsMatrix2D(matrix2DToBeAppendedTo: &finalDatamatrix, array1DToAppend: rowS)
+            colsArray.append(index)
+        }
+        colsArray.sortInPlace()
+        
+        //make a headers
+        var colNamesArray = StringsArray1D()
+        colNamesArray.append(self.headersStringsArray1D[columnIndexForGrouping])
+        colNamesArray.append(self.headersStringsArray1D[columnIndexToRecord])
+        for i in 0..<colsArray.count
+        {
+            colNamesArray.append(self.headersStringsArray1D[colsArray[i]])
         }
         
-        return nil
+        var finalDatamatrix = StringsMatrix2D()
+        //add the headers
+        CSVdata.appendThisStringsArray1DToStringsMatrix2D(matrix2DToBeAppendedTo: &finalDatamatrix, array1DToAppend: colNamesArray)
+        //now add the rows
+        for (parameter,stats) in statsForGroup
+        {
+            for score in stats.AEscores
+            {
+                var rowS = [String](count: colsArray.count+2, repeatedValue: "*")
+                rowS[0] = parameter
+                rowS[1] = score.AETERMname
+                for scoretypevalue in score.AEScoresArray
+                {
+                    guard
+                        let indexOfColIndex = colsArray.indexOf(scoretypevalue.columnIndex)
+                    else {continue}
+                    rowS[indexOfColIndex+2] = String(scoretypevalue.value)
+                }
+                CSVdata.appendThisStringsArray1DToStringsMatrix2D(matrix2DToBeAppendedTo: &finalDatamatrix, array1DToAppend: rowS)
+            }
+        }
+        
+        return CSVdata(headers: colNamesArray, csvdata: finalDatamatrix, name: colNamesArray[0]+"-"+colNamesArray[1])
     }
     
     func combineColumnsAndExtractAllStatsToNewDocument(columnIndexForGrouping columnIndexForGrouping:Int, columnIndexesToGroup: NSIndexSet, columnIndexToRecord:Int?)
@@ -441,6 +459,10 @@ extension CSVdata
         let stats = self.combinedColumnsAndNewColumnName_UsingAllMethods(columnIndexForGrouping: columnIndexForGrouping, columnIndexesToGroup: columnIndexesToGroup, columnIndexToRecord: columnIndexToRecord)
         // stats is a [CSVData] where 0 = the data, 1+ is extra sheets of aggregated recorded values etc. 0 is alwyas there even if blank
         CSVdata.createNewDocumentFromCVSDataAndColumnName(cvsData: stats[0], name: "All Stats("+stats[0].name+") by "+self.headerStringForColumnIndex(columnIndexForGrouping))
+        if columnIndexToRecord != nil && stats.count>1
+        {
+            CSVdata.createNewDocumentFromCVSDataAndColumnName(cvsData: stats[1], name: "All Stats listing("+stats[1].name+")")
+        }
     }
 
 
